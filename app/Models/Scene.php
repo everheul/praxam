@@ -112,16 +112,25 @@ class Scene extends Model
     }
 
     /**
-     * Get the id of the next scene.
-     * todo: select next scene of the same exam
+     * Get the id of the next scene of the given exam
      * 
      * @return int
      */
-    public function nextSceneId() {
-        $nextScene = DB::table('scenes')->select('id')->where('id','>',$this->id)->orderBy('id')->first();
+    public function nextSceneId($examId) {
+        $nextScene = DB::table('exam_scenes')
+            ->select('scene_id')
+            ->where('exam_id','=',$examId)
+            ->where('scene_id','>',$this->id)
+            ->orderBy('scene_id')
+            ->first();
         if (empty($nextScene)) {
-            $nextScene = DB::table('scenes')->select('id')->orderBy('id')->first();
+            $nextScene = DB::table('exam_scenes')
+                ->select('scene_id')
+                ->where('exam_id','=',$examId)
+                ->orderBy('scene_id')
+                ->first();
         }
         return (empty($nextScene)) ? 0 : $nextScene->id;
     }
+
 }

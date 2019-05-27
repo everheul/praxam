@@ -15,15 +15,12 @@ class UserSceneController extends Controller
     }
 
     /**
-     * Show the result of the Practice Exam taken.
-     * todo
+     * Display a list of the scenes of this prax?
      *
      * @return \Illuminate\Http\Response
      */
-    public function result($exuid) {
-
-        //$sidebar = (new SideBar)->practiceExam($exuid, 0);
-
+    public function index() {
+        dd(" -= TODO =- ");
     }
 
     /**
@@ -32,23 +29,23 @@ class UserSceneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($userexamid, $order) {
-        $userexam = UserExam::findOrFail($userexamid);
+    public function show($prax_id, $order) {
+        $userexam = UserExam::findOrFail($prax_id);
         if (($order > 0) && ($order <= $userexam->scene_count)) {
-            $userScene = $this->loadFullUserscene($userexamid, $order);
+            $userScene = $this->loadFullUserscene($prax_id, $order);
             $scene = $this->mergeUserscene( $this->loadFullScene($userScene->scene_id), $userScene);
             $nextId = $this->next($userexam, $order);
-            $sidebar = (new SideBar)->practiceExam($userexamid, $order);
+            $sidebar = (new SideBar)->practiceExam($prax_id, $order);
             return View('scene.show.type' . $scene->scene_type_id,
                 [ 'sidebar' => $sidebar,
                     'scene' => $scene,
                     'action' => 'ANSWER',
-                    'user' => ['exam' => $userexamid, 'order' => $order],
-                    'next' => "/examu/$userexamid/sceneu/$nextId/show"
+                    'user' => ['exam' => $prax_id, 'order' => $order],
+                    'next' => "/prax/$prax_id/scene/$nextId/show"
                 ]);
         } else {
             //- redirect to result
-            return redirect(url("/examu/$userexamid/result"));
+            return redirect(url("/examu/$prax_id/result"));
         }
     }
 

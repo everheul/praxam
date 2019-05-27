@@ -35,8 +35,8 @@ class ExamController extends Controller
      * @param  int $id
      * @return \\Illuminate\Http\Response
      */
-    public function show($examid) {
-        $exam = Exam::findOrFail($examid);
+    public function show($exam_id) {
+        $exam = Exam::findOrFail($exam_id);
         return View('exam.show',
             ['sidebar' => (new Sidebar)->examOverview($exam),
                 'exam' => $exam ]
@@ -54,6 +54,8 @@ class ExamController extends Controller
     }
 
     /**
+     * POST
+     *
      * Store a newly created exam.
      * TODO
      *
@@ -70,10 +72,10 @@ class ExamController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id) {
+    public function edit($exam_id) {
         $user = Auth::user();
         if (!empty($user) && $user->isAdmin()) {
-            $exam = Exam::findOrFail($id);
+            $exam = Exam::findOrFail($exam_id);
             return View('exam.edit',
                 [   'sidebar' => (new Sidebar)->examEdit($exam),
                     'exam' => $exam ]
@@ -86,6 +88,7 @@ class ExamController extends Controller
 
     /**
      * POST
+     *
      * Update the exam.
      * TODO: image test
      *
@@ -93,10 +96,10 @@ class ExamController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $exam_id) {
         $user = Auth::user();
         if (!empty($user) && $user->isAdmin()) {
-            $exam = Exam::findOrFail($id);
+            $exam = Exam::findOrFail($exam_id);
             $exam->fill($request->all());
             $image = $request->file('newimage');
             if (!empty($image)) {
@@ -114,8 +117,8 @@ class ExamController extends Controller
      * @param  int $id
      * @return \\Illuminate\Http\Response
      */
-    public function kill($id) {
-        $exam = Exam::findOrFail($id);
+    public function kill($exam_id) {
+        $exam = Exam::findOrFail($exam_id);
         $exam->delete();
         //$exam->deleted_at = \Carbon\Carbon::now();
         //$exam->update();

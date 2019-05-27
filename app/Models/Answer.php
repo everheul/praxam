@@ -29,6 +29,7 @@ class Answer extends Model
 {
     //- attributes
     private $checked = false;
+    private $disabled = false;
 
     /**
      * @var array

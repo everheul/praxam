@@ -10,6 +10,7 @@ use App\Models\UserScene;
 use App\Models\UserQuestion;
 use App\Models\UserAnswer;
 use App\Models\Answer;
+use App\Models\Question;
 
 class AjaxController extends Controller
 {

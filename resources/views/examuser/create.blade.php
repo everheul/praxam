@@ -10,7 +10,7 @@
                 <div class="examtext">
                     <h1 class="text-center">Take a Practice Exam</h1>
                     <h3 class="text-center">{{ $exam->name }}, {{ $exam->head }}</h3>
-                    <form method="post" action="/exam/{{ $exam->id }}/examu" enctype="multipart/form-data">
+                    <form method="post" action="/prax/{{ $exam->id }}/store" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         <input name="exam_id" type="hidden" value="{{ $exam->id }}">
                         <div class="form-group row">

@@ -17,7 +17,7 @@ class Sidebar
             $id = $exam->id;
             $this->sbarBlock($exam->name, $exam->head);
             $this->sbarButton('Back to Overview',"/exam",'dark');
-            $this->sbarButton('Start Practice Exam',"/exam/$id/examu",'dark');
+            $this->sbarButton('Start Practice Exam',"/prax/$id/create",'dark');
             //- todo: isAdmin($id) to test if it's the owner OR admin
             $user = Auth::user();
             if (!empty($user) && $user->isAdmin()) {
@@ -71,14 +71,14 @@ class Sidebar
     }
 
 
-    public function practiceExam($exuid, $order) {
+    public function practiceExam($prax_id, $order) {
         // load all userscenes and their userquestions objects
-        $userscenes = UserScene::where('userexam_id','=',$exuid)->orderBy('order')->with('userquestions')->get();
+        $userscenes = UserScene::where('userexam_id','=',$prax_id)->orderBy('order')->with('userquestions')->get();
         //dd($userscenes);
         foreach($userscenes as $us) {
             $scorder = $us->order;
             $head = "Scene $scorder";
-            $href = "/examu/$exuid/sceneu/$scorder/show";
+            $href = "/prax/$prax_id/scene/$scorder";
             //- show question result, lock answered questions.
             $locked = true;
             foreach ($us->userquestions as $uq) {
@@ -92,7 +92,7 @@ class Sidebar
             }
             $this->sbarScene($head,$href,$col);
         }
-        $this->sbarScene("View Score","/examu/$exuid/result","outline-dark");
+        $this->sbarScene("View Score","/examu/$prax_id/result","outline-dark");
         return $this->blocks;
     }
 

@@ -21,55 +21,90 @@ class UserExamController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
+    public function index() {
+        dd(" -= TODO =- ");
     }
 
     /**
-     * Show the form for creating a new UserExam of Exam $examid.
+     * Display all the info (result!) of the specified userexam.
+     * TODO
+     *
+     * @param  int $id
+     * @return \\Illuminate\Http\Response
+     */
+    public function show($prax_id) {
+        $userexam = UserExam::where('id', '=', $prax_id)->with('exams')->firstOrFail();
+        return View('userexam.show',
+            [   'sidebar' => (new Sidebar)->examOverview($userexam),
+                'userexam' => $userexam ]
+        );
+    }
+
+
+    /**
+     * Show the form for creating a new UserExam.
+     * NOTE: This needs an Exam $exam_id !
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($examid) {
-        $exam = Exam::findOrFail($examid);
+    public function create($exam_id) {
+        $exam = Exam::findOrFail($exam_id);
         $sidebar = (new Sidebar)->editUserExam($exam);
         return view('examuser.create',['sidebar' => $sidebar, 'exam' => $exam]);
     }
 
     /**
      * POST
+     *
      * Make a new Practice Exam: a UserExam with UserScenes and UserQuestions.
      * The UserAnswers will be created after answering the questions.
+     * NOTE: This gets an Exam $exam_id too!
      *
-     * @param  int  $examid
+     * @param  int  $exam_id
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store($examid, Request $request) {
+    public function store(Request $request, $exam_id) {
         // todo: check the route $examid with $request->examid ?
         $scene_count = $request->scene_count;
-        $userexamid = (new UserExam())->create($request->user()->id, $examid, $scene_count)->id;
-        $scenes = $this->getRandomScenes($examid, $scene_count);
+        $userexamid = (new UserExam())->create($request->user()->id, $exam_id, $scene_count)->id;
+        $scenes = $this->getRandomScenes($exam_id, $scene_count);
         $this->makeUserExamScenes($userexamid, $scenes);
-        return redirect(url("/examu/$userexamid/sceneu/1/show"));
+        return redirect(url("/prax/$userexamid/scene/1"));
     }
 
-    private function getRandomScenes($examid, $scene_count) {
+    /**
+     * Soft-delete the userexam.
+     *
+     * @param  int $prax_id
+     * @return \\Illuminate\Http\Response
+     */
+    public function kill($prax_id) {
+        $prax = Exam::findOrFail($prax_id);
+        $prax->delete();
+        return redirect(url("/prax"));
+    }
+
+    /**
+     * @param  int  $exam_id
+     * @param  int  $scene_count
+     * @return  mixed
+     */
+    private function getRandomScenes($exam_id, $scene_count) {
         //- todo: pick the scenes for a Practice Exam in a more sophisticated way,
         //- like the ones never done before, or failed to answer correctly.
         return DB::table('scenes')
             ->leftJoin('exam_scene', 'scenes.id', '=', 'exam_scene.scene_id')
-            ->where('exam_scene.exam_id', '=', $examid)
+            ->where('exam_scene.exam_id', '=', $exam_id)
             ->select('id')
             ->inRandomOrder()
             ->limit($scene_count)->get();
     }
 
-    private function makeUserExamScenes($userexamid, $scenes) {
+    private function makeUserExamScenes($prax_id, $scenes) {
         $order = 1;
         foreach($scenes as $scene) {
-            $us = (new UserScene())->create($userexamid, $scene->id, $order++);
+            $us = (new UserScene())->create($prax_id, $scene->id, $order++);
             $questions = $this->getSceneQuestionIds($scene);
             foreach($questions as $question) {
                 (new UserQuestion())->create($us->id, $question->id);
