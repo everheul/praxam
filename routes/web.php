@@ -26,28 +26,32 @@ Auth::routes();
 Route::post('/ajax', 'AjaxController@handle');
 
 //- users home page
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home'); //in progress
 
 //- all userexam (prax) actions
-Route::get('/prax', 'UserExamController@index');
 Route::prefix('/prax/{exam_id?}')->group(function () {
 	//- note: these two use the exam id!
 	Route::get('/create','UserExamController@create');
 	Route::post('/store','UserExamController@store');
 });
+Route::get('/prax', 'UserExamController@index');
+Route::get('/prax/{prax_id?}','UserExamController@show');
 Route::prefix('/prax/{prax_id?}')->group(function () {
 	Route::get('/show','UserExamController@show');
+	Route::get('/next','UserExamController@nextScene');
 	Route::get('/kill','UserExamController@kill');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
 	Route::get('/scene/{order?}','UserSceneController@show');
 	Route::get('/scene/{order?}/show','UserSceneController@show');
+	Route::post('/scene/{order?}/answer','UserSceneController@answer'); //todo
 });
 
 //--- authorized ADMINS only
 
 //- all exam actions
 Route::get('/exam', 'ExamController@index');
+Route::get('/exam/{exam_id?}', 'ExamController@show');
 Route::prefix('/exam/{exam_id?}')->group(function () {
 	Route::get('/show','ExamController@show');
 	Route::get('/create','ExamController@create');
@@ -57,6 +61,7 @@ Route::prefix('/exam/{exam_id?}')->group(function () {
 	Route::get('/kill','ExamController@kill');
 	//- all exam/scene actions
 	Route::get('/scene', 'SceneController@index');
+	Route::get('/scene/{scene_id?}', 'SceneController@show');
 	Route::prefix('/scene/{scene_id?}')->group(function () {
 		Route::get('/show','SceneController@show');
 		Route::get('/create','SceneController@create');

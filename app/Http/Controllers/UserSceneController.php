@@ -37,7 +37,7 @@ class UserSceneController extends Controller
             $nextId = $this->next($userexam, $order);
             $sidebar = (new SideBar)->practiceExam($prax_id, $order);
             return View('scene.show.type' . $scene->scene_type_id,
-                [ 'sidebar' => $sidebar,
+                [   'sidebar' => $sidebar,
                     'scene' => $scene,
                     'action' => 'ANSWER',
                     'user' => ['exam' => $prax_id, 'order' => $order],
@@ -45,7 +45,7 @@ class UserSceneController extends Controller
                 ]);
         } else {
             //- redirect to result
-            return redirect(url("/examu/$prax_id/result"));
+            return redirect(url("/prax/$prax_id/show"));
         }
     }
 
@@ -62,10 +62,12 @@ class UserSceneController extends Controller
 
     private function loadFullUserscene($userexamId, $order) {
         return UserScene::where('userexam_id','=',$userexamId)->where('order','=',$order)->with('userquestions','userquestions.useranswers')->firstOrFail();
+        //return $this->enumResults($prax);
     }
 
     private function loadFullScene($sceneId) {
-        return Scene::where('id', '=', $sceneId)->with('questions','questions.answers')->firstOrFail();
+        return (new SceneController())->getFullScene($sceneId);
+        //return Scene::where('id', '=', $sceneId)->with('questions','questions.answers')->firstOrFail();
     }
 
     /**
@@ -73,17 +75,18 @@ class UserSceneController extends Controller
      *
      * @param $scene
      * @param $userScene
-     */
+    **/
     private function mergeUserscene($scene, $userScene) {
         foreach($userScene->userquestions as $userquestion) {
             if (!is_null($userquestion->result)) {
                 $question = $scene->questions->find($userquestion->question_id);
                 if (!empty($question)) {
-                    $question->lock();
+                    $question->locked = true;
                     foreach($userquestion->useranswers as $useranswer) {
                         $answer = $question->answers->find($useranswer->answer_id);
                         if (!empty($answer)) {
-                            $answer->check();
+                            $answer->checked = true;
+                            $answer->order = $useranswer->order;
                         }
                     }
                 }
@@ -92,5 +95,27 @@ class UserSceneController extends Controller
         return $scene;
     }
 
+    /**
+     * Set the UserScenes' result & locked values until locked.
+     *
+     * @param  UserScene  $prax
+     * @return  UserScene
+    private function enumResults(UserScene $prax) {
+        if (empty($prax->locked)) {
+            $tot = 0;
+            $locked = 1;
+            foreach ($prax->userquestions as $uq) {
+                if (is_null($uq->result)) {
+                    $locked = 0;
+                } else {
+                    $tot += $uq->result;
+                }
+            }
+            $prax->locked = $locked;
+            $prax->result = $tot;
+            $prax->update();
+        }
+        return $prax;
+    }     */
 
 }

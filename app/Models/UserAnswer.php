@@ -6,13 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserAnswer extends Model
 {
-
+    public $timestamps = false; 
+    
     protected $table = 'useranswers';
+
+    //- fields that may be filled by create() and update();
+    //  all others will be ignored without warning (!)
+    protected $fillable = [ 'userquestion_id', 'answer_id', 'order'];
 
     /**
      * The relation with userquestions (OneToMany Inverse)
      */
-    public function userquestions() {
+    public function userquestion() {
         return $this->belongsTo('App\Models\UserQuestion', 'id', 'userquestion_id');
     }
 
@@ -20,24 +25,8 @@ class UserAnswer extends Model
      * The relation with answers (OneToMany Inverse)
      * todo: used?
      */
-    public function answers() {
+    public function answer() {
         return $this->belongsTo('App\Models\Answers', 'id', 'answer_id');
-    }
-
-    /**
-     * Initiate and save the useranswer
-     *
-     * @param $uqid
-     * @param $aid
-     * @param $order
-     * @return $this
-     */
-    public function create($uqid, $aid, $order) {
-        $this->userquestion_id = $uqid;
-        $this->answer_id = $aid;
-        $this->order = $order;
-        $this->save();
-        return $this;
     }
 
 }

@@ -19,12 +19,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class UserExam extends Model
 {
+    use SoftDeletes;
 
+    //- no standard name for the user tables, for better readability.
     protected $table = 'userexams';
+
+    protected $dates = ['deleted_at'];
+
+    //- fields that may be filled by create() and update();
+    //  all others will be ignored without warning (!)
+    protected $fillable = [ 'user_id', 'exam_id', 'scene_count'];
 
     /**
      * The relation with userscenes (OneToMany)
@@ -36,24 +45,14 @@ class UserExam extends Model
     /**
      * The relation with exams (OneToMany Inverse)
      */
-    public function exams() {
-        return $this->belongsTo('App\Models\Exam', 'id', 'exam_id');
+    public function exam() {
+        return $this->belongsTo('App\Models\Exam');
     }
 
     /**
      * The relation with users (OneToMany Inverse)
      */
-    public function users() {
-        return $this->belongsTo('App\Models\User', 'id', 'user_id');
+    public function user() {
+        return $this->belongsTo('App\Models\User');
     }
-
-
-    public function create($userid, $examid, $scene_count) {
-        $this->user_id = $userid;
-        $this->exam_id = $examid;
-        $this->scene_count = $scene_count;
-        $this->save();
-        return $this;
-    }
-
 }

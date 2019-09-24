@@ -26,7 +26,8 @@ class Scene extends Model
 {
     use SoftDeletes;
 
-    //private $questions = [];
+    protected $appends = ['locked'];
+
 
     /**
      * @var array
@@ -48,6 +49,7 @@ class Scene extends Model
     }
     
     /**
+     * todo?
      * The relation with scene-types (OneToMany Inverse)
      */
     public function sceneType() {
@@ -61,10 +63,36 @@ class Scene extends Model
         return $this->hasMany('App\Models\UserScene', 'scene_id', 'id');
     }
 
+
+
+    /**
+     * JSON list with question data for template <scripts> sections, to be used by the accordion.
+     * Note: the Scene must be loaded with questions.
+     */
+    public function questionTypes(): string {
+        $a = [];
+        $q = $this->questions;
+        foreach($q as $question) {
+            $a[] = Array('id' => $question->id,
+                'type' => $question->question_type_id,
+                'first' => $question->is_first,
+                'last' => $question->is_last);
+        }
+        return json_encode($a);
+    }
+
+    /**
+     * the first question of this scene, used by template
+     */
+    public function first_question(): Question {
+        return $this->questions[0];
+    }
+
+
     /**
      * the questions belonging to this scene, cached in correct order
      * @return Collection
-     */
+     *
     public function getQuestions(): Collection {
         if (empty($this->questions)) {
             $this->questions = $this->questions()
@@ -76,15 +104,8 @@ class Scene extends Model
     }
 
     /**
-     * the first (only?) question of this scene
-     */
-    public function first_question(): Question {
-        return $this->getQuestions()[0];
-    }
-
-    /**
      * let the accordion know what's what
-     */
+     *
     private function setFirstLast() {
         $last = count($this->questions);
         $n = 1;
@@ -96,26 +117,10 @@ class Scene extends Model
     }
 
     /**
-     * JSON list with question data to be used in template <scripts> sections.
-     */
-    public function questionTypes(): string {
-        $a = [];
-        $q = $this->getQuestions();
-        foreach($q as $question) {
-            $a[] = Array('id' => $question->id,
-                    'type' => $question->question_type_id,
-                    'first' => $question->isFirst,
-                    'last' => $question->isLast);
-        }
-        // this might return false?
-        return json_encode($a);
-    }
-
-    /**
      * Get the id of the next scene of the given exam
      * 
      * @return int
-     */
+     *
     public function nextSceneId($examId) {
         $nextScene = DB::table('exam_scenes')
             ->select('scene_id')
@@ -132,5 +137,5 @@ class Scene extends Model
         }
         return (empty($nextScene)) ? 0 : $nextScene->id;
     }
-
+*/
 }

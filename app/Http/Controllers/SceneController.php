@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\URL;
 
 class SceneController extends Controller
 {
+    /*
     public function __construct(Request $request) {
         $this->middleware(['auth','admin']);
     }
+    */
 
     /**
      * Display a listing of the exam scenes.
@@ -34,7 +36,8 @@ class SceneController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($exam_id, $scene_id) {
-        $scene = Scene::findOrFail($scene_id);
+        //$scene = Scene::findOrFail($scene_id);
+        $scene = $this->getFullScene($scene_id);
         $sidebar = (new Sidebar())->sceneExams($scene);
         //dd($sidebar);
         return View( 'scene.show.type'.$scene->scene_type_id,
@@ -42,7 +45,7 @@ class SceneController extends Controller
                 'scene' => $scene,
                 'user' => ['exam' => 0, 'scene' => 0],
                 'action' => 'IGNORE',
-                'next' => "/scene/" . $scene->nextSceneId() . "/show"
+                'next' => "/exam/$exam_id/scene/" . $this->nextSceneId($exam_id, $scene_id) . "/show"
             ]);
     }
 
@@ -122,6 +125,55 @@ class SceneController extends Controller
     public function kill($exam_id, $scene_id) {
         $scene = Scene::findOrFail($scene_id);
         $scene->delete();
+    }
+
+    //--------
+
+    /**
+     * get a scene with its question(s) and answers
+     */
+    public function getFullScene($scene_id) {
+        $scene = Scene::where('id', '=', $scene_id)->with('questions','questions.answers')->firstOrFail();
+        if ($scene->scene_type_id == 2) {
+            $this->setFirstLastQuestions($scene);
+        }
+        return $scene;
+    }
+
+    /**
+     * let the accordion know what's what
+     * todo when the questions' orders are set in db
+     *
+     * @param  Scene  $scene
+     */
+    private function setFirstLastQuestions(Scene $scene) {
+        $last = count($scene->questions); // $scene->question_count
+        $n = 1;
+        foreach($scene->questions as &$question) {
+            $question->is_first = ($n == 1) ? true : false;
+            $question->is_last = ($n == $last) ? true : false;
+            $question->order = $n;
+            $n += 1;
+        }
+    }
+
+    private function nextSceneId($exam_id, $scene_id) {
+        $nextScene = DB::table('exam_scenes')
+            ->select('scene_id')
+            ->where('exam_id','=',$exam_id)
+            ->where('scene_id','>',$scene_id)
+            ->orderBy('scene_id')
+            ->select('scene_id')
+            ->first();
+        if (empty($nextScene)) {
+            $nextScene = DB::table('exam_scenes')
+                ->select('scene_id')
+                ->where('exam_id','=',$exam_id)
+                ->orderBy('scene_id')
+                ->select('scene_id')
+                ->first();
+        }
+        return (empty($nextScene)) ? 0 : $nextScene->id;
     }
 
 }

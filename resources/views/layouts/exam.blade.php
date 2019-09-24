@@ -17,7 +17,7 @@
 @endpush
 
 @section('body')
-    <div id="mainapp" class="container-fluid">
+    <div id="mainapp" class="container-fluid clearfix">
 
         <!-- toprow -->
         @include('components.toprow',['align' => 'left'])

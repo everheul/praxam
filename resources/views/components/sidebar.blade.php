@@ -1,7 +1,7 @@
 {{-- components / sidebar
     uses: $sidebar
 --}}
-<div id="sidebar">
+<div id="sidebar" class="clearfix">
     <div class="sidebar-arrow">
     </div>
     @foreach ($sidebar as $block)

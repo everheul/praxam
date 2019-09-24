@@ -12,7 +12,7 @@
                 @isset($scene->head)
                     <h3>{{ $scene->head }}</h3>
                 @endisset
-                @include('question.show.type' . $scene->first_question()->question_type_id, ['question' => $scene->first_question()])
+                @include('question.show.type' . $scene->questions[0]->question_type_id, ['question' => $scene->questions[0] ])
             </div>
         </div>
     </div>

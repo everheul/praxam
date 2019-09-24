@@ -81,12 +81,13 @@ class AjaxController extends Controller
 
         //- store the selected answers
         foreach($data['answers'] as $order => $aid) {
-            (new UserAnswer())->create($uq->id, intval($aid), $order + 1);
+            (new UserAnswer())->create(['userquestion_id' => $uq->id, 'answer_id' => intval($aid), 'order' => $order + 1]);
         }
 
         //- calc and store the result
         $uq->calcResult($question, $data['answers']);
         $us->checkResult();
+        //- todo: $data['userexam'] -> checkResult()
     }
 
     private function answerToDisk($user, $data) {

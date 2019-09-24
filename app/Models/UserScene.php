@@ -9,35 +9,32 @@ use App\Models\Scene;
 /**
  * Class UserScene
  * @package App\Models
- *
-    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `userscene_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-    `question_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `order` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-    `result` SMALLINT(6) NULL DEFAULT NULL,
- *
+ * 
  * Register the userexams scenes.
  */
 
 class UserScene extends Model
 {
-    public $timestamps = false;
+    
+    public $timestamps = false; // same as userexam or questions
 
     protected $table = 'userscenes';
+
+    //- fields that may be filled by create() and update();
+    //  all others will be ignored without warning (!)
+    protected $fillable = [ 'userexam_id', 'scene_id', 'order'];
 
     /**
      * The relation with userexams (OneToMany Inverse)
      */
-    public function userexams() {
+    public function userexam() {
         return $this->belongsTo('App\Models\UserExam', 'id', 'userexam_id');
     }
 
     /**
      * The relation with scenes (OneToMany Inverse)
      */
-    public function scenes() {
+    public function scene() {
         return $this->belongsTo('App\Models\Scene', 'id', 'scene_id');
     }
 
@@ -50,8 +47,7 @@ class UserScene extends Model
 
 
     /**
-     * Initiate and save this model to get a valid id.
-     *
+     * Initiate and save this userscene:
      *      $userscene = (new UserScene)->create($userexamid, $sceneid, $order);
      *      $id = $userscene->id;
      *
@@ -59,7 +55,6 @@ class UserScene extends Model
      * @param int $sceneid
      * @param int $order
      * @return $this
-     */
     public function create($userexamid, $sceneid, $order) {
         $this->userexam_id = $userexamid;
         $this->scene_id = $sceneid;
@@ -67,26 +62,31 @@ class UserScene extends Model
         $this->save();
         return $this;
     }
+*/
 
     /**
-     * Calc and store the result (question result total)
+     * Calc and store the result (questions result total)
      * ..or null if one or more questions were not answered yet.
      *
-     * Called from AjaxController.
+     * Called from AjaxController. todo
      */
     public function checkResult() {
-        if (is_null($this->result)) {
-            $result = 0;
-            $questions = $this->userquestions()->select('result')->get();
-            foreach ($questions as $question) {
-                if (is_null($question->result)) {
-                    return null;
+        if (empty($this->locked)) {
+            $tot = 0;
+            $locked = 1;
+            $userquestions = $this->userquestions()->select('result')->get();
+            foreach ($userquestions as $userquestion) {
+                if (is_null($userquestion->result)) {
+                    $locked = 0;
+                } else {
+                    $tot += $userquestion->result;
                 }
-                $result += $question->result;
             }
-            $this->result = $result;
+            $this->result = $tot;
+            $this->locked = 1;
         }
-        $this->save();
+        $this->update();
         return $this->result;
     }
+
 }

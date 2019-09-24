@@ -13,13 +13,13 @@
                 </div>
             </div>
         @endforeach
-        <button id="done_{{ $question->id }}" class="btn btn-outline-danger px-4 py-1 mt-2" {{ $question->locked() ? 'disabled' : '' }}>Done</button>
+        <button id="done_{{ $question->id }}" class="btn btn-outline-danger px-4 py-1 mt-2" {{ $question->locked ? 'disabled' : '' }}>Done</button>
     </div>
-    <div id="ëxpo_{{ $question->id }}" style="{{ $question->locked() ? '' : 'display:none' }}" >
+    <div id="ëxpo_{{ $question->id }}" style="{{ $question->locked ? '' : 'display:none' }}" >
         <div class="mt-3 px-3 pt-3 explanation">
             <h4>Explanation:</h4>
             {!! $question->explanation !!}
         </div>
-        <button id="next_{{ $question->id }}" class="btn btn-success px-4 py-1 mt-3" >Continue</button>
+        <button id="next_{{ $question->id }}" class="btn btn-success px-4 py-1 my-3" >Continue</button>
     </div>
 </question>

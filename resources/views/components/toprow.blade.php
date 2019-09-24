@@ -2,7 +2,7 @@
     named slots:
     arguments: $align (left,=right)
 --}}
-<div id="toprow" class="navbar navbar-expand-md navbar-light bg-faded navbar-laravel appcolor">
+<div id="toprow" class="navbar navbar-expand-md navbar-light bg-faded appcolor">
     <div  class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
             {{ config('app.name') }}

@@ -3,13 +3,20 @@
 #sidebar {
     background: linear-gradient(to top, #f8fff6, #e6f7e1);
     display: block;
-    position: absolute;
-    left: 0;
-    top: 62px;
+/*  position: absolute; */
+    float: left;
+/*  left: 0;
+    top: 0;
+    padding-top: 60px; */
+    padding-bottom: 16px;
     width: 250px;
-    bottom: 0;
+    height: 100%;
     z-index: 99;
     transition: all 0.3s;
+    border-right: 1px solid #d9ead4;
+    border-bottom: 1px solid #d9ead4;
+    -moz-border-radius-bottomright: .25rem;
+    border-bottom-right-radius: .25rem;
 }
 
 /* the sidebar is 250px wide, and moves from 0 to -230 (by margin) if "active" */
@@ -40,55 +47,24 @@
         margin-left: 250px;
     }
     #content.active {
-        margin-left: 0;
+        margin-left: 20px;
     }
 }
-/*
-#sidebar ul.components {
-    padding: 20px 0;
-}
-#sidebar ul p {
-    padding: 10px;
-}
-#sidebar ul li a {
-    padding: 10px;
-    font-size: 1.1em;
-    display: block;
-}
-#sidebar ul li a:hover {
-    text-decoration: none;
-}
-#sbtag {
-    position: relative;
-    right: 0;
-    top: 10px;
-    display: inline-block;
-}
-*/
-
 .sidebar-arrow {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 66 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='rgba(0, 0, 0, 0.7)' stroke-miterlimit='10' d='M0 20L30 10L30 30L0 20Z M66 20L36 30L36 10L66 20Z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 70 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='rgba(0, 0, 0, 0.7)' stroke-miterlimit='10' d='M0 20L30 10L30 30L0 20Z M66 20L36 30L36 10L66 20Z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right;
     height: 28px;
     padding: 4px 0;
-    margin: 2px;
-    border: 2px solid #d9ead4;
-    border-radius: .25rem;
+    margin: 0;
+    border-bottom: 1px solid #d9ead4;
+/*    border: 2px solid #d9ead4;
+    border-radius: .25rem; */
     cursor: pointer;
 }
 .sidebar-arrow:hover {
     background-color: white;
 }
-/*
-#sidebar .sidebar-arrow {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M0 20L30 10L30 30L0 20Z'/%3E%3C/svg%3E");
-}
-#sidebar.active .sidebar-arrow {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M10 10L40 20L10 30L10 10Z'/%3E%3C/svg%3E");
-}
-*/
-
 .sbarhead {
     text-align: center;
 }
@@ -102,7 +78,6 @@
     line-height: 16px;
     margin: 12px auto 4px;
 }
-
 .sbarblock {
     border-radius: .25rem;
     border: none;

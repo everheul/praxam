@@ -22,8 +22,9 @@
         if (sc.type == 2) {
             $("#accordion").accordion();
             $("#accordion").accordion({
-                "header": "ui-icon-triangle-1-e",
-                "activeHeader": "ui-icon-triangle-1-s"
+                header: "ui-icon-triangle-1-e",
+                activeHeader: "ui-icon-triangle-1-s",
+                collapsible: true
             });
             //- skip earlier answered questions, if any:
             selectAccordionNext();
@@ -187,20 +188,24 @@
     }
 
     function selectAccordionNext() {
+        var done = true;
         if (sc.type == 2) {
+            var active = $('#accordion').accordion('option', 'active');
             $.each(ql, function(index, obj){
-                /* activate the first question NOT having the Done button disabled  */
-                if ($("#done_" + obj.id).prop('disabled') != true) {
-                    $( "#accordion" ).accordion("option", 'active', index);
-                    return false;
+                /* activate the next question NOT having the Done button disabled  */
+                if ((done) && (index > active)) {
+                    if ($("#done_" + obj.id).prop('disabled') != true) {
+                        $("#accordion").accordion("option", 'active', index);
+                        done = false;
+                    }
                 }
             });
         }
-        return true;
+        return done;
     }
 
-    function nextQuestion(data) {
-        if (selectAccordionNext()) {
+    function nextQuestion() {
+        if (selectAccordionNext() === true) {
             window.location.href = "{{ url($next) }}";
         }
     }

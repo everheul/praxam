@@ -26,6 +26,18 @@ class UserExamController extends Controller
     }
 
     /**
+     * Jump to the first scene that yet has to be answered
+     */
+    public function nextScene($prax_id) {
+        $us = DB::table('userscenes')->where('userexam_id','=',$prax_id)->where('locked',0)->select('order')->first();
+        //dd($us);
+        if (!empty($us)) {
+            return redirect(url("/prax/$prax_id/scene/".$us->order));
+        }
+        return $this->show($prax_id); //- show result
+    }
+
+    /**
      * Display all the info (result!) of the specified userexam.
      * TODO
      *
@@ -33,9 +45,9 @@ class UserExamController extends Controller
      * @return \\Illuminate\Http\Response
      */
     public function show($prax_id) {
-        $userexam = UserExam::where('id', '=', $prax_id)->with('exams')->firstOrFail();
+        $userexam = UserExam::where('id', '=', $prax_id)->with('exam')->firstOrFail();
         return View('userexam.show',
-            [   'sidebar' => (new Sidebar)->examOverview($userexam),
+            [   'sidebar' => (new Sidebar)->examResult($userexam),
                 'userexam' => $userexam ]
         );
     }
@@ -50,7 +62,7 @@ class UserExamController extends Controller
     public function create($exam_id) {
         $exam = Exam::findOrFail($exam_id);
         $sidebar = (new Sidebar)->editUserExam($exam);
-        return view('examuser.create',['sidebar' => $sidebar, 'exam' => $exam]);
+        return view('userexam.create',['sidebar' => $sidebar, 'exam' => $exam]);
     }
 
     /**
@@ -67,7 +79,7 @@ class UserExamController extends Controller
     public function store(Request $request, $exam_id) {
         // todo: check the route $examid with $request->examid ?
         $scene_count = $request->scene_count;
-        $userexamid = (new UserExam())->create($request->user()->id, $exam_id, $scene_count)->id;
+        $userexamid = (new UserExam())->create(['user_id' => $request->user()->id, 'exam_id' => $exam_id, 'scene_count' => $scene_count])->id;
         $scenes = $this->getRandomScenes($exam_id, $scene_count);
         $this->makeUserExamScenes($userexamid, $scenes);
         return redirect(url("/prax/$userexamid/scene/1"));
@@ -80,9 +92,9 @@ class UserExamController extends Controller
      * @return \\Illuminate\Http\Response
      */
     public function kill($prax_id) {
-        $prax = Exam::findOrFail($prax_id);
+        $prax = UserExam::findOrFail($prax_id);
         $prax->delete();
-        return redirect(url("/prax"));
+        return redirect(url("/home"));
     }
 
     /**
@@ -104,10 +116,10 @@ class UserExamController extends Controller
     private function makeUserExamScenes($prax_id, $scenes) {
         $order = 1;
         foreach($scenes as $scene) {
-            $us = (new UserScene())->create($prax_id, $scene->id, $order++);
+            $us = (new UserScene())->create(['userexam_id'=>$prax_id, 'scene_id' => $scene->id, 'order' => $order++]);
             $questions = $this->getSceneQuestionIds($scene);
             foreach($questions as $question) {
-                (new UserQuestion())->create($us->id, $question->id);
+                (new UserQuestion())->create(['userscene_id' => $us->id, 'question_id' => $question->id]);
             }
         }
     }
@@ -115,5 +127,6 @@ class UserExamController extends Controller
     private function getSceneQuestionIds($scene) {
         return DB::table('questions')->where('scene_id', '=', $scene->id)->orderBy('order')->select('id')->get();
     }
+
 
 }

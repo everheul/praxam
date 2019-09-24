@@ -5,24 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection as Collection;
 use App\Models\Answer;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Question
- * @package App\Models
- *
- * Every question belongs to exactly 1 scene and is the owner of some (multiple-choice) answers.
- *
- * TABLE `questions` (
- * `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
- * `scene_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
- * `question_type_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
- * `order` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'if more questions per scene',
- * `head` VARCHAR(191) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
- * `text` VARCHAR(5000) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
- * `explanation` VARCHAR(5000) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
- * `points` SMALLINT(6) NULL DEFAULT '0',
- * `answer_count` TINYINT(4) UNSIGNED NULL DEFAULT '0',
- * `old_question_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
  *
  *  question_type_id:
  *  1 - One correct answer only (radioboxes)
@@ -33,26 +19,34 @@ use App\Models\Answer;
  */
 class Question extends Model
 {
-    //- property
-    private $locked = false;
+    use SoftDeletes;
+    
+    /**
+     * Appended Attribute with Accessors and Mutators (getters & setters).
+     *
+     * @var  array
+     */
+    protected $appends = ['locked', 'is_first', 'is_last'];
 
     /**
+    //- fields that may be filled by create() and update();
+    //  all others will be ignored without warning (!)
+     *
      * @var array
      */
-    //protected $fillable = [ 'question_type_id', 'order', 'head', 'text', 'explanation', 'points'];
-
+    protected $fillable = [ 'scene_id', 'question_type_id', 'order', 'head', 'text', 'explanation', 'points', 'answer_count'];
 
     /**
      * The relation with scenes (OneToMany Inverse)
      */
-    public function scenes() {
+    public function scene() {
         return $this->belongsTo('App\Models\Scene', 'id', 'scene_id');
     }
 
     /**
      * The relation with question_types (OneToMany Inverse)
      */
-    public function questionTypes() {
+    public function questionType() {
         return $this->belongsTo('App\Models\QuestionType', 'id', 'question_type_id');
     }
 
@@ -70,30 +64,63 @@ class Question extends Model
         return $this->hasMany('App\Models\Answer');
     }
 
+    //------- Accessors and Mutators ------
+
+    /** locked Accessor
+     * @return  bool
+     */
+    public function getLockedAttribute() {
+        if (empty($this->attributes['locked'])) {
+            $this->attributes['locked'] = false;
+        }
+        return $this->attributes['locked'];
+    }
+
+    /** locked Mutator
+     * @param  bool  $locked
+     */
+    public function setLockedAttribute($locked) {
+        $locked = boolval($locked);
+        $this->attributes['locked'] = $locked;
+        if (!empty($this->answers)) {
+            foreach ($this->answers as $answer) {
+                $answer->setLockedAttribute($locked);
+            }
+        }
+    }
 
     /**
-     * the answers belonging to this question, cached in correct order
-     * @return Collection
-    public function getAnswers(): Collection {
-        if (empty($this->answers)) {
-            $this->answers = $this->answers()
-                ->orderBy('order')
-                ->get();
+     * @return  bool
+     */
+    public function getIsFirstAttribute() {
+        if (empty($this->attributes['is_first'])) {
+            $this->attributes['is_first'] = false;
         }
-        return $this->answers;
+        return $this->attributes['is_first'];
     }
-    */
 
-    public function lock() {
-        $this->locked = true;
-        foreach($this->answers as $answer) {
-            $answer->disable();
+    /**
+     * @param  bool  $is_first
+     */
+    public function setIsFirstAttribute($is_first) {
+        $this->attributes['is_first'] = boolval($is_first);
+    }
+
+    /**
+     * @return  bool
+     */
+    public function getIsLastAttribute() {
+        if (empty($this->attributes['is_last'])) {
+            $this->attributes['is_last'] = false;
         }
+        return $this->attributes['is_last'];
     }
 
-    public function locked() {
-        return $this->locked;
+    /**
+     * @param  bool  $is_last
+     */
+    public function setIsLastAttribute($is_last) {
+        $this->attributes['is_last'] = boolval($is_last);
     }
-
 
 }

@@ -6,19 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserQuestion extends Model
 {
+    public $timestamps = false; 
+    
     protected $table = 'userquestions';
+
+    //- fields that may be filled by create() and update();
+    //  all others will be ignored without warning (!)
+    protected $fillable = [ 'userscene_id', 'question_id'];
 
     /**
      * The relation with userscenes (OneToMany Inverse)
      */
-    public function userscenes() {
+    public function userscene() {
         return $this->belongsTo('App\Models\UserScene', 'id', 'userscene_id');
     }
 
     /**
      * The relation with questions (OneToMany Inverse)
      */
-    public function questions() {
+    public function question() {
         return $this->belongsTo('App\Models\Questions', 'id', 'question_id');
     }
 
@@ -29,16 +35,18 @@ class UserQuestion extends Model
         return $this->hasMany('App\Models\UserAnswer', 'userquestion_id', 'id');
     }
 
+    /*
     public function create($usid, $qid) {
         $this->userscene_id = $usid;
         $this->question_id = $qid;
         $this->save();
         return $this;
     }
+*/
 
     /**
-     * Store the questions points (if the answer was correct) or 0 in this UserQuestion.
-     * Called from AjaxController with the Question and its Answers loaded.
+     * Store the Question points (if the answer was correct) or 0 in UserQuestion.
+     * Called from AjaxController with the Question and its Answers loaded. (todo)
      * After this, this UserQuestion will be locked for ever.
      *
      * @param Question $question
@@ -61,10 +69,39 @@ class UserQuestion extends Model
         $this->save();
     }
 
+    /**
+     * Only one answer is correct and checked, make sure its the right one.
+     *
+     * @param $question
+     * @param $userAnswerIds
+     * @return int
+     */
     private function calcResultType1($question,$userAnswerIds) {
         foreach($question->answers as $answer) {
-            if ($answer->is_correct) {
-                if ($answer->id != $userAnswerIds[0]) {
+            if ($answer->id == $userAnswerIds[0]) {
+                if ($answer->is_correct) {
+                    return $question->points;
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * More answers are correct, make sure all those, and only those, were checked.
+     *
+     * @param $question
+     * @param $userAnswerIds
+     * @return int
+     */
+    private function calcResultType2($question,$userAnswerIds) {
+        foreach($question->answers as $answer) {
+            if (in_array($answer->id,$userAnswerIds)) {
+                if (!($answer->is_correct)) {
+                    return 0;
+                }
+            } else {
+                if ($answer->is_correct) {
                     return 0;
                 }
             }
@@ -72,29 +109,24 @@ class UserQuestion extends Model
         return $question->points;
     }
 
-    private function calcResultType2($question,$userAnswerIds) {
-        foreach($question->answers as $answer) {
-            if ($answer->is_correct) {
-                foreach($userAnswerIds as $uaid) {
-                    if ($answer->id == $uaid) {
-                        continue;
-                    }
-                }
-                return 0;
-            }
-        }
-        return $question->points;
-    }
-
+    /**
+     * More answers are correct and they have to be in the correct order.
+     *
+     * @param $question
+     * @param $userAnswerIds
+     * @return int
+     */
     private function calcResultType3($question,$userAnswerIds) {
         foreach($question->answers as $answer) {
             if ($answer->is_correct) {
-                foreach($userAnswerIds as $order => $uaid) {
-                    if (($answer->id == $uaid) && ($answer->order == $order + 1)) {
-                        continue;
-                    }
+                $pos = $answer->order - 1;
+                if (!((isset($userAnswerIds[$pos])) && ($userAnswerIds[$pos] == $answer->id))) {
+                    return 0;
                 }
-                return 0;
+            } else {
+                if (in_array($answer->id, $userAnswerIds)) {
+                    return 0;
+                }
             }
         }
         return $question->points;
