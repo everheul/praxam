@@ -46,7 +46,8 @@ class UserQuestion extends Model
 
     /**
      * Store the Question points (if the answer was correct) or 0 in UserQuestion.
-     * Called from AjaxController with the Question and its Answers loaded. (todo)
+     * Called from UserQuestionController with the Question and its Answers loaded.
+     * 
      * After this, this UserQuestion will be locked for ever.
      *
      * @param Question $question
@@ -66,7 +67,7 @@ class UserQuestion extends Model
                 break;
         }
         $this->result = $result;
-        $this->save();
+        $this->update();
     }
 
     /**

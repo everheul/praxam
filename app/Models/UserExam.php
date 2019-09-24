@@ -55,4 +55,18 @@ class UserExam extends Model
     public function user() {
         return $this->belongsTo('App\Models\User');
     }
+    
+    /**
+     * re-calculate the total result on this exam
+     */
+    public function checkResult()
+    {
+        $result = DB::table('userscenes')
+            ->where('userexam_id', '=', $this->id)
+            ->whereNotNull('result')
+            ->sum('userscenes.result');
+        $this->result = $result;
+        $this->update();
+    }
+    
 }

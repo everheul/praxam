@@ -68,7 +68,7 @@ class UserScene extends Model
      * Calc and store the result (questions result total)
      * ..or null if one or more questions were not answered yet.
      *
-     * Called from AjaxController. todo
+     * Called from UserQuestionController
      */
     public function checkResult() {
         if (empty($this->locked)) {
@@ -83,10 +83,9 @@ class UserScene extends Model
                 }
             }
             $this->result = $tot;
-            $this->locked = 1;
+            $this->locked = $locked;
         }
         $this->update();
-        return $this->result;
     }
 
 }

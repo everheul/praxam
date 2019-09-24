@@ -22,8 +22,8 @@ Auth::routes();
 
 //--- authorized USERS only
 
-//- AJAX path for all events; uses 'action' argument for distinction
-Route::post('/ajax', 'AjaxController@handle');
+//- AJAX path for all events; uses 'action' argument for distinction (obsolete)
+// Route::post('/ajax', 'AjaxController@handle');
 
 //- users home page
 Route::get('/home', 'HomeController@index')->name('home'); //in progress
@@ -44,8 +44,9 @@ Route::prefix('/prax/{prax_id?}')->group(function () {
 	Route::get('/scene', 'UserSceneController@index');
 	Route::get('/scene/{order?}','UserSceneController@show');
 	Route::get('/scene/{order?}/show','UserSceneController@show');
-	Route::post('/scene/{order?}/answer','UserSceneController@answer'); //todo
+	Route::post('/scene/{order?}/answer','UserQuestionController@userAnswer'); // todo: templates!
 });
+
 
 //--- authorized ADMINS only
 
