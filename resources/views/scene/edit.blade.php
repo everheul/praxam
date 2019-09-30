@@ -1,6 +1,7 @@
 {{-- exam.edit (admin)
      Open the forms of a scene, its questions and their answers.
 --}}
+{{-- obsolete --}}
 
 @extends('layouts.exam')
 

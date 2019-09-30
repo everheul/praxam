@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserQuestion extends Model
 {
-    public $timestamps = false; 
+    public $timestamps = false;
+
+    public $question = null;
     
     protected $table = 'userquestions';
 
@@ -43,6 +45,19 @@ class UserQuestion extends Model
         return $this;
     }
 */
+
+    /**
+     * set the pointer to the Question this UserQuestion belongs to
+     *  and let the UserAnswers do the same.
+     *
+     * @param Question $question
+     */
+    public function setQuestion(\App\Models\Question $question) {
+        $this->question = $question;
+        foreach($this->useranswers() as $useranswer) {
+            $useranswer->setAnswer($question->answers->find($useranswer->answer_id));
+        }
+    }
 
     /**
      * Store the Question points (if the answer was correct) or 0 in UserQuestion.

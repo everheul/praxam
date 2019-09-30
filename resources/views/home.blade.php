@@ -82,18 +82,18 @@
                     </table>
                 </div>
             </div>
-
+{{--
             @if(Auth::user()->isAdmin())
-                <div class="card">
-                    <div class="card-header">
-                        <h1>Admin Dashboard</h1>
-                    </div>
+                <div class="card w-100 home mt-2">
+                    <div class="card-header py-1">
+                        <h3>Admin Dashboard</h3>
+                </div>
                     <div class="card-body">
                         todo
                     </div>
                 </div>
             @endif
-
+--}}
         </div>
     </div>
 </div>

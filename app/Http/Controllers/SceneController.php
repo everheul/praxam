@@ -4,33 +4,56 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Scene as Scene;
-use App\Models\User;
+use App\Models\Exam;
+use App\Helpers\Helper as Helper;
 use App\Helpers\Sidebar as Sidebar;
 use DB;
 use Illuminate\Support\Facades\URL;
 
 class SceneController extends Controller
 {
-    /*
-    public function __construct(Request $request) {
-        $this->middleware(['auth','admin']);
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('args2session')->only('index');
     }
-    */
 
     /**
      * Display a listing of the exam scenes.
-     * TODO
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, $exam_id)
     {
-        return Scene::all();
+        //- all this needs 'args2session'
+        $page_base = str_replace('/','.',$request->path());
+        $this->registerPaginator($request,$page_base);
+        $paginate = $request->session()->get('paginate', 10);
+        $filter = $request->session()->get($page_base.'.filter', "");
+        $lf = Helper::likeFilter($filter);
+        $direction = $request->session()->get($page_base.'.direction', 'asc');
+        $sortby = $request->session()->get($page_base.'.sortby', 'id');
+        if (!in_array($sortby,['id','created_at','scene_type_id','head'])) $sortby = 'id';
+
+        //DB::enableQueryLog();
+        $exam = Exam::findOrFail($exam_id);
+        $scenes = $exam->scenes()->
+                where( function($q) use($lf) {
+                    $q->where('head', 'LIKE', $lf)->
+                        orWhere('text', 'LIKE', $lf)->
+                        orWhere('instructions', 'LIKE', $lf);
+                })->
+                orderBy($sortby, $direction)->
+                paginate($paginate);
+        //dd(DB::getQueryLog());
+        $sidebar = (new Sidebar)->editExamScenes($exam);
+        $data = compact('exam','scenes','paginate','filter','sortby','direction','sidebar');
+
+        return view('scene.index', $data);
     }
 
     /**
      * Show the scene. Admin mode, action IGNORE.
-     * todo: load scene questions and answers first (eager loading)
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -43,9 +66,9 @@ class SceneController extends Controller
         return View( 'scene.show.type'.$scene->scene_type_id,
             [   'sidebar' => $sidebar,
                 'scene' => $scene,
-                'user' => ['exam' => 0, 'scene' => 0],
+                'user' => ['exam' => 0, 'scene' => 0, 'order' => 0],
                 'action' => 'IGNORE',
-                'next' => "/exam/$exam_id/scene/" . $this->nextSceneId($exam_id, $scene_id) . "/show"
+                'next' => "/exam/$exam_id/scene/0", //  . $this->nextSceneId($exam_id, $scene_id) . "/show"
             ]);
     }
 
@@ -156,24 +179,22 @@ class SceneController extends Controller
             $n += 1;
         }
     }
-
+/*
     private function nextSceneId($exam_id, $scene_id) {
-        $nextScene = DB::table('exam_scenes')
+        $nextScene = DB::table('exam_scene')
             ->select('scene_id')
             ->where('exam_id','=',$exam_id)
             ->where('scene_id','>',$scene_id)
             ->orderBy('scene_id')
-            ->select('scene_id')
             ->first();
         if (empty($nextScene)) {
-            $nextScene = DB::table('exam_scenes')
+            $nextScene = DB::table('exam_scene')
                 ->select('scene_id')
                 ->where('exam_id','=',$exam_id)
                 ->orderBy('scene_id')
-                ->select('scene_id')
                 ->first();
         }
         return (empty($nextScene)) ? 0 : $nextScene->id;
     }
-
+*/
 }

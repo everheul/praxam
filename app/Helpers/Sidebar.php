@@ -13,19 +13,45 @@ class Sidebar
 {
     private $blocks = [];
 
-    public function examOverview($exam = null) {
+    /**
+     * Called from SceneController@index
+     * @param Exam $exam
+     * @return array
+     */
+    public function editExamScenes($exam = null) {
         if (!empty($exam)) {
             $id = $exam->id;
+            $this->sbarLink('Exams','overview',"/exam");
             $this->sbarBlock($exam->name, $exam->head);
-            $this->sbarButton('Back to Overview',"/exam",'dark');
             $this->sbarButton('Start Practice Exam',"/prax/$id/create",'dark');
-            //- todo: isAdmin($id) to test if it's the owner OR admin
             $user = Auth::user();
             if (!empty($user) && $user->isAdmin()) {
-                // todo: don't use id's in text
+                $this->sbarHead("Exam", 'Admin Controls');
+                $this->sbarButton('Edit Exam', "/exam/$id/edit/", 'dark');
+                $this->sbarButton('Cancel',"/exam/$id/show/",'dark');
+            }
+        }
+        return $this->blocks;
+    }
+
+    /**
+     *
+     * @param Exam $exam
+     * @return array
+     */
+    public function examOverview($exam = null)
+    {
+        if (!empty($exam)) {
+            $id = $exam->id;
+            $this->sbarLink('Exams','overview',"/exam");
+            $this->sbarBlock($exam->name, $exam->head);
+            $this->sbarButton('Start Practice Exam',"/prax/$id/create",'dark');
+            $user = Auth::user();
+            if (!empty($user) && $user->isAdmin()) {
                 $this->sbarHead("Exam", 'Admin Controls');
                 $this->sbarButton('Edit Exam',"/exam/$id/edit/",'dark');
-                $this->sbarButton('Delete Exam',"/exam/$id/kill/",'danger');
+    //            $this->sbarButton('Delete Exam',"/exam/$id/kill/",'danger'); //- todo:  onclick="return confirm(&quot;Click Ok to delete this Scene.&quot;)"
+                $this->sbarButton('Manage Scenes',"/exam/$id/scene/",'dark');
             }
         } else {
             $this->sbarHead('Exams','overview');
@@ -38,7 +64,6 @@ class Sidebar
     }
 
     public function examEdit($exam) {
-        // user was tested for admin
         $this->sbarLink('Exams','overview',"/exam");
         $this->sbarBlock($exam->name, $exam->head);
         $id = $exam->id;
@@ -47,20 +72,27 @@ class Sidebar
         return $this->blocks;
     }
 
+    /**
+     * Called from SceneController@show
+     * @param Exam $exam
+     * @return array
+     */
     public function sceneExams($scene) {
+        //- show all exams using this scene:
         $exams = $scene->exams()->get();
         foreach ($exams as $exam) {
             $this->sbarLink($exam->name,$exam->head,"/exam/".$exam->id."/show");
         }
+
         $this->sbarHead('Scene ' . $scene->id, 'Admin Controls');
         
-        $next = $scene->nextSceneId($scene->id);
-        if (!empty($next)) {
-            $this->sbarButton('Next Scene',"/scene/$next/show",'dark');
-        }
+     //   $next = $scene->nextSceneId($scene->id);
+     //   if (!empty($next)) {
+     //       $this->sbarButton('Next Scene',"/scene/$next/show",'dark');
+     //   }
 
-        $this->sbarButton('Edit Scene','/scene/'.$scene->id."/edit",'dark');
-        $this->sbarButton('Delete Scene','/scene/'.$scene->id."/kill",'danger');
+        $this->sbarButton('Edit Scene',"/exam/".$exam->id.'/scene/'.$scene->id."/edit",'dark');
+    //    $this->sbarButton('Delete Scene','/scene/'.$scene->id."/kill",'danger');
         return $this->blocks;
     }
 
@@ -85,7 +117,7 @@ class Sidebar
         $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
         $this->sbarBlock('Practice Exam',$prax->created_at);
         $this->userSceneList($prax->id, 0);
-        $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
+    //    $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
         return $this->blocks;
     }
 

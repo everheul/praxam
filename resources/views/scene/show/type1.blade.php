@@ -1,6 +1,6 @@
 {{-- scene.show.type1
      Show a scene of type 1, its question and answers.
-     input: $scene, $userScene, $sidebar, $action
+     input: $userscene, $sidebar, $action
 --}}
 
 @extends('layouts.exam')
@@ -12,7 +12,7 @@
                 @isset($scene->head)
                     <h3>{{ $scene->head }}</h3>
                 @endisset
-                @include('question.show.type' . $scene->questions[0]->question_type_id, ['question' => $scene->questions[0] ])
+                @include('question.type' . $userscene->userquestion()->question->question_type_id . '.show', ['userquestion' => $userscene->userquestion() ])
             </div>
         </div>
     </div>

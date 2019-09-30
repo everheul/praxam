@@ -1,6 +1,6 @@
 {{-- question.show.type1
-     Show a question of type 1 with its radiobox answers.
-     input: $userQuestion, $question
+     Show a question of type 1, with radiobox answers.
+     input: $userquestion, $question
 --}}
 <question id="{{ $question->id }}">
     {!! $question->text !!}
@@ -13,8 +13,9 @@
                 </div>
             </div>
         @endforeach
-        <button id="done_{{ $question->id }}" class="btn btn-outline-danger px-4 py-1 mt-2" {{ $question->locked ? 'disabled' : '' }}>Done</button>
+        <button id="done_{{ $question->id }}" class="btn btn-outline-danger px-4 py-1 mt-2" {{ $userquestion->locked ? 'disabled' : '' }}>Done</button>
     </div>
+
     <div id="ëxpo_{{ $question->id }}" style="{{ $question->locked ? '' : 'display:none' }}" >
         <div class="mt-3 px-3 pt-3 explanation">
             <h4>Explanation:</h4>

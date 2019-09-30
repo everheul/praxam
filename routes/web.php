@@ -27,25 +27,30 @@ Auth::routes();
 
 //- users home page
 Route::get('/home', 'HomeController@index')->name('home'); //in progress
+Route::get('/prax', 'HomeController@index');
+
 
 //- all userexam (prax) actions
+//- create userexam:
 Route::prefix('/prax/{exam_id?}')->group(function () {
-	//- note: these two use the exam id!
+	//- note: these two use the exam id, no user-exam yet!
 	Route::get('/create','UserExamController@create');
 	Route::post('/store','UserExamController@store');
 });
-Route::get('/prax', 'UserExamController@index');
-Route::get('/prax/{prax_id?}','UserExamController@show');
+//- show,
 Route::prefix('/prax/{prax_id?}')->group(function () {
+	Route::get('/','UserExamController@show');
+	Route::delete('/','UserExamController@destroy');
 	Route::get('/show','UserExamController@show');
 	Route::get('/next','UserExamController@nextScene');
-	Route::get('/kill','UserExamController@kill');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
 	Route::get('/scene/{order?}','UserSceneController@show');
 	Route::get('/scene/{order?}/show','UserSceneController@show');
-	Route::post('/scene/{order?}/answer','UserQuestionController@userAnswer'); // todo: templates!
 });
+
+//- all user answers go to:
+Route::post('/answer','UserQuestionController@userAnswer');
 
 
 //--- authorized ADMINS only
@@ -74,21 +79,5 @@ Route::prefix('/exam/{exam_id?}')->group(function () {
 	});
 });
 
-/*
-Route::get('/exam/{examid?}', 'ExamController@show');
-Route::get('/exam/edit/{examid?}', 'ExamController@edit');
-Route::post('exam/update/{examid?}', 'ExamController@update');
-Route::post('exam/store', 'ExamController@store');
+Route::get('/crest/question', 'QuestionController@index');
 
-Route::get('/test/{testid?}', 'TestController@config');
-Route::get('/newtest/{testid?}', 'TestController@newTest');
-
-Route::get('/scene/{id?}', 'SceneController@show');
-Route::get('/scene/show/{id?}', 'SceneController@show');
-Route::get('/scene/edit/{id?}', 'SceneController@edit');
-Route::post('/scene/update/{id?}', 'SceneController@update');
-
-Route::get('/next', function (Request $request) {
-    dd($request);
-})->name('next');
-*/

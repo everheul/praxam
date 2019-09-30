@@ -1,0 +1,6 @@
+
+
+
+php artisan resource-file:from-database Question --table-name=questions
+php artisan create:views Question --routes-prefix=crest/questions
+php artisan create:controller Question --routes-prefix=crest/questions --with-auth --with-form-request

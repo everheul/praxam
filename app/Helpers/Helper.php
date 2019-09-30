@@ -34,4 +34,15 @@ class Helper {
     public function testMeNow($s) {
         return $s;
     }
+
+    public static function likeFilter($s) {
+        if (strpos($s, '%') === false) {
+            if (empty($s)) {
+                $s = '%';
+            } else {
+                $s = '%' . $s . '%';
+            }
+        }
+        return $s;
+    }
 }

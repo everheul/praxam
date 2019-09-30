@@ -21,7 +21,7 @@
                             <input name="scene[head]" type="text" class="form-control" id="headid" placeholder="Scene Head" value="{{ $scene->head }}">
                         </div>
                     </div>
-                    @include('question.edit.type' . $scene->questions[0]->question_type_id, ['question' => $scene->questions[0]])
+                    @include('question.edit.type' . $scene->question()->question_type_id, ['question' => $scene->question()])
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="submit">Control</label>
                         <div class="col-sm-10">

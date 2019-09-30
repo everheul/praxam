@@ -10,6 +10,9 @@ use App\Helpers\Sidebar;
 
 class UserSceneController extends Controller
 {
+    // used to check user-exam ownership once
+    private $user_checked;
+
     public function __construct() {
         $this->middleware('auth');
     }
@@ -29,24 +32,49 @@ class UserSceneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($prax_id, $order) {
-        $userexam = UserExam::findOrFail($prax_id);
-        if (($order > 0) && ($order <= $userexam->scene_count)) {
-            $userScene = $this->loadFullUserscene($prax_id, $order);
-            $scene = $this->mergeUserscene( $this->loadFullScene($userScene->scene_id), $userScene);
-            $nextId = $this->next($userexam, $order);
+    public function show(Request $request, $prax_id, $order) {
+
+        if (!$this->checkUser($request, $prax_id)) {
+            return redirect(url("/home"));
+        }
+
+        /*
+        //$userScene = $this->loadFullUserscene($prax_id, $order);
+        $userScene = UserScene::where('userexam_id','=',$prax_id)->where('order','=',$order)->with('userquestions','userquestions.useranswers')->firstOrFail();
+        //$scene = $this->mergeUserscene( $this->loadFullScene($userScene->scene_id), $userScene);
+        $scene = $this->mergeUserscene( (new SceneController())->getFullScene($userScene->scene_id), $userScene);
+        $userScene->setScene($scene);
+        //$nextId = $this->next($userexam, $order);
+        */
+
+        if ($praxScene = $this->loadPraxScene($prax_id, $order)) {
             $sidebar = (new SideBar)->practiceExam($prax_id, $order);
-            return View('scene.show.type' . $scene->scene_type_id,
+            return View('scene.show.type' . $praxScene->scene->scene_type_id,
                 [   'sidebar' => $sidebar,
-                    'scene' => $scene,
+                    'praxScene' => $praxScene,
                     'action' => 'ANSWER',
-                    'user' => ['exam' => $prax_id, 'order' => $order],
-                    'next' => "/prax/$prax_id/scene/$nextId/show"
                 ]);
         } else {
-            //- redirect to result
+            //- userScene not found?? redirect to result
             return redirect(url("/prax/$prax_id/show"));
         }
+    }
+
+    /**
+     * @param  int  $prax_id
+     * @param  int  $order
+     * @return  PraxScene|bool
+     */
+    private function loadPraxScene($prax_id, $order) {
+        $userScene = UserScene::where('userexam_id','=',$prax_id)
+            ->where('order','=',$order)
+            ->with('userquestions','userquestions.useranswers')
+            ->firstOrFail();
+        if (!empty($userScene)) {
+            $scene = (new SceneController())->getFullScene($userScene->scene_id);
+            return new PraxScene($scene, $userScene);
+        }
+        return false;
     }
 
     /**
@@ -55,7 +83,6 @@ class UserSceneController extends Controller
      * @param  UserExam  $userexam
      * @param  int  $order
      * @return int
-     */
     private function next( $userexam, $order) {
         return ($order < $userexam->scene_count) ? $order + 1 : 0;
     }
@@ -69,13 +96,14 @@ class UserSceneController extends Controller
         return (new SceneController())->getFullScene($sceneId);
         //return Scene::where('id', '=', $sceneId)->with('questions','questions.answers')->firstOrFail();
     }
+*/
 
     /**
      *  Lock the already answered questions.
      *
      * @param $scene
      * @param $userScene
-    **/
+     **/
     private function mergeUserscene($scene, $userScene) {
         foreach($userScene->userquestions as $userquestion) {
             if (!is_null($userquestion->result)) {
@@ -96,7 +124,7 @@ class UserSceneController extends Controller
     }
 
     /**
-     * Set the UserScenes' result & locked values until locked.
+* Set the UserScenes' result & locked values until locked.
      *
      * @param  UserScene  $prax
      * @return  UserScene
@@ -117,5 +145,23 @@ class UserSceneController extends Controller
         }
         return $prax;
     }     */
+
+    /**
+     * Make sure this userExam was created by THIS user.
+     * todo: move to User?
+     *
+     * @param Request $request
+     * @param $prax_id
+     * @return bool
+     */
+    private function checkUser(Request $request, $prax_id)
+    {
+        if (empty($this->user_checked)) {
+            $user_exam = UserExam::where('id', $prax_id)->firstOrFail();
+            $this->user_checked = ($user_exam->user_id === $request->user()->id);
+            //- todo: log if false
+        }
+        return $this->user_checked;
+    }
 
 }

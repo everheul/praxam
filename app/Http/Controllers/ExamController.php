@@ -12,7 +12,7 @@ class ExamController extends Controller
 {
 
     public function __construct() {
-        //$this->middleware('auth');
+        $this->middleware('auth');
     }
 
     /**
@@ -38,7 +38,7 @@ class ExamController extends Controller
     public function show($exam_id) {
         $exam = Exam::findOrFail($exam_id);
         return View('exam.show',
-            ['sidebar' => (new Sidebar)->examOverview($exam),
+               ['sidebar' => (new Sidebar)->examOverview($exam),
                 'exam' => $exam ]
         );
     }
@@ -81,9 +81,8 @@ class ExamController extends Controller
                     'exam' => $exam ]
             );
         } else {
-            //?
+            return redirect(url("/home"));
         }
-        dd(" -= TODO =- ");
     }
 
     /**
@@ -108,7 +107,7 @@ class ExamController extends Controller
             }
             $exam->update();
         }
-        return redirect(url("/exam/$id/show"));
+        return redirect(url("/exam/$exam_id/show"));
     }
 
     /**

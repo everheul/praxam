@@ -12,40 +12,56 @@ use DB;
 
 class UserExamController extends Controller
 {
+    // used to check user-exam ownership once
+    private $user_checked;
+
+
     public function __construct() {
         $this->middleware('auth');
     }
 
     /**
-     * Display a list of the tests created by user?
+     * Display a list of the tests created by this user.
      *
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        dd(" -= TODO =- ");
+        return redirect(url("/home"));
     }
 
     /**
-     * Jump to the first scene that yet has to be answered
+     * Jump to the first scene that still has to be answered
      */
-    public function nextScene($prax_id) {
-        $us = DB::table('userscenes')->where('userexam_id','=',$prax_id)->where('locked',0)->select('order')->first();
-        //dd($us);
+    public function nextScene(Request $request, $prax_id) {
+
+        if (!$this->checkUser($request, $prax_id)) {
+            return redirect(url("/home"));
+        }
+
+        $us = UserScene::where('userexam_id', $prax_id)->where('locked',0)->select('order')->first();
         if (!empty($us)) {
             return redirect(url("/prax/$prax_id/scene/".$us->order));
         }
-        return $this->show($prax_id); //- show result
+
+        //- no unlocked scenes left; show result:
+        return $this->show($prax_id);
     }
 
     /**
-     * Display all the info (result!) of the specified userexam.
+     * Display the Test Result of the specified userexam.
      * TODO
      *
      * @param  int $id
      * @return \\Illuminate\Http\Response
      */
-    public function show($prax_id) {
-        $userexam = UserExam::where('id', '=', $prax_id)->with('exam')->firstOrFail();
+    public function show(Request $request, $prax_id) {
+
+        if (!$this->checkUser($request, $prax_id)) {
+            return redirect(url("/home"));
+        }
+
+        $userexam = UserExam::where('id', $prax_id)->with('exam')->firstOrFail();
+
         return View('userexam.show',
             [   'sidebar' => (new Sidebar)->examResult($userexam),
                 'userexam' => $userexam ]
@@ -91,7 +107,7 @@ class UserExamController extends Controller
      * @param  int $prax_id
      * @return \\Illuminate\Http\Response
      */
-    public function kill($prax_id) {
+    public function destroy($prax_id) {
         $prax = UserExam::findOrFail($prax_id);
         $prax->delete();
         return redirect(url("/home"));
@@ -128,5 +144,22 @@ class UserExamController extends Controller
         return DB::table('questions')->where('scene_id', '=', $scene->id)->orderBy('order')->select('id')->get();
     }
 
+
+    /**
+     * Make sure this userExam was created by THIS user.
+     *
+     * @param Request $request
+     * @param $prax_id
+     * @return bool
+     */
+    private function checkUser(Request $request, $prax_id)
+    {
+        if (empty($this->user_checked)) {
+            $user_exam = UserExam::where('id', $prax_id)->firstOrFail();
+            $this->user_checked = ($user_exam->user_id === $request->user()->id);
+            //- todo: log if false
+        }
+        return $this->user_checked;
+    }
 
 }

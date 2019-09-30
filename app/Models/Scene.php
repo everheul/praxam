@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @package App\Models
  *
  * A Scene is the beginning of a testcase with one or more questions.
- * The 'head', 'overview', 'exhibit' (the path to a picture) and 'chapter' are optional and depending on type.
+ * The fields 'head', 'overview', 'exhibit' (the path to a picture) and 'chapter' are optional and depend on 'scene_type_id'.
  *
  *  scene.type:
  *  1 - One question only.
@@ -32,7 +32,7 @@ class Scene extends Model
     /**
      * @var array
      */
-    //protected $fillable = ['scene_type_id', 'chapter', 'head', 'text', 'image'];
+    protected $fillable = ['scene_type_id', 'chapter', 'head', 'text', 'image'];
 
     /**
      * The relation with exams (ManyToMany, using exam_scene)
@@ -47,15 +47,28 @@ class Scene extends Model
     public function questions() {
         return $this->hasMany('App\Models\Question', 'scene_id', 'id');
     }
-    
+
     /**
-     * todo?
+     * the first (or only) question of this scene, used by templates.
+     */
+    public function question($order = 0): Question {
+        return $this->questions[$order];
+    }
+
+    /**
      * The relation with scene-types (OneToMany Inverse)
      */
     public function sceneType() {
         return $this->belongsTo('App\Models\SceneType', 'id', 'scene_type_id');
     }
-    
+
+    /**
+     * The scene-type-name (OneToMany Inverse)
+     */
+    public function sceneTypeName() {
+        return $this->belongsTo('App\Models\SceneType', 'id', 'scene_type_id')->select('name');
+    }
+
     /**
      * The relation with userscenes (OneToMany)
      */
@@ -63,30 +76,6 @@ class Scene extends Model
         return $this->hasMany('App\Models\UserScene', 'scene_id', 'id');
     }
 
-
-
-    /**
-     * JSON list with question data for template <scripts> sections, to be used by the accordion.
-     * Note: the Scene must be loaded with questions.
-     */
-    public function questionTypes(): string {
-        $a = [];
-        $q = $this->questions;
-        foreach($q as $question) {
-            $a[] = Array('id' => $question->id,
-                'type' => $question->question_type_id,
-                'first' => $question->is_first,
-                'last' => $question->is_last);
-        }
-        return json_encode($a);
-    }
-
-    /**
-     * the first question of this scene, used by template
-     */
-    public function first_question(): Question {
-        return $this->questions[0];
-    }
 
 
     /**

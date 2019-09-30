@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class UserAnswer extends Model
 {
     public $timestamps = false; 
-    
+
+    public $answer = null;
+
     protected $table = 'useranswers';
 
     //- fields that may be filled by create() and update();
@@ -29,4 +31,7 @@ class UserAnswer extends Model
         return $this->belongsTo('App\Models\Answers', 'id', 'answer_id');
     }
 
+    public function setAnswer(\App\Models\Answer $answer) {
+        $this->answer = $answer;
+    }
 }

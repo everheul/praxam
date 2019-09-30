@@ -9,19 +9,18 @@ class Exam extends Model
 {
     use SoftDeletes;
 
-    //protected $table = 'exams';
     protected $dates = ['deleted_at'];
 
     /**
      * @var array
      */
-    //protected $fillable = ['name', 'head', 'intro', 'text', 'image'];
+    protected $fillable = ['name', 'head', 'intro', 'text', 'image'];
 
     /**
      * The relation with userexams (OneToMany)
      */
     public function userexams() {
-        return $this->hasMany('App\Models\UserExam', 'exam_id', 'id');
+        return $this->hasMany('App\Models\UserExam');
     }
 
     /**
@@ -29,7 +28,7 @@ class Exam extends Model
      * can be disabled by DBA ;)
      */
     public function scenes() {
-        return $this->belongsToMany('App\Models\Scene','exam_scene', 'id')->where('active', 1);
+        return $this->belongsToMany('App\Models\Scene'); // ->where('pivot.active', 1)
     }
 
 

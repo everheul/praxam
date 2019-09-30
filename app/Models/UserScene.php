@@ -18,6 +18,8 @@ class UserScene extends Model
     
     public $timestamps = false; // same as userexam or questions
 
+    public $scene = null;
+
     protected $table = 'userscenes';
 
     //- fields that may be filled by create() and update();
@@ -45,6 +47,10 @@ class UserScene extends Model
         return $this->hasMany('App\Models\UserQuestion', 'userscene_id', 'id');
     }
 
+    public function userquestion() {
+        return $this->userquestions[0];
+    }
+
 
     /**
      * Initiate and save this userscene:
@@ -63,6 +69,13 @@ class UserScene extends Model
         return $this;
     }
 */
+
+    public function setScene(\App\Models\Scene $scene) {
+        $this->scene = $scene;
+        foreach($this->userquestions as $userquestion) {
+            $userquestion->setQuestion($scene->questions->find($userquestion->question_id));
+        }
+    }
 
     /**
      * Calc and store the result (questions result total)

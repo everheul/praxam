@@ -10,9 +10,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\UserExam;
+use App\Models\User;
 use App\Models\Scene;
 use App\Models\UserScene;
 use App\Helpers\Sidebar;
+use Illuminate\Support\Facades\Log;
 
 class UserQuestionController extends Controller
 {
@@ -27,35 +29,37 @@ class UserQuestionController extends Controller
      * @param  int  $order  The order of the userscene in this userexam. check?
      * @return \Illuminate\Http\Response
      */
-    public function userAnswer(Request $request, $order)
+    public function userAnswer(Request $request)
     {
+        //dd($request);
         $user = $request->user();
         if (!empty($user)) {
             switch ($request->action) {
                 case 'ANSWER': /* user test */
                     $this->saveAnswer($user, $request->all());
                     break;
-                case 'IGNORE': /* admin preview (/scene/show) */
+                case 'IGNORE': /* admin preview */
                     $this->answerToDisk($user, $request->all());
                     break;
                 default:
-                    report("userAnswer, Unknown Action: " . $request->action);
+                    Log::warning("userAnswer, Unknown Action: " . $request->action);
             }
+        } else {
+            Log::warning("userAnswer: UNAUTHORISED USER");
         }
-        report("userAnswer: UNAUTHORISED USER");
     }
 
     /**
      * Store the answer and calc the result
      * 
-     * @param \App\Http\Controllers\User $user
+     * @param User $user
      * @param array $data
      * @return void
      */
     private function saveAnswer(User $user, Array $data) {
 
         if (empty($data['answers'])) {
-            report("saveAnswer: No answer selected.");
+            Log::warning("saveAnswer: No answer selected.");
             return;
         }
         
@@ -63,12 +67,12 @@ class UserQuestionController extends Controller
         $user_exam = UserExam::where('id', '=', $data['userexam'])->first();
         
         if (empty($user_exam)) {
-            report("saveAnswer: This UserExam was not found. User: " . $user->id . ", userexam: " . $data['userexam']);
+            Log::warning("saveAnswer: This UserExam was not found. User: " . $user->id . ", userexam: " . $data['userexam']);
             return;
         }
         
         if ($user_exam->user_id != $user->id) {
-            report("saveAnswer: User ID does not match. User: " . $user->id . ", exam user: ". $user_scene->userexam->user_id);
+            Log::warning("saveAnswer: User ID does not match. User: " . $user->id . ", exam user: ". $user_exam->user_id);
             return;
         }
         
@@ -79,7 +83,7 @@ class UserQuestionController extends Controller
                 ->first();
         
         if (empty($user_scene)) {
-            report("saveAnswer: This Practice Exam Scene was not found. User: " . $user->id . ", userexam: " . $data['userexam']);
+            Log::warning("saveAnswer: This Practice Exam Scene was not found. User: " . $user->id . ", userexam: " . $data['userexam']);
             return;
         }
 
@@ -89,13 +93,13 @@ class UserQuestionController extends Controller
                 ->first();
         
         if (empty($user_question)) {
-            report("saveAnswer: UserQuestion not found. User: " . $user->id . ", userscene: " . $user_scene->id);
+            Log::warning("saveAnswer: UserQuestion not found. User: " . $user->id . ", userscene: " . $user_scene->id);
             return;
         } 
         
         // It may be answered only once
         if (!is_null($user_question->result)) {
-            report("saveAnswer: UserQuestion is Locked. User: " . $user->id . ", userquestion: " . $user_question->id);
+            Log::warning("saveAnswer: UserQuestion is Locked. User: " . $user->id . ", userquestion: " . $user_question->id);
             return;
         }
 
@@ -105,7 +109,7 @@ class UserQuestionController extends Controller
                 ->first();
         
         if (empty($question)) {
-            report("saveAnswer: Question not found. User: " . $user->id . ", userquestion: " . $user_question->id);
+            Log::warning("saveAnswer: Question not found. User: " . $user->id . ", userquestion: " . $user_question->id);
             return;
         }
 

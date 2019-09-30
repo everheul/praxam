@@ -5,20 +5,20 @@
 
 @push('scripts')
 <script>
-    var sc = { "id": {{ $scene->id }}, "type": {{ $scene->scene_type_id }} };
-    var ql = {!! $scene->questionTypes() !!};
-    var us = { "exam": {{ $user['exam'] }}, "order": {{ $user['order'] }} };
-    var ajaxo = null;
+    var sc = { "id": {{ $userscene->scene->id }}, "type": {{ $userscene->scene->scene_type_id }} };
+    var ql = {!! $userscene->scene->questionTypes() !!};
 
     /* register the buttons of all questions */
     $(function() {
+        // activate sortable on all type 3 questions:
         $.each(ql, function(index, obj){
-            $("#done_" + obj.id).click(obj, doneClicked);
-            $("#next_" + obj.id).click(obj, nextClicked);
+        //    $("#done_" + obj.id).click(obj, doneClicked);
+        //    $("#next_" + obj.id).click(obj, nextClicked);
             if (obj.type == 3) {
                 $('#choices_' + obj.id + ', #answers_' + obj.id).sortable({connectWith: '.sortable', cursor: "move"});
             }
         });
+        // more questions; activate the accordion:
         if (sc.type == 2) {
             $("#accordion").accordion();
             $("#accordion").accordion({
@@ -30,32 +30,32 @@
             selectAccordionNext();
         }
     });
-
+/*
     function doneClicked(event) {
-        /* the current question id, type, first and last fields are in event.data */
+        // the current question id, type, first and last fields are in event.data
         if (isAnswered(event.data.id, event.data.type)) {
             sendAnswer(event.data.id, event.data.type);
         }
     }
-
-    function nextClicked(event) {
-        nextQuestion();
-    }
-
+*/
+    //function nextClicked(event) {
+    //    nextQuestion();
+    //}
+/*
     function isAnswered(qid, qtype) {
         var ret = false;
         if (qtype == 1) {
-            /* is one of the radioboxes checked? */
+            // is one of the radioboxes checked?
             $("question#" + qid + " :input[type='radio']:checked").each(function(){
                 ret = true;
             });
         } else if (qtype == 2) {
-            /* is one of the checkboxes checked? */
+            // is one of the checkboxes checked?
             $("question#" + qid + " :input[type='checkbox']:checked").each(function(){
                 ret = true;
             });
         } else if (qtype == 3) {
-            /* anything in the answers list? */
+            // anything in the answers list?
             $("#answers_" + qid + " .dragable").each(function(){
                 ret = true;
             });
@@ -186,7 +186,7 @@
             $("question#" + qid + " .sortable" ).sortable({ disabled: true });
         }
     }
-
+*/
     function selectAccordionNext() {
         var done = true;
         if (sc.type == 2) {
@@ -202,12 +202,6 @@
             });
         }
         return done;
-    }
-
-    function nextQuestion() {
-        if (selectAccordionNext() === true) {
-            window.location.href = "{{ url($next) }}";
-        }
     }
 
 </script>
