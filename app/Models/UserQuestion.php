@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserQuestion extends Model
 {
-    public $timestamps = false;
+    public $timestamps = false; //- same as userscenes, made with userexam.
 
     public $question = null;
     
@@ -35,28 +35,6 @@ class UserQuestion extends Model
      */
     public function useranswers() {
         return $this->hasMany('App\Models\UserAnswer', 'userquestion_id', 'id');
-    }
-
-    /*
-    public function create($usid, $qid) {
-        $this->userscene_id = $usid;
-        $this->question_id = $qid;
-        $this->save();
-        return $this;
-    }
-*/
-
-    /**
-     * set the pointer to the Question this UserQuestion belongs to
-     *  and let the UserAnswers do the same.
-     *
-     * @param Question $question
-     */
-    public function setQuestion(\App\Models\Question $question) {
-        $this->question = $question;
-        foreach($this->useranswers() as $useranswer) {
-            $useranswer->setAnswer($question->answers->find($useranswer->answer_id));
-        }
     }
 
     /**

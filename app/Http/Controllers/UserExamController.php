@@ -30,24 +30,6 @@ class UserExamController extends Controller
     }
 
     /**
-     * Jump to the first scene that still has to be answered
-     */
-    public function nextScene(Request $request, $prax_id) {
-
-        if (!$this->checkUser($request, $prax_id)) {
-            return redirect(url("/home"));
-        }
-
-        $us = UserScene::where('userexam_id', $prax_id)->where('locked',0)->select('order')->first();
-        if (!empty($us)) {
-            return redirect(url("/prax/$prax_id/scene/".$us->order));
-        }
-
-        //- no unlocked scenes left; show result:
-        return $this->show($prax_id);
-    }
-
-    /**
      * Display the Test Result of the specified userexam.
      * TODO
      *
@@ -114,6 +96,34 @@ class UserExamController extends Controller
     }
 
     /**
+     * Jump to the next (or first) scene that still has to be answered
+     */
+    public function nextScene($prax_id, $order = 0) {
+
+        $userscene = UserScene::where('userexam_id', $prax_id)
+            ->where('locked',0)
+            ->where('order','>',$order)
+            ->orderBy('order')
+            ->select('order')
+            ->first();
+
+        if (empty($userscene)) {
+            $userscene = UserScene::where('userexam_id', $prax_id)
+                ->where('locked',0)
+                ->orderBy('order')
+                ->select('order')
+                ->first();
+        }
+
+        if (empty($userscene)) {
+            //- no unlocked scenes left, test finished. Show result:
+            return $this->show($prax_id);
+        }
+
+        return redirect(url("/prax/$prax_id/scene/{$userscene->order}"));
+    }
+
+    /**
      * @param  int  $exam_id
      * @param  int  $scene_count
      * @return  mixed
@@ -147,6 +157,7 @@ class UserExamController extends Controller
 
     /**
      * Make sure this userExam was created by THIS user.
+     * todo: move to middleware
      *
      * @param Request $request
      * @param $prax_id

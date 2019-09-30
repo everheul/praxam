@@ -123,4 +123,29 @@ class ExamController extends Controller
         //$exam->update();
         return redirect(url("/exam"));
     }
+
+    /**
+     * Jump to the next scene (or first) of this exam
+     */
+    public function nextScene($exam_id, $scene_id = 0) {
+
+        $scene = Scene::where('exam_id', $exam_id)
+            ->where('id','>',$scene_id)
+            ->orderBy('id')
+            ->select('id')
+            ->first();
+        if (empty($scene)) {
+            $scene = Scene::where('exam_id', $exam_id)
+                ->orderBy('id')
+                ->select('id')
+                ->first();
+
+        }
+        if (empty($scene)) {
+            //- no scenes found..
+            return $this->show($exam_id);
+        }
+        return redirect(url("/exam/$exam_id/scene/{$scene->id}" ));
+    }
+
 }

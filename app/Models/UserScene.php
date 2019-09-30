@@ -16,15 +16,13 @@ use App\Models\Scene;
 class UserScene extends Model
 {
     
-    public $timestamps = false; // same as userexam or questions
-
-    public $scene = null;
+    public $timestamps = false; // same as userquestions, made with userexam.
 
     protected $table = 'userscenes';
 
     //- fields that may be filled by create() and update();
     //  all others will be ignored without warning (!)
-    protected $fillable = [ 'userexam_id', 'scene_id', 'order'];
+    protected $fillable = [ 'userexam_id', 'scene_id', 'order', 'result', 'locked'];
 
     /**
      * The relation with userexams (OneToMany Inverse)
@@ -47,39 +45,15 @@ class UserScene extends Model
         return $this->hasMany('App\Models\UserQuestion', 'userscene_id', 'id');
     }
 
-    public function userquestion() {
-        return $this->userquestions[0];
-    }
-
-
-    /**
-     * Initiate and save this userscene:
-     *      $userscene = (new UserScene)->create($userexamid, $sceneid, $order);
-     *      $id = $userscene->id;
-     *
-     * @param int $userexamid
-     * @param int $sceneid
-     * @param int $order
-     * @return $this
-    public function create($userexamid, $sceneid, $order) {
-        $this->userexam_id = $userexamid;
-        $this->scene_id = $sceneid;
-        $this->order = $order;
-        $this->save();
-        return $this;
-    }
-*/
-
-    public function setScene(\App\Models\Scene $scene) {
-        $this->scene = $scene;
-        foreach($this->userquestions as $userquestion) {
-            $userquestion->setQuestion($scene->questions->find($userquestion->question_id));
-        }
+    public function userquestion($index = 0) {
+        return $this->userquestions[$index];
     }
 
     /**
      * Calc and store the result (questions result total)
      * ..or null if one or more questions were not answered yet.
+     *
+     * Note: this will lock the exam if all questions are answered.
      *
      * Called from UserQuestionController
      */
@@ -97,8 +71,8 @@ class UserScene extends Model
             }
             $this->result = $tot;
             $this->locked = $locked;
+            $this->update();
         }
-        $this->update();
     }
 
 }

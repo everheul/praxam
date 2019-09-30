@@ -9,8 +9,6 @@ class Exam extends Model
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
-
     /**
      * @var array
      */
@@ -25,10 +23,10 @@ class Exam extends Model
 
     /**
      * The relation with scenes (ManyToMany, using exam_scene)
-     * can be disabled by DBA ;)
+     * can be disabled by DBA by setting 'active' to 0
      */
     public function scenes() {
-        return $this->belongsToMany('App\Models\Scene'); // ->where('pivot.active', 1)
+        return $this->belongsToMany('App\Models\Scene')->withPivot('exam_scene')->where('active', 1);
     }
 
 

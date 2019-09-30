@@ -20,13 +20,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Question extends Model
 {
     use SoftDeletes;
-    
-    /**
-     * Appended Attribute with Accessors and Mutators (getters & setters).
-     *
-     * @var  array
-     */
-    protected $appends = ['locked', 'is_first', 'is_last'];
 
     /**
     //- fields that may be filled by create() and update();
@@ -51,6 +44,13 @@ class Question extends Model
     }
 
     /**
+     * The name of the question_type (OneToMany Inverse)
+     */
+    public function questionTypeName() {
+        return $this->belongsTo('App\Models\QuestionType', 'id', 'question_type_id')->select('name');
+    }
+
+    /**
      * The relation with userquestions (OneToMany)
      */
     public function userquestions() {
@@ -62,65 +62,6 @@ class Question extends Model
      */
     public function answers() {
         return $this->hasMany('App\Models\Answer');
-    }
-
-    //------- Accessors and Mutators ------
-
-    /** locked Accessor
-     * @return  bool
-     */
-    public function getLockedAttribute() {
-        if (empty($this->attributes['locked'])) {
-            $this->attributes['locked'] = false;
-        }
-        return $this->attributes['locked'];
-    }
-
-    /** locked Mutator
-     * @param  bool  $locked
-     */
-    public function setLockedAttribute($locked) {
-        $locked = boolval($locked);
-        $this->attributes['locked'] = $locked;
-        if (!empty($this->answers)) {
-            foreach ($this->answers as $answer) {
-                $answer->setLockedAttribute($locked);
-            }
-        }
-    }
-
-    /**
-     * @return  bool
-     */
-    public function getIsFirstAttribute() {
-        if (empty($this->attributes['is_first'])) {
-            $this->attributes['is_first'] = false;
-        }
-        return $this->attributes['is_first'];
-    }
-
-    /**
-     * @param  bool  $is_first
-     */
-    public function setIsFirstAttribute($is_first) {
-        $this->attributes['is_first'] = boolval($is_first);
-    }
-
-    /**
-     * @return  bool
-     */
-    public function getIsLastAttribute() {
-        if (empty($this->attributes['is_last'])) {
-            $this->attributes['is_last'] = false;
-        }
-        return $this->attributes['is_last'];
-    }
-
-    /**
-     * @param  bool  $is_last
-     */
-    public function setIsLastAttribute($is_last) {
-        $this->attributes['is_last'] = boolval($is_last);
     }
 
 }

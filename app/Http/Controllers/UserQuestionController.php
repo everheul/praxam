@@ -37,6 +37,7 @@ class UserQuestionController extends Controller
             switch ($request->action) {
                 case 'ANSWER': /* user test */
                     $this->saveAnswer($user, $request->all());
+
                     break;
                 case 'IGNORE': /* admin preview */
                     $this->answerToDisk($user, $request->all());

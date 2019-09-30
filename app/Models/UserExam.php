@@ -29,8 +29,6 @@ class UserExam extends Model
     //- no standard name for the user tables, for better readability.
     protected $table = 'userexams';
 
-    protected $dates = ['deleted_at'];
-
     //- fields that may be filled by create() and update();
     //  all others will be ignored without warning (!)
     protected $fillable = [ 'user_id', 'exam_id', 'scene_count'];

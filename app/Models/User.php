@@ -22,19 +22,6 @@ class User extends Authenticatable // implements MustVerifyEmail
     ];
 
     /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
-     */
-
-    public function isAdmin() : bool {
-        return ($this->role == 'admin');
-    }
-
-    /**
      * The relation with userexams (OneToMany)
      */
     public function userexams() {
@@ -46,6 +33,14 @@ class User extends Authenticatable // implements MustVerifyEmail
      */
     public function startedExams() {
         return $this->userexams()->where('result', null);
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function isAdmin() : bool {
+        return ($this->role == 'admin');
     }
 
 }

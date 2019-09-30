@@ -42,11 +42,11 @@ Route::prefix('/prax/{prax_id?}')->group(function () {
 	Route::get('/','UserExamController@show');
 	Route::delete('/','UserExamController@destroy');
 	Route::get('/show','UserExamController@show');
-	Route::get('/next','UserExamController@nextScene');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
 	Route::get('/scene/{order?}','UserSceneController@show');
 	Route::get('/scene/{order?}/show','UserSceneController@show');
+	Route::get('/scene/{order?}/next','UserExamController@nextScene');
 });
 
 //- all user answers go to:
@@ -75,6 +75,7 @@ Route::prefix('/exam/{exam_id?}')->group(function () {
 		Route::get('/edit','SceneController@edit');
 		Route::post('/update','SceneController@update');
 		Route::get('/kill','SceneController@kill');
+		Route::get('/next','SceneController@nextScene');
 		//- any exam/scene/question actions?
 	});
 });

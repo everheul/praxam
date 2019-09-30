@@ -26,9 +26,6 @@ class Scene extends Model
 {
     use SoftDeletes;
 
-    protected $appends = ['locked'];
-
-
     /**
      * @var array
      */
@@ -45,7 +42,7 @@ class Scene extends Model
      * The relation with questions (OneToMany)
      */
     public function questions() {
-        return $this->hasMany('App\Models\Question', 'scene_id', 'id');
+        return $this->hasMany('App\Models\Question', 'scene_id', 'id')->orderBy(['order','id']);
     }
 
     /**
@@ -76,55 +73,4 @@ class Scene extends Model
         return $this->hasMany('App\Models\UserScene', 'scene_id', 'id');
     }
 
-
-
-    /**
-     * the questions belonging to this scene, cached in correct order
-     * @return Collection
-     *
-    public function getQuestions(): Collection {
-        if (empty($this->questions)) {
-            $this->questions = $this->questions()
-                ->orderBy('order')
-                ->get();
-            $this->setFirstLast();
-        }
-        return $this->questions;
-    }
-
-    /**
-     * let the accordion know what's what
-     *
-    private function setFirstLast() {
-        $last = count($this->questions);
-        $n = 1;
-        foreach($this->questions as &$question) {
-            $question->isFirst = ($n == 1) ? true : false;
-            $question->isLast = ($n == $last) ? true : false;
-            $n += 1;
-         }
-    }
-
-    /**
-     * Get the id of the next scene of the given exam
-     * 
-     * @return int
-     *
-    public function nextSceneId($examId) {
-        $nextScene = DB::table('exam_scenes')
-            ->select('scene_id')
-            ->where('exam_id','=',$examId)
-            ->where('scene_id','>',$this->id)
-            ->orderBy('scene_id')
-            ->first();
-        if (empty($nextScene)) {
-            $nextScene = DB::table('exam_scenes')
-                ->select('scene_id')
-                ->where('exam_id','=',$examId)
-                ->orderBy('scene_id')
-                ->first();
-        }
-        return (empty($nextScene)) ? 0 : $nextScene->id;
-    }
-*/
 }

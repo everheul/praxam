@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserAnswer extends Model
 {
-    public $timestamps = false; 
-
-    public $answer = null;
 
     protected $table = 'useranswers';
 
@@ -25,13 +22,9 @@ class UserAnswer extends Model
 
     /**
      * The relation with answers (OneToMany Inverse)
-     * todo: used?
      */
     public function answer() {
         return $this->belongsTo('App\Models\Answers', 'id', 'answer_id');
     }
 
-    public function setAnswer(\App\Models\Answer $answer) {
-        $this->answer = $answer;
-    }
 }
