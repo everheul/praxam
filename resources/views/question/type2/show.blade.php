@@ -1,5 +1,5 @@
-{{-- question.type1.show
-     Show a question of type 1, with radiobox answers.
+{{-- question.type2.show
+     Show a question of type 2, with checkbox answers.
      input: $praxquestion, $praxscene
 --}}
 <question id="{{ $praxquestion->question->id }}">
@@ -12,7 +12,7 @@
             @foreach ($praxquestion->praxanswers as $praxanswer)
                 <div class="input-group-prepend mb-1">
                     <div class="{{ $praxanswer->coolness() }}input-group-text minw-25">
-                        <input type="radio" name="answer[]" value="{{ $praxanswer->answer->id }}"{{ $praxanswer->checked() }}{{ $praxanswer->disabled() }} />
+                        <input type="checkbox" name="answer[]" value="{{ $praxanswer->answer->id }}" {{ $praxanswer->checked() }} {{ $praxanswer->disabled() }} />
                         <div class="pl-3 py-0">{{ $praxanswer->answer->text }}</div>
                     </div>
                 </div>

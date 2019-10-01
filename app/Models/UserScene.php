@@ -28,14 +28,14 @@ class UserScene extends Model
      * The relation with userexams (OneToMany Inverse)
      */
     public function userexam() {
-        return $this->belongsTo('App\Models\UserExam', 'id', 'userexam_id');
+        return $this->belongsTo('App\Models\UserExam', 'userexam_id', 'id');
     }
 
     /**
      * The relation with scenes (OneToMany Inverse)
      */
     public function scene() {
-        return $this->belongsTo('App\Models\Scene', 'id', 'scene_id');
+        return $this->belongsTo('App\Models\Scene', 'scene_id', 'id');
     }
 
     /**

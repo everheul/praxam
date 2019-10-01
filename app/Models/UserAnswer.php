@@ -11,7 +11,7 @@ class UserAnswer extends Model
 
     //- fields that may be filled by create() and update();
     //  all others will be ignored without warning (!)
-    protected $fillable = [ 'userquestion_id', 'answer_id', 'order'];
+    protected $fillable = [ 'userquestion_id', 'answer_id', 'order', 'correct'];
 
     /**
      * The relation with userquestions (OneToMany Inverse)

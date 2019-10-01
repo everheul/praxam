@@ -14,11 +14,25 @@ class PraxScene
     public $praxquestions = [];
 
     public function __construct(Scene $scene, UserScene $userscene) {
-        $this->$scene = $scene;
-        $this->$userscene = $userscene;
+        $this->scene = $scene;
+        $this->userscene = $userscene;
         foreach($userscene->userquestions as $userquestion) {
             $question = $scene->questions->find($userquestion->question_id);
             $this->praxquestions[] = new PraxQuestion($question, $userquestion);
+        }
+        //dd($scene,$userscene,$this);
+    }
+
+    /**
+     * @param int $index
+     * @return \App\Classes\PraxAnswer
+     */
+    public function praxquestion($index = 0) {
+        if (isset($this->praxquestions[$index])) {
+            return $this->praxquestions[$index];
+        } else {
+            //- userquestion missing??
+            dd($this);
         }
     }
 
@@ -28,12 +42,12 @@ class PraxScene
      */
     public function questionTypes(): string {
         $a = [];
-        $q = $this->scene->questions;
+        $q = $this->scene->questions->all();
         foreach($q as $key => $question) {
             $a[] = Array('id' => $question->id,
-                'type' => $question->question_type_id,
-                'first' => ($key === array_key_first($q)),
-                'last' => ($key === array_key_last($q)));
+                        'type' => $question->question_type_id,
+                        'first' => ($key === array_key_first($q)),
+                        'last' => ($key === array_key_last($q)));
         }
         return json_encode($a);
     }

@@ -7,6 +7,9 @@ use App\Models\UserExam;
 use App\Models\Scene;
 use App\Models\UserScene;
 use App\Helpers\Sidebar;
+use App\Classes\PraxScene;
+use App\Classes\PraxQuestion;
+use App\Classes\PraxAnswer;
 
 class UserSceneController extends Controller
 {
@@ -47,12 +50,14 @@ class UserSceneController extends Controller
         //$nextId = $this->next($userexam, $order);
         */
 
+        $userexam = UserExam::where('id', $prax_id)->with('exam')->firstOrFail();
+        
         if ($praxScene = $this->loadPraxScene($prax_id, $order)) {
-            $sidebar = (new SideBar)->practiceExam($prax_id, $order);
-            return View('scene.show.type' . $praxScene->scene->scene_type_id,
+            $sidebar = (new SideBar)->practiceExam($userexam, $order);
+            return View('scene.type' . $praxScene->scene->scene_type_id . '.show',
                 [   'sidebar' => $sidebar,
-                    'praxScene' => $praxScene,
-                    'action' => 'ANSWER',
+                    'praxscene' => $praxScene,
+                    'useraction' => 'ANSWER',
                 ]);
         } else {
             //- userScene not found?? redirect to result

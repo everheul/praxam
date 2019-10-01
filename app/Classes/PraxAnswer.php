@@ -9,26 +9,27 @@ class PraxAnswer
 {
     public $answer;
     public $useranswer;
-    private $locked = false;
-    private $checked = false;
+    public $locked = false;
+    public $checked = false;
 
-    public function __construct(Answer $answer, UserAnswer $useranswer, $locked) {
+    public function __construct(Answer $answer, $locked = false) {
 
         $this->answer = $answer;
-        $this->useranswer = $useranswer;
         $this->locked = $locked;
-
-        if (!empty($useranswer)) {
-            $this->checked = true;
-        }
     }
 
+    public function setUserAnswer(UserAnswer $useranswer) {
+        $this->useranswer = $useranswer;
+        $this->checked = true;
+    //    $this->correct = ;
+    }
+    
     /**
      * Return the string that disables the inputboxes/radioboxes if locked
      * @return string
      */
     public function disabled() {
-        return ($this->locked) ? "disabled" : "";
+        return ($this->locked) ? ' disabled=1' : "";
     }
 
     /**
@@ -36,7 +37,15 @@ class PraxAnswer
      * @return  string
      */
     public function checked() {
-        return ($this->checked) ? "checked=\"checked\"" : "";
+        return ($this->checked) ? ' checked=1' : "";
+    }
+
+    /**
+     * Return the string that holds the correct order of answer if locked
+     * @return  string
+     */
+    public function order() {
+        return ($this->locked && $this->answer->correct_order > 0) ? $this->answer->correct_order . '. ' : "";
     }
 
     /**
@@ -48,7 +57,7 @@ class PraxAnswer
     public function coolness() {
         if ($this->locked) {
             $cool = is_null($this->answer->correct_order) ? ($this->answer->is_correct === 1) : ($this->answer->correct_order > 0);
-            return $cool ? 'correct' : 'wrong';
+            return $cool ? 'correct ' : 'wrong ';
         }
         return '';
     }

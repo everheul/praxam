@@ -103,9 +103,10 @@ class Sidebar
         return $this->blocks;
     }
 
-    public function practiceExam($prax_id, $order) {
-        $this->userSceneList($prax_id, $order);
-        $this->sbarScene("View Score","/prax/$prax_id/show","outline-dark");
+    public function practiceExam(UserExam $userexam, $order) {
+        $this->sbarBlock($userexam->exam->name, $userexam->exam->head);
+        $this->userSceneList($userexam->id, $order);
+        $this->sbarScene("View Score","/prax/{$userexam->id}/show","outline-dark");
         return $this->blocks;
     }
 
@@ -115,7 +116,7 @@ class Sidebar
         $this->sbarBlock($prax->exam->name, $prax->exam->head);
         $this->sbarButton('Back to Overview',"/exam",'dark');
         $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
-        $this->sbarBlock('Practice Exam',$prax->created_at);
+        $this->sbarBlock('Started At',$prax->created_at);
         $this->userSceneList($prax->id, 0);
     //    $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
         return $this->blocks;

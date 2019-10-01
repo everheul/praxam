@@ -158,23 +158,19 @@ class SceneController extends Controller
     public function getFullScene($scene_id) {
         $scene = Scene::where('id', '=', $scene_id)->with('questions','questions.answers')->firstOrFail();
         if ($scene->scene_type_id == 2) {
-            $this->setFirstLastQuestions($scene);
+            $this->setQuestionOrder($scene);
         }
         return $scene;
     }
 
     /**
-     * let the accordion know what's what
-     * todo when the questions' orders are set in db
+     * todo: set in db!
      *
      * @param  Scene  $scene
      */
-    private function setFirstLastQuestions(Scene $scene) {
-        $last = count($scene->questions); // $scene->question_count
+    private function setQuestionOrder(Scene $scene) {
         $n = 1;
         foreach($scene->questions as &$question) {
-            $question->is_first = ($n == 1) ? true : false;
-            $question->is_last = ($n == $last) ? true : false;
             $question->order = $n;
             $n += 1;
         }

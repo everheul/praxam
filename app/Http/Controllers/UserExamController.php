@@ -117,7 +117,7 @@ class UserExamController extends Controller
 
         if (empty($userscene)) {
             //- no unlocked scenes left, test finished. Show result:
-            return $this->show($prax_id);
+            return redirect(url("/prax/$prax_id"));
         }
 
         return redirect(url("/prax/$prax_id/scene/{$userscene->order}"));

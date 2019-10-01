@@ -20,14 +20,14 @@ class UserQuestion extends Model
      * The relation with userscenes (OneToMany Inverse)
      */
     public function userscene() {
-        return $this->belongsTo('App\Models\UserScene', 'id', 'userscene_id');
+        return $this->belongsTo('App\Models\UserScene', 'userscene_id', 'id');
     }
 
     /**
      * The relation with questions (OneToMany Inverse)
      */
     public function question() {
-        return $this->belongsTo('App\Models\Questions', 'id', 'question_id');
+        return $this->belongsTo('App\Models\Questions', 'question_id', 'id');
     }
 
     /**
@@ -61,6 +61,7 @@ class UserQuestion extends Model
         }
         $this->result = $result;
         $this->update();
+        return ($result > 0);
     }
 
     /**
@@ -70,7 +71,7 @@ class UserQuestion extends Model
      * @param $userAnswerIds
      * @return int
      */
-    private function calcResultType1($question,$userAnswerIds) {
+    private function calcResultType1($question, $userAnswerIds) {
         foreach($question->answers as $answer) {
             if ($answer->id == $userAnswerIds[0]) {
                 if ($answer->is_correct) {
@@ -88,9 +89,9 @@ class UserQuestion extends Model
      * @param $userAnswerIds
      * @return int
      */
-    private function calcResultType2($question,$userAnswerIds) {
+    private function calcResultType2($question, $userAnswerIds) {
         foreach($question->answers as $answer) {
-            if (in_array($answer->id,$userAnswerIds)) {
+            if (in_array($answer->id, $userAnswerIds)) {
                 if (!($answer->is_correct)) {
                     return 0;
                 }

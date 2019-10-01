@@ -78,11 +78,12 @@
     line-height: 16px;
     margin: 12px auto 4px;
 }
+/* the name of the exam */
 .sbarblock {
     border-radius: .25rem;
     border: none;
-    background-color: #343a40;
-    color: #FFF;
+    background-color: #f8fff6;
+    color: #000;
     text-align: center;
     cursor: default;
 }

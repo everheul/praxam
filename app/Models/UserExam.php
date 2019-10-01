@@ -20,7 +20,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use DB;
 
 class UserExam extends Model
 {
@@ -64,6 +64,14 @@ class UserExam extends Model
             ->whereNotNull('result')
             ->sum('userscenes.result');
         $this->result = $result;
+        
+        $scenes_left = DB::table('userscenes')
+            ->where('userexam_id', '=', $this->id)
+            ->where('locked',0)
+            ->count();
+        if ($scenes_left === 0) {
+            $this->finished_at = DB::raw('now()');
+        }
         $this->update();
     }
     
