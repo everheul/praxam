@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dea62b42ab241896e8ed6cdac01384b",
+    "content-hash": "ba03c0429354a4ae137a86aa84cb65c9",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -3077,78 +3077,6 @@
             "time": "2019-08-11T13:17:40+00:00"
         },
         {
-            "name": "crest_ekke/laravel-code-generator",
-            "version": "v4.0.0",
-            "dist": {
-                "type": "path",
-                "url": "../crest_ekke/laravel-code-generator",
-                "reference": "c7d2ac076e459336b125fc53f89daf464158cbcc"
-            },
-            "require": {
-                "laravel/framework": "~5.8"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "CrestApps\\CodeGenerator\\CodeGeneratorServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "CrestApps\\CodeGenerator\\": "src/"
-                }
-            },
-            "scripts": {
-                "post-install-cmd": [
-                    "composer dump-autoload"
-                ],
-                "post-update-cmd": [
-                    "composer dump-autoload"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Majd Alhayek (Mike)",
-                    "email": "mike@crestapps.com",
-                    "homepage": "https://www.crestapps.com"
-                },
-                {
-                    "name": "Ekke Verheul",
-                    "email": "ekke@darn.nl",
-                    "homepage": "http://darn.nl"
-                }
-            ],
-            "description": "An intelligent code generator for Laravel framework that will save you time! This awesome tool will help you generate resources like views, controllers, routes, migrations, languages and/or form-requests! It is extremely flexible and customizable to cover many on the use cases. It is shipped with cross-browsers compatible template, along with a client-side validation to modernize your application.",
-            "keywords": [
-                "Alhayek",
-                "CrestApps",
-                "Majd Alhayek",
-                "Mike Alhayek",
-                "code generator",
-                "code generator",
-                "code-generator",
-                "controller creator",
-                "crud",
-                "crud builder",
-                "crud generator",
-                "generator",
-                "generators",
-                "laravel",
-                "laravel code generator",
-                "laravel crud",
-                "laravel crud builder",
-                "laravel crud generator",
-                "laravel-code-generator",
-                "routes creator",
-                "views creator"
-            ]
-        },
-        {
             "name": "doctrine/cache",
             "version": "v1.8.0",
             "source": {
@@ -3663,16 +3591,16 @@
         },
         {
             "name": "mockery/mockery",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mockery/mockery.git",
-                "reference": "4eff936d83eb809bde2c57a3cea0ee9643769031"
+                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/4eff936d83eb809bde2c57a3cea0ee9643769031",
-                "reference": "4eff936d83eb809bde2c57a3cea0ee9643769031",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/b3453f75fd23d9fd41685f2148f4abeacabc6405",
+                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405",
                 "shasum": ""
             },
             "require": {
@@ -3686,7 +3614,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.2.x-dev"
                 }
             },
             "autoload": {
@@ -3724,7 +3652,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2019-08-07T15:01:07+00:00"
+            "time": "2019-09-30T08:30:27+00:00"
         },
         {
             "name": "myclabs/deep-copy",

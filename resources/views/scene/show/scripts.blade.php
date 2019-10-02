@@ -21,15 +21,9 @@
         if (sc.type == 2) {
             $("#accordion").accordion({
                 active: {{ $praxscene->nextQuestion() }},
-                heightStyle: "content"
-            });
-            $("#accordion").accordion({
-                header: "ui-icon-triangle-1-e",
-                activeHeader: "ui-icon-triangle-1-s",
+                heightStyle: "content",
                 collapsible: true
             });
-            //- skip earlier answered questions, if any:
-            //selectAccordionNext();
         }
     });
 
