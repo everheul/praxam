@@ -108,7 +108,6 @@ class UserSceneController extends Controller
      *
      * @param $scene
      * @param $userScene
-     **/
     private function mergeUserscene($scene, $userScene) {
         foreach($userScene->userquestions as $userquestion) {
             if (!is_null($userquestion->result)) {
@@ -127,6 +126,7 @@ class UserSceneController extends Controller
         }
         return $scene;
     }
+**/
 
     /**
 * Set the UserScenes' result & locked values until locked.

@@ -9,6 +9,7 @@ use App\Models\UserQuestion;
 use App\Models\UserExam;
 use App\Models\UserScene;
 use DB;
+use App\Http\Requests\NewPraxRequest;
 
 class UserExamController extends Controller
 {
@@ -68,20 +69,56 @@ class UserExamController extends Controller
      *
      * Make a new Practice Exam: a UserExam with UserScenes and UserQuestions.
      * The UserAnswers will be created after answering the questions.
-     * NOTE: This gets an Exam $exam_id too!
+     * NOTE: This needs an exam id; there's no prax id yet!
      *
      * @param  int  $exam_id
-     * @param  \Illuminate\Http\Request  $request
+     * @param  NewPraxRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $exam_id) {
+    public function store(NewPraxRequest $request, $exam_id) {
         // todo: check the route $examid with $request->examid ?
-        $scene_count = $request->scene_count;
-        $userexamid = (new UserExam())->create(['user_id' => $request->user()->id, 'exam_id' => $exam_id, 'scene_count' => $scene_count])->id;
-        $scenes = $this->getRandomScenes($exam_id, $scene_count);
-        $this->makeUserExamScenes($userexamid, $scenes);
-        return redirect(url("/prax/$userexamid/scene/1"));
+
+        $req_exam_id = $request->input('exam_id',$exam_id);
+        $scene_type = $request->input('scene_type',0);
+        $question_type = $request->input('question_type',0);
+        $scene_count = $request->input('scene_count',10);
+
+        $query = DB::table('scenes')
+            ->join('exam_scene', function ($join) use ($req_exam_id) {
+                $join->on('scenes.id', '=', 'exam_scene.scene_id')->where('exam_scene.exam_id', '=', $req_exam_id); })
+            ->join('questions', 'scenes.id', '=', 'questions.scene_id');
+        if ($scene_type > 0) {
+            $query = $query->where('scenes.scene_type_id', '=', $scene_type);
+        }
+        if ($question_type > 0) {
+            $query = $query->where('questions.question_type_id', '=', $question_type);
+        }
+        $scene_ids = $query->select('scenes.id')
+            ->inRandomOrder()
+            ->limit($scene_count)
+            ->get();
+
+        $nr = $scene_ids->count();
+
+        if ($nr === 0) {
+            return Redirect::back()->withErrors(['msg', 'No Scenes found for this combination of Types.']);
+        }
+
+        if ($nr < $scene_count) {
+            //- todo: add some more scenes!?
+            $scene_count = $nr;
+        }
+
+        $user_exam_id = (new UserExam())->create(['user_id' => $request->user()->id, 'exam_id' => $exam_id, 'scene_count' => $scene_count])->id;
+
+        //$scenes = $this->getRandomScenes($exam_id, $scene_count);
+
+        $this->makeUserExamScenes($user_exam_id, $scene_ids);
+
+        return redirect(url("/prax/$user_exam_id/scene/1"));
     }
+
+
 
     /**
      * Soft-delete the userexam.

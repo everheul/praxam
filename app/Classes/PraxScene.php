@@ -38,7 +38,7 @@ class PraxScene
 
     /**
      * JSON list with question data for template <scripts> sections, to be used by the accordion.
-     * Note: the Scene must be loaded with questions.
+     * Note: the Scene must be loaded with() questions.
      */
     public function questionTypes(): string {
         $a = [];
@@ -52,5 +52,34 @@ class PraxScene
         return json_encode($a);
     }
 
+    public function nextQuestion()
+    {
+        foreach ($this->praxquestions as $key => $praxquestion) {
+            if (!$praxquestion->is_locked) {
+                return $key;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * @param $image
+     * @return string
+     */
+    public function getImageSizeStr()
+    {
+        $image = $this->scene->image;
+        if (!empty($image)) {
+            $size = getimagesize(public_path() . '/img/' . $image);
+            if (!empty($size)) {
+                $width = ($size[0] > 0) ? (($size[0] < 9999) ? $size[0] : 0) : 0;
+                $height = ($size[1] > 0) ? (($size[1] < 9999) ? $size[1] : 0) : 0;
+                if ($width && $height) {
+                    return " width=\"$width\" height=\"$height\"";
+                }
+            }
+        }
+        return "";
+    }
 
 }

@@ -19,13 +19,13 @@
             @endforeach
             <div class="input-group-prepend mt-4">
                 <input class="btn btn-outline-danger px-4 py-1" type="submit" value="Done"{{ $praxquestion->disabled() }}>
-    @if($praxquestion->locked)
+    @if($praxquestion->is_locked)
                 <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/next">Next Scene</a>
     @endif
             </div>
         </form>
     </div>
-    @if($praxquestion->locked)
+    @if($praxquestion->is_locked)
     <div id="exp_{{ $praxquestion->question->id }}" >
         <div class="mt-3 px-3 pt-3 explanation">
             <h4>Explanation:</h4>

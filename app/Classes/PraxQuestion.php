@@ -11,7 +11,7 @@ class PraxQuestion
     public $question;
     public $userquestion;
     public $praxanswers = [];
-    public $locked = false;
+    public $is_locked = false;
 
     public function __construct(Question $question, UserQuestion $userquestion) {
 
@@ -19,11 +19,11 @@ class PraxQuestion
         $this->userquestion = $userquestion;
 
         if (!is_null($userquestion->result)) {
-            $this->locked = true;
+            $this->is_locked = true;
         }
 
         foreach($question->answers->sortBy('order') as $answer) {
-            $this->praxanswers[] = new PraxAnswer($answer, $this->locked);
+            $this->praxanswers[] = new PraxAnswer($answer, $this->is_locked);
         }
         
         //- add the selected answers in a double loop :-( todo?
@@ -44,7 +44,13 @@ class PraxQuestion
      * @return string
      */
     public function disabled() {
-        return ($this->locked) ? " disabled" : "";
+        return ($this->is_locked) ? " disabled" : "";
     }
 
+    /**
+     * @return mixed
+     */
+    public function isCheckedStr() {
+        return ($this->is_locked) ? "&nbsp;&nbsp;<i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i>" : ""; //   "<i class=\"fas fa-check\"></i>"" &#61452; "
+    }
 }

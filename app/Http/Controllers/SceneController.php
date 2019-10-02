@@ -58,17 +58,17 @@ class SceneController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($exam_id, $scene_id) {
-        //$scene = Scene::findOrFail($scene_id);
+    public function show($exam_id, $scene_id)
+    {
         $scene = $this->getFullScene($scene_id);
         $sidebar = (new Sidebar())->sceneExams($scene);
-        //dd($sidebar);
+
         return View( 'scene.show.type'.$scene->scene_type_id,
             [   'sidebar' => $sidebar,
                 'scene' => $scene,
                 'user' => ['exam' => 0, 'scene' => 0, 'order' => 0],
                 'action' => 'IGNORE',
-                'next' => "/exam/$exam_id/scene/0", //  . $this->nextSceneId($exam_id, $scene_id) . "/show"
+                'next' => "/exam/$exam_id/scene/0",
             ]);
     }
 

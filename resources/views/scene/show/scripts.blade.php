@@ -1,6 +1,6 @@
 {{-- scene.show.scripts
      Javascripts codes for scene.show
-     input: $scene
+     input: $praxscene
 --}}
 
 @push('scripts')
@@ -19,14 +19,17 @@
         });
         // more questions; activate the accordion:
         if (sc.type == 2) {
-            $("#accordion").accordion();
+            $("#accordion").accordion({
+                active: {{ $praxscene->nextQuestion() }},
+                heightStyle: "content"
+            });
             $("#accordion").accordion({
                 header: "ui-icon-triangle-1-e",
                 activeHeader: "ui-icon-triangle-1-s",
                 collapsible: true
             });
             //- skip earlier answered questions, if any:
-            selectAccordionNext();
+            //selectAccordionNext();
         }
     });
 
@@ -52,20 +55,20 @@
     }
 
     function selectAccordionNext() {
-        var done = true;
+        var busy = true;
         if (sc.type == 2) {
             var active = $('#accordion').accordion('option', 'active');
             $.each(ql, function(index, obj){
                 // todo: activate the next unanswered question
-                if ((done) && (index > active)) {
+                if ((busy) && (index > active)) {
                     if ($("#done_" + obj.id).prop('disabled') != true) {
-                        $("#accordion").accordion("option", 'active', index);
-                        done = false;
+                        $("#accordion").accordion({ active: index}); // "option", 'active', index);
+                        busy = false;
                     }
                 }
             });
         }
-        return done;
+        return busy;
     }
 
     function isAnswered(qid, qtype) {
