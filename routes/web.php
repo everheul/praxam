@@ -42,6 +42,7 @@ Route::prefix('/prax/{prax_id?}')->group(function () {
 	Route::get('/','UserExamController@show');
 	Route::delete('/','UserExamController@destroy');
 	Route::get('/show','UserExamController@show');
+	Route::get('/destroy','UserExamController@destroy');
 	Route::get('/next','UserExamController@nextScene');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
@@ -54,7 +55,15 @@ Route::prefix('/prax/{prax_id?}')->group(function () {
 Route::post('/answer','UserQuestionController@userAnswer');
 
 
-//--- authorized ADMINS only
+//--- authorized ADMINS and EXAM OWNERS
+
+/**
+ *  edit paths:
+ *  exam/{id}/edit											-> edit the exam fields, like head, name, intro..
+ *  exam/{id}/scene/{id}/edit								-> edit the scene fields, like head, text, image (depends on type)
+ *  exam/{id}/scene/{id}/question/{id}/edit					-> edit the question fields, like head, text, points..
+ *  exam/{id}/scene/{id}/question/{id}/answer/{id}/edit		-> edit the answer fields, like text, is_correct, order..
+ */
 
 //- all exam actions
 Route::get('/exam', 'ExamController@index');
@@ -68,16 +77,16 @@ Route::prefix('/exam/{exam_id?}')->group(function () {
 	Route::get('/kill','ExamController@kill');
 	//- all exam/scene actions
 	Route::get('/scene', 'SceneController@index');
-	Route::get('/scene/{scene_id?}', 'SceneController@show');
+        Route::get('/scene/create','SceneController@create');
+        Route::post('/scene/store','SceneController@store');
 	Route::prefix('/scene/{scene_id?}')->group(function () {
-		Route::get('/show','SceneController@show');
-		Route::get('/create','SceneController@create');
-		Route::post('/store','SceneController@store');
-		Route::get('/edit','SceneController@edit');
-		Route::post('/update','SceneController@update');
-		Route::get('/kill','SceneController@kill');
-		Route::get('/next','SceneController@nextScene');
-		//- any exam/scene/question actions?
+            Route::get('/','SceneController@show');
+            Route::get('/show','SceneController@show');
+            Route::get('/edit','SceneController@edit');
+            Route::post('/update','SceneController@update');
+            Route::get('/destroy','SceneController@destroy');
+            Route::get('/next','SceneController@nextScene');
+            //- any exam/scene/question actions?
 	});
 });
 

@@ -18,6 +18,7 @@ use App\Models\UserScene;
 use App\Helpers\Sidebar;
 use Illuminate\Support\Facades\Log;
 use DB;
+use Illuminate\Support\Facades\Storage;
 
 class UserQuestionController extends Controller
 {
@@ -38,13 +39,11 @@ class UserQuestionController extends Controller
     public function userAnswer(Request $request)
     {
         //dd($request);
-
         $user = $request->user();
         if (!empty($user)) {
             switch ($request->useraction) {
                 case 'ANSWER': /* user test */
                     $is_correct = $this->saveAnswer($user, $request->only("userquestion", "answer"));
-                    //- todo: show next question ?
                     if ($is_correct) {
                         return redirect("/prax/" . $this->prax_id . "/scene/" . $this->scene_order . "/next");
                     } else {
@@ -53,6 +52,7 @@ class UserQuestionController extends Controller
                     break;
                 case 'IGNORE': /* admin preview */
                     $this->answerToDisk($user, $request->all());
+                    return redirect("/exam/" . $request->get('exam') . "/scene/");
                     break;
                 default:
                     Log::warning("userAnswer, Unknown Action: " . $request->action);
@@ -150,7 +150,9 @@ class UserQuestionController extends Controller
     private function answerToDisk($user, $data) {
         $u = var_export($user,true);
         $d = var_export($data,true);
-        Storage::disk('local')->put('\post_result.txt', "USER: $u\n\n\nDATA: $d\n");
+        //- ?? doesn't do anything ??
+        Storage::disk('local')->put('post_result.txt', "USER: $u\n\n\nDATA: $d\n");
+        //dd($user, $data);
     }
     
 }

@@ -9,6 +9,8 @@ use App\Helpers\Helper as Helper;
 use App\Helpers\Sidebar as Sidebar;
 use DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Pagination\Paginator;
+use App\Classes\PraxScene;
 
 class SceneController extends Controller
 {
@@ -25,50 +27,55 @@ class SceneController extends Controller
      */
     public function index(Request $request, $exam_id)
     {
-        //- all this needs 'args2session'
+        //- code for 'args2session'
         $page_base = str_replace('/','.',$request->path());
         $this->registerPaginator($request,$page_base);
         $paginate = $request->session()->get('paginate', 10);
         $filter = $request->session()->get($page_base.'.filter', "");
-        $lf = Helper::likeFilter($filter);
         $direction = $request->session()->get($page_base.'.direction', 'asc');
         $sortby = $request->session()->get($page_base.'.sortby', 'id');
         if (!in_array($sortby,['id','created_at','scene_type_id','head'])) $sortby = 'id';
 
-        //DB::enableQueryLog();
         $exam = Exam::findOrFail($exam_id);
-        $scenes = $exam->scenes()->
-                where( function($q) use($lf) {
-                    $q->where('head', 'LIKE', $lf)->
-                        orWhere('text', 'LIKE', $lf)->
-                        orWhere('instructions', 'LIKE', $lf);
-                })->
-                orderBy($sortby, $direction)->
-                paginate($paginate);
-        //dd(DB::getQueryLog());
-        $sidebar = (new Sidebar)->editExamScenes($exam);
-        $data = compact('exam','scenes','paginate','filter','sortby','direction','sidebar');
+        $lf = Helper::likeFilter($filter);
 
-        return view('scene.index', $data);
+        /* note: the whereRaw below is a workaround for this grouped 'where' does not seem to work with paginate
+              ->where( function($q) use($lf) {
+                $q->where('head', 'LIKE', "'$lf'")->
+                orWhere('text', 'LIKE', "'$lf'")->
+                orWhere('instructions', 'LIKE', "'$lf'");
+                })
+
+            DB::enableQueryLog();
+            dd(DB::getQueryLog());
+        */
+
+        $scenes = $exam->scenes()
+                ->whereRaw("(`scenes`.`head` LIKE '$lf' or `scenes`.`text` LIKE '$lf' or `scenes`.`instructions` LIKE '$lf')")
+                ->orderBy($sortby, $direction)
+                ->paginate($paginate);
+
+        $sidebar = (new Sidebar)->editExamScenes($exam);
+
+        return view('scene.index', compact('exam','scenes','paginate','filter','sortby','direction','sidebar'));
     }
 
     /**
      * Show the scene. Admin mode, action IGNORE.
+     * todo: show all fields normally, but with edit icons, to favor editting of single fields.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($exam_id, $scene_id)
-    {
+    public function show($exam_id, $scene_id) {
         $scene = $this->getFullScene($scene_id);
+        $praxscene = new PraxScene($scene);
         $sidebar = (new Sidebar())->sceneExams($scene);
-
-        return View( 'scene.show.type'.$scene->scene_type_id,
+        return View( 'scene.type' . $scene->scene_type_id . '.show',
             [   'sidebar' => $sidebar,
-                'scene' => $scene,
-                'user' => ['exam' => 0, 'scene' => 0, 'order' => 0],
-                'action' => 'IGNORE',
-                'next' => "/exam/$exam_id/scene/0",
+                'praxscene' => $praxscene,
+                'useraction' => 'IGNORE',
+                'exam_id' => $exam_id,
             ]);
     }
 
@@ -105,14 +112,16 @@ class SceneController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($exam_id, $scene_id) {
-        $scene = Scene::findOrFail($scene_id);
-        return View('scene.edit.type'.$scene->scene_type_id, 
+        $scene = $this->getFullScene($scene_id);
+        
+        return View('scene.type' . $scene->scene_type_id . '.edit',
             [   'sidebar' => [],
+                'exam_id' => $exam_id,
                 'scene' => $scene,
-                'lastpage' => URL::previous()
+                'lastpage' => URL::previous(),
             ]);
     }
-
+    
     /**
      * POST
      *
@@ -145,9 +154,10 @@ class SceneController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function kill($exam_id, $scene_id) {
+    public function destroy($exam_id, $scene_id) {
         $scene = Scene::findOrFail($scene_id);
         $scene->delete();
+        return redirect("/exam/$exam_id/scene");
     }
 
     //--------
@@ -156,41 +166,38 @@ class SceneController extends Controller
      * get a scene with its question(s) and answers
      */
     public function getFullScene($scene_id) {
-        $scene = Scene::where('id', '=', $scene_id)->with('questions','questions.answers')->firstOrFail();
+        $scene = Scene::where('id', '=', $scene_id)->with('exam','questions','questions.answers')->firstOrFail();
         if ($scene->scene_type_id == 2) {
-            $this->setQuestionOrder($scene);
+            $scene->setQuestionsOrder();
         }
         return $scene;
     }
-
+    
     /**
-     * todo: set in db!
-     *
-     * @param  Scene  $scene
+     * Redirect to the next question of this exam
+     * 
+     * @param Request $request
+     * @param int $exam_id
+     * @param int $scene_id
+     * @return Response
      */
-    private function setQuestionOrder(Scene $scene) {
-        $n = 1;
-        foreach($scene->questions as &$question) {
-            $question->order = $n;
-            $n += 1;
-        }
-    }
-/*
-    private function nextSceneId($exam_id, $scene_id) {
-        $nextScene = DB::table('exam_scene')
-            ->select('scene_id')
-            ->where('exam_id','=',$exam_id)
-            ->where('scene_id','>',$scene_id)
-            ->orderBy('scene_id')
+    public function nextScene(Request $request, $exam_id, $scene_id) {
+        $nextScene = Scene::select('id')
+            ->where('exam_id', '=', $exam_id)
+            ->where('id','>',$scene_id)
+            ->orderBy('id')
             ->first();
         if (empty($nextScene)) {
-            $nextScene = DB::table('exam_scene')
-                ->select('scene_id')
-                ->where('exam_id','=',$exam_id)
-                ->orderBy('scene_id')
+            $nextScene = Scene::select('id')
+                ->where('exam_id', '=', $exam_id)
+                ->orderBy('id')
                 ->first();
         }
-        return (empty($nextScene)) ? 0 : $nextScene->id;
+        if (empty($nextScene)) {
+            return redirect("/exam/$exam_id/scene");
+        } else {
+            return redirect("/exam/$exam_id/scene/{$nextScene->id}");
+        }
     }
-*/
+    
 }

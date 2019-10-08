@@ -40,29 +40,14 @@ class UserSceneController extends Controller
         if (!$this->checkUser($request, $prax_id)) {
             return redirect(url("/home"));
         }
-
-        /*
-        //$userScene = $this->loadFullUserscene($prax_id, $order);
-        $userScene = UserScene::where('userexam_id','=',$prax_id)->where('order','=',$order)->with('userquestions','userquestions.useranswers')->firstOrFail();
-        //$scene = $this->mergeUserscene( $this->loadFullScene($userScene->scene_id), $userScene);
-        $scene = $this->mergeUserscene( (new SceneController())->getFullScene($userScene->scene_id), $userScene);
-        $userScene->setScene($scene);
-        //$nextId = $this->next($userexam, $order);
-        */
-
         $userexam = UserExam::where('id', $prax_id)->with('exam')->firstOrFail();
-        
-        if ($praxScene = $this->loadPraxScene($prax_id, $order)) {
-            $sidebar = (new SideBar)->practiceExam($userexam, $order);
-            return View('scene.type' . $praxScene->scene->scene_type_id . '.show',
-                [   'sidebar' => $sidebar,
-                    'praxscene' => $praxScene,
-                    'useraction' => 'ANSWER',
-                ]);
-        } else {
-            //- userScene not found?? redirect to result
-            return redirect(url("/prax/$prax_id/show"));
-        }
+        $praxScene = $this->loadPraxScene($prax_id, $order);
+        $sidebar = (new SideBar)->practiceExam($userexam, $order);
+        return View('scene.type' . $praxScene->scene->scene_type_id . '.show',
+            [   'sidebar' => $sidebar,
+                'praxscene' => $praxScene,
+                'useraction' => 'ANSWER',
+            ]);
     }
 
     /**
@@ -75,11 +60,8 @@ class UserSceneController extends Controller
             ->where('order','=',$order)
             ->with('userquestions','userquestions.useranswers')
             ->firstOrFail();
-        if (!empty($userScene)) {
-            $scene = (new SceneController())->getFullScene($userScene->scene_id);
-            return new PraxScene($scene, $userScene);
-        }
-        return false;
+        $scene = (new SceneController())->getFullScene($userScene->scene_id);
+        return (new PraxScene($scene))->setUserScene($userScene);
     }
 
     /**

@@ -10,17 +10,31 @@ use App\Classes\PraxAnswer;
 class PraxScene
 {
     public $scene;
-    public $userscene;
+    public $userscene = null;
     public $praxquestions = [];
 
-    public function __construct(Scene $scene, UserScene $userscene) {
+    public function __construct(Scene $scene) {
         $this->scene = $scene;
-        $this->userscene = $userscene;
-        foreach($userscene->userquestions as $userquestion) {
-            $question = $scene->questions->find($userquestion->question_id);
-            $this->praxquestions[] = new PraxQuestion($question, $userquestion);
+        foreach($scene->questions as $question) {
+            $this->praxquestions[] = new PraxQuestion($question);
         }
-        //dd($scene,$userscene,$this);
+    }
+
+    /**
+     * @param UserScene $userscene
+     */
+    public function setUserScene(UserScene $userscene) {
+        $this->userscene = $userscene;
+        foreach($this->praxquestions as $praxquestion) {
+            foreach($userscene->userquestions as $userquestion) {
+                if ($praxquestion->question->id === $userquestion->question_id) {
+                    $praxquestion->setUserQuestion($userquestion);
+                    break;
+                }
+            }
+        }
+        //dd($this);
+        return $this;
     }
 
     /**
@@ -52,10 +66,9 @@ class PraxScene
         return json_encode($a);
     }
 
-    public function nextQuestion()
-    {
+    public function nextQuestion() {
         foreach ($this->praxquestions as $key => $praxquestion) {
-            if (!$praxquestion->is_locked) {
+            if (!$praxquestion->locked) {
                 return $key;
             }
         }
@@ -82,4 +95,21 @@ class PraxScene
         return "";
     }
 
+    public function maxScore() {
+        $total = 0;
+        foreach($this->praxquestions as $praxquestion) {
+            $total += $praxquestion->question->points;
+        }
+        return $total;
+    }
+
+    public function score() {
+        $total = 0;
+        foreach($this->praxquestions as $praxquestion) {
+            if (!is_null($praxquestion->userquestion) && !is_null($praxquestion->userquestion->result)) {
+                $total += $praxquestion->userquestion->result;
+            }
+        }
+        return $total;
+    }
 }

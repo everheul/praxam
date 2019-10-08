@@ -73,9 +73,9 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($exam_id) {
+        $exam = Exam::findOrFail($exam_id);
         $user = Auth::user();
-        if (!empty($user) && $user->isAdmin()) {
-            $exam = Exam::findOrFail($exam_id);
+        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
             return View('exam.edit',
                 [   'sidebar' => (new Sidebar)->examEdit($exam),
                     'exam' => $exam ]
@@ -96,9 +96,9 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $exam_id) {
+        $exam = Exam::findOrFail($exam_id);
         $user = Auth::user();
-        if (!empty($user) && $user->isAdmin()) {
-            $exam = Exam::findOrFail($exam_id);
+        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
             $exam->fill($request->all());
             $image = $request->file('newimage');
             if (!empty($image)) {
@@ -118,9 +118,10 @@ class ExamController extends Controller
      */
     public function kill($exam_id) {
         $exam = Exam::findOrFail($exam_id);
-        $exam->delete();
-        //$exam->deleted_at = \Carbon\Carbon::now();
-        //$exam->update();
+        $user = Auth::user();
+        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
+            $exam->delete();
+        }
         return redirect(url("/exam"));
     }
 
@@ -146,6 +147,22 @@ class ExamController extends Controller
             return $this->show($exam_id);
         }
         return redirect(url("/exam/$exam_id/scene/{$scene->id}" ));
+    }
+
+    
+    /**
+     * load this exam with all its scenes, questions and answers
+     */
+    public function getFullExam($exam_id) {
+        $exam = Exam::where('id', '=', $exam_id)
+                ->with('scenes','scenes.questions','scenes.questions.answers')
+                ->firstOrFail();
+        foreach($exam->scenes as $scene) {
+            if ($scene->scene_type_id == 2) {
+                $scene->setQuestionsOrder(); //- todo: set in db!
+            }
+        }
+        return $exam;
     }
 
 }

@@ -22,7 +22,7 @@
                 <div class="row justify-content-center px-3">
                     <div id="accordion" class="accordion mt-2 w-100">
                         @foreach ($praxscene->praxquestions as $praxquestion)
-                            <h3>Question {{ $loop->iteration }}{!! $praxquestion->isCheckedStr() !!}</h3>
+                            <h3>Question {{ $loop->iteration }}{!! $praxquestion->checkedTabStr() !!}</h3>
                             <div class="w-100">
                                 @include('question.type' . $praxquestion->question->question_type_id . '.show')
                             </div>

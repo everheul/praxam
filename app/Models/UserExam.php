@@ -31,7 +31,7 @@ class UserExam extends Model
 
     //- fields that may be filled by create() and update();
     //  all others will be ignored without warning (!)
-    protected $fillable = [ 'user_id', 'exam_id', 'scene_count'];
+    protected $fillable = [ 'user_id', 'exam_id', 'scene_count', 'finished_at', 'result'];
 
     /**
      * The relation with userscenes (OneToMany)

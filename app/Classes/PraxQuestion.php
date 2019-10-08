@@ -9,48 +9,61 @@ use App\Classes\PraxAnswer;
 class PraxQuestion
 {
     public $question;
-    public $userquestion;
+    public $userquestion = null;
     public $praxanswers = [];
-    public $is_locked = false;
+    public $locked = false;
 
-    public function __construct(Question $question, UserQuestion $userquestion) {
-
+    public function __construct(Question $question) {
         $this->question = $question;
-        $this->userquestion = $userquestion;
-
-        if (!is_null($userquestion->result)) {
-            $this->is_locked = true;
-        }
-
         foreach($question->answers->sortBy('order') as $answer) {
-            $this->praxanswers[] = new PraxAnswer($answer, $this->is_locked);
+            $this->praxanswers[] = new PraxAnswer($answer);
         }
-        
+    }
+
+    /**
+     * @param UserQuestion $userquestion
+     */
+    public function setUserQuestion(UserQuestion $userquestion) {
+        $this->userquestion = $userquestion;
+        if (!is_null($userquestion->result)) {
+            $this->locked = true;
+        }
         //- add the selected answers in a double loop :-( todo?
         foreach($userquestion->useranswers as $useranswer) {
             foreach($this->praxanswers as $praxanswer) {
                 if ($praxanswer->answer->id === $useranswer->answer_id) {
                     $praxanswer->setUserAnswer($useranswer);
+                    break;
                 }
             }
-        }            
-        //    $useranswer = $userquestion->useranswers->firstWhere('question_id', $answer->id); // = null for not selected answers
-
-        //dd($this);
+            // todo: answer not found??
+        }
+        return $this;
     }
 
     /**
-     * Return the string that disables the 'Done' button if locked
-     * @return string
-     */
-    public function disabled() {
-        return ($this->is_locked) ? " disabled" : "";
-    }
-
-    /**
+     * This FormId is only important when there is a userquestion, otherwise it just has to be unique.
+     *
      * @return mixed
      */
-    public function isCheckedStr() {
-        return ($this->is_locked) ? "&nbsp;&nbsp;<i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i>" : ""; //   "<i class=\"fas fa-check\"></i>"" &#61452; "
+    public function getFormId() {
+        return (empty($this->userquestion)) ? $this->question->id : $this->userquestion->id;
+    }
+
+    /**
+     * Returns the string that disables the 'Done' button if locked
+     * @return string
+     */
+    public function disabledStr() {
+        return ($this->locked) ? " disabled" : "";
+    }
+
+    /**
+     * used for scene type 2 questions
+     *
+     * @return mixed
+     */
+    public function checkedTabStr() {
+        return ($this->locked) ? "&nbsp;&nbsp;<i class=\"fa fa-check-circle\" aria-hidden=\"true\"></i>" : ""; //   "<i class=\"fas fa-check\"></i>"" &#61452; "
     }
 }

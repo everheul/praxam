@@ -30,7 +30,7 @@
     function doneClicked(event) {
         /* the current question id and type are in event.data */
         if (isAnswered(event.data.id, event.data.type)) {
-            myForm = $("#form_" + event.data.id);
+            var myForm = $("#form_" + event.data.id);
             if (event.data.type == 3) {
                 $("#answers_" + event.data.id + " .dragable").each(function(){
                     var dom = document.createElement('input');
@@ -43,7 +43,8 @@
             //myForm.submit();
             return true;
         } else {
-            // tell the user to give an answer first
+            // todo: tell the user to give an answer first
+            console.log("No answer selected.");
         }
         return false;
     }

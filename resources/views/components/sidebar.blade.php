@@ -30,6 +30,9 @@
             @case('sbar-scene')
                 <a href="{{ $block['href'] }}" class="btn btn-sm btn-{{ $block['color'] }} py-2 mx-3 mt-2 d-block">{{ $block['head'] }}</a>
                 @break
+            @case('sbar-delete')
+                <a href="{{ $block['href'] }}" class="btn btn btn-outline-{{ $block['color'] }} py-2 mx-3 mt-2 d-block" {!! $block['msg'] !!}>{{ $block['head'] }}</a>
+                @break
         @endswitch
     @endforeach
 </div>

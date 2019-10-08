@@ -32,17 +32,25 @@ class Scene extends Model
     protected $fillable = ['scene_type_id', 'chapter', 'head', 'text', 'image'];
 
     /**
-     * The relation with exams (ManyToMany, using exam_scene)
+     * The relation with exams
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function exams() {
-        return $this->belongsToMany('App\Models\Exam', 'exam_scene');
+    public function exam() {
+        return $this->belongsTo('App\Models\Exam');
     }
-    
+
     /**
      * The relation with questions (OneToMany)
      */
     public function questions() {
         return $this->hasMany('App\Models\Question', 'scene_id', 'id')->orderBy('order');
+    }
+
+    /**
+     * The relation with userscenes (OneToMany)
+     */
+    public function userscenes() {
+        return $this->hasMany('App\Models\UserScene', 'scene_id', 'id');
     }
 
     /**
@@ -67,10 +75,15 @@ class Scene extends Model
     }
 
     /**
-     * The relation with userscenes (OneToMany)
+     * todo: set in db!
+     *
+     * @param  Scene  $scene
      */
-    public function userscenes() {
-        return $this->hasMany('App\Models\UserScene', 'scene_id', 'id');
+    public function setQuestionsOrder() {
+        $n = 1;
+        foreach($this->questions as &$question) {
+            $question->order = $n++;
+        }
     }
 
 }

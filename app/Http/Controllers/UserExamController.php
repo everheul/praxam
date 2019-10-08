@@ -10,6 +10,7 @@ use App\Models\UserExam;
 use App\Models\UserScene;
 use DB;
 use App\Http\Requests\NewPraxRequest;
+use App\Classes\PraxExam;
 
 class UserExamController extends Controller
 {
@@ -32,7 +33,6 @@ class UserExamController extends Controller
 
     /**
      * Display the Test Result of the specified userexam.
-     * TODO
      *
      * @param  int $id
      * @return \\Illuminate\Http\Response
@@ -43,14 +43,27 @@ class UserExamController extends Controller
             return redirect(url("/home"));
         }
 
-        $userexam = UserExam::where('id', $prax_id)->with('exam')->firstOrFail();
+        $praxexam = $this->loadPraxExam($prax_id);
 
         return View('userexam.show',
-            [   'sidebar' => (new Sidebar)->examResult($userexam),
-                'userexam' => $userexam ]
+            [   'sidebar' => (new Sidebar)->examResult($praxexam),
+                'praxexam' => $praxexam ]
         );
     }
 
+
+    /**
+     * @param  int  $prax_id
+     * @return  PraxExam|bool
+     */
+    private function loadPraxExam($prax_id) {
+        $userExam = UserExam::where('id', '=', $prax_id)
+            ->with('userscenes','userscenes.userquestions','userscenes.userquestions.useranswers')
+            ->firstOrFail();
+        $exam = (new ExamController())->getFullExam($userExam->exam_id);
+        return (new PraxExam($exam))->setUserExam($userExam);
+    }
+    
 
     /**
      * Show the form for creating a new UserExam.
@@ -101,7 +114,7 @@ class UserExamController extends Controller
         $nr = $scene_ids->count();
 
         if ($nr === 0) {
-            return Redirect::back()->withErrors(['msg', 'No Scenes found for this combination of Types.']);
+            return redirect()->back()->withInput()->withErrors('Sorry. No scenes found for this combination of types.');
         }
 
         if ($nr < $scene_count) {

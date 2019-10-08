@@ -18,7 +18,7 @@ class HomeController extends Controller
 
 
     /**
-     * Show the application dashboard.
+     * Show the users tests and exams.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -27,13 +27,10 @@ class HomeController extends Controller
         if (!empty($user)) {
             $sidebar = (new Sidebar)->examOverview();
             $working = UserExam::where('user_id','=',$user->id)->whereNull('finished_at')->with('exam')->with('userscenes')->get();
-            //dd($working);
             $hystory = UserExam::where('user_id','=',$user->id)->whereNotNull('finished_at')->with('exam')->get();
-            return view('home',
-                [   'sidebar' => $sidebar,
-                    'working' => $working,
-                    'hystory' => $hystory
-                ]);
+            $exams = Exam::where('created_by','=',$user->id)->get();
+            return view('home', compact('sidebar','working','hystory','exams'));
         }
     }
+
 }
