@@ -8,8 +8,6 @@ class UserQuestion extends Model
 {
     public $timestamps = false; //- same as userscenes, made with userexam.
 
-    public $question = null;
-    
     protected $table = 'userquestions';
 
     //- fields that may be filled by create() and update();
@@ -27,7 +25,7 @@ class UserQuestion extends Model
      * The relation with questions (OneToMany Inverse)
      */
     public function question() {
-        return $this->belongsTo('App\Models\Questions', 'question_id', 'id');
+        return $this->belongsTo('App\Models\Question', 'question_id', 'id');
     }
 
     /**

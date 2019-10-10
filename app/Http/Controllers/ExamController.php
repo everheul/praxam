@@ -23,7 +23,7 @@ class ExamController extends Controller
      */
     public function index() {
         return View('exam.index',
-            ['sidebar' => (new Sidebar)->examOverview(),
+            ['sidebar' => (new Sidebar)->sbarExamIndex(),
                 'exams' => Exam::get(['id','name','head','intro','image'])
         ]);
     }
@@ -38,7 +38,7 @@ class ExamController extends Controller
     public function show($exam_id) {
         $exam = Exam::findOrFail($exam_id);
         return View('exam.show',
-               ['sidebar' => (new Sidebar)->examOverview($exam),
+               ['sidebar' => (new Sidebar)->sbarExamShow($exam),
                 'exam' => $exam ]
         );
     }
@@ -147,22 +147,6 @@ class ExamController extends Controller
             return $this->show($exam_id);
         }
         return redirect(url("/exam/$exam_id/scene/{$scene->id}" ));
-    }
-
-    
-    /**
-     * load this exam with all its scenes, questions and answers
-     */
-    public function getFullExam($exam_id) {
-        $exam = Exam::where('id', '=', $exam_id)
-                ->with('scenes','scenes.questions','scenes.questions.answers')
-                ->firstOrFail();
-        foreach($exam->scenes as $scene) {
-            if ($scene->scene_type_id == 2) {
-                $scene->setQuestionsOrder(); //- todo: set in db!
-            }
-        }
-        return $exam;
     }
 
 }

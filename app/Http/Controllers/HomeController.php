@@ -25,7 +25,7 @@ class HomeController extends Controller
     public function index() {
         $user = Auth::user();
         if (!empty($user)) {
-            $sidebar = (new Sidebar)->examOverview();
+            $sidebar = (new Sidebar)->sbarHomeIndex();
             $working = UserExam::where('user_id','=',$user->id)->whereNull('finished_at')->with('exam')->with('userscenes')->get();
             $hystory = UserExam::where('user_id','=',$user->id)->whereNotNull('finished_at')->with('exam')->get();
             $exams = Exam::where('created_by','=',$user->id)->get();

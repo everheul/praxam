@@ -43,7 +43,7 @@ class Scene extends Model
      * The relation with questions (OneToMany)
      */
     public function questions() {
-        return $this->hasMany('App\Models\Question', 'scene_id', 'id')->orderBy('order');
+        return $this->hasMany('App\Models\Question', 'scene_id', 'id')->orderBy('order')->orderBy('id');
     }
 
     /**

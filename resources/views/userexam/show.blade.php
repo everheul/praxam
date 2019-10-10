@@ -9,7 +9,7 @@
             <div class="card w-100">
                 <div class="examtext">
                     <h1 class="text-center">Test Result</h1>
-                    <h3 class="text-center">{{ $praxexam->userexam->exam->name }}, {{ $praxexam->userexam->exam->head }}</h3>
+                    <h3 class="text-center">{{ $praxexam->exam->name }}, {{ $praxexam->exam->head }}</h3>
                 </div>
             </div>
             <div class="card w-100 mt-2">

@@ -8,37 +8,45 @@ use App\Models\UserExam;
 use App\Models\UserScene;
 use App\Classes\PraxQuestion;
 use App\Classes\PraxAnswer;
+use DB;
 
 class PraxExam
 {
-    public $exam;
-    public $userexam = null;
-    public $praxscenes = [];
+    public $exam = NULL;
+    public $userexam = NULL;
+    public $praxscenes;
 
-    public function __construct(Exam $exam) {
-        $this->exam = $exam;
-        foreach($exam->scenes as $scene) {
-            $this->praxscenes[] = new PraxScene($scene);
-        }
+    /**
+     * Load all the data we need to make a complete PraxExam piramide.
+     *
+     * @param int $userexam_id
+     * @return $this
+     */
+    public function loadUserExamData($userexam_id) {
+        //DB::enableQueryLog();
+        $userexam = UserExam::where('id','=',$userexam_id)
+            ->with('exam','userscenes','userscenes.userquestions','userscenes.userquestions.useranswers')
+            ->with('userscenes.scene','userscenes.userquestions.question','userscenes.userquestions.question.answers')
+            ->firstOrFail();
+        //dd(DB::getQueryLog(),$userexam);
+        $this->setUserExamData($userexam);
+        return $this;
     }
 
     /**
-     * @param UserScene $userscene
+     * @param UserExam $userexam
+     * @return $this
      */
-    public function setUserExam(UserExam $userexam) {
+    public function setUserExamData(UserExam $userexam) {
         $this->userexam = $userexam;
-        foreach($this->praxscenes as $praxscene) {
-            foreach($userexam->userscenes as $userscene) {
-                if ($praxscene->scene->id === $userscene->scene_id) {
-                    $praxscene->setUserScene($userscene);
-                    break;
-                }
-            }
+        $this->exam = $userexam->exam;
+        $this->praxscenes = collect();
+        foreach($userexam->userscenes as $userscene) {
+            $this->praxscenes->add((new PraxScene())->setUserSceneData($userscene, $this));
         }
         //dd($this);
         return $this;
     }
-
 
     
 }

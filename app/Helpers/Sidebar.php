@@ -15,52 +15,75 @@ class Sidebar
     private $blocks = [];
 
     /**
-     * Called from SceneController@index
+     * Called from: ExamController@index
+     * @return array
+     */
+    public function sbarExamIndex() {
+        $this->sbarHead('All Exams','overview');
+        return $this->blocks;
+    }
+
+    /**
+     * Called from: ExamController@show
      * @param Exam $exam
      * @return array
      */
-    public function editExamScenes($exam = null) {
-        if (!empty($exam)) {
-            $id = $exam->id;
-            $this->sbarLink('Exams','overview',"/exam");
-            $this->sbarBlock($exam->name, $exam->head);
-            $this->sbarButton('Start Practice Exam',"/prax/$id/create",'dark');
-            $user = Auth::user();
-            if (!empty($user) && $user->isAdmin()) {
-                $this->sbarHead("Exam", 'Admin Controls');
-                $this->sbarButton('Edit Exam', "/exam/$id/edit/", 'dark');
-                $this->sbarButton('Cancel',"/exam/$id/show/",'dark');
-            }
+    public function sbarExamShow(Exam $exam) {
+        $id = $exam->id;
+        $this->sbarLink('All Exams','overview',"/exam");
+        $this->sbarBlock($exam->name, $exam->head);
+        $this->sbarButton('Start Test',"/prax/$id/create",'dark');
+        if (Auth::user()->isAdmin()) {
+            $this->sbarHead("- = -", 'Admin Controls');
+            $this->sbarButton('Edit Exam',"/exam/$id/edit/",'primary');
+            $this->sbarButton('Manage Scenes',"/exam/$id/scene/",'primary');
+            $this->sbarDelete('Delete Exam',"/exam/$id/destroy");
         }
         return $this->blocks;
     }
 
     /**
-     *
+     * Called from SceneController@index
      * @param Exam $exam
      * @return array
      */
-    public function examOverview($exam = null)
-    {
-        if (!empty($exam)) {
-            $id = $exam->id;
-            $this->sbarLink('Exams','overview',"/exam");
-            $this->sbarBlock($exam->name, $exam->head);
-            $this->sbarButton('Start Practice Exam',"/prax/$id/create",'dark');
-            $user = Auth::user();
-            if (!empty($user) && $user->isAdmin()) {
-                $this->sbarHead("Exam", 'Admin Controls');
-                $this->sbarButton('Edit Exam',"/exam/$id/edit/",'dark');
-    //            $this->sbarButton('Delete Exam',"/exam/$id/kill/",'danger'); //- todo:  onclick="return confirm(&quot;Click Ok to delete this Scene.&quot;)"
-                $this->sbarButton('Manage Scenes',"/exam/$id/scene/",'dark');
-            }
-        } else {
-            $this->sbarHead('Exams','overview');
-            $exams = Exam::get(['id', 'name', 'head']);
-            foreach ($exams as $exam) {
-                $this->sbarLink($exam->name,$exam->head,"/exam/".$exam->id."/show");
-            }
+    public function sbarSceneIndex($exam) {
+        $id = $exam->id;
+        $this->sbarLink('All Exams','overview',"/exam");
+        $this->sbarBlock($exam->name, $exam->head);
+        $this->sbarButton('Start Test',"/prax/$id/create",'dark');
+        if (Auth::user()->isAdmin()) {
+            $this->sbarHead("- = -", 'Admin Controls');
+            $this->sbarButton('Edit Exam', "/exam/$id/edit/", 'primary');
+            $this->sbarButton('Cancel',"/exam/$id/show/",'dark');
+            $this->sbarDelete('Delete Exam',"/exam/$id/destroy");
         }
+        return $this->blocks;
+    }
+
+    /**
+     * Called from HomeController@index
+     */
+    public function sbarHomeIndex() {
+        $this->sbarLink('All Exams','overview',"/exam");
+        $exams = Exam::get(['id', 'name', 'head']);
+        foreach ($exams as $exam) {
+            $this->sbarLink($exam->name, $exam->head, "/exam/".$exam->id."/show");
+        }
+        return $this->blocks;
+    }
+
+    /**
+     * The menu during the test, called from
+     *
+     * @param  PraxExam  $praxexam
+     * @param  int  $order
+     * @return  array
+     */
+    public function practiceExam(PraxExam $praxexam, $order) {
+        $this->sbarBlock($praxexam->exam->name, $praxexam->exam->head);
+        $this->userSceneList($praxexam, $order);
+        $this->sbarScene("View Score","/prax/{$praxexam->userexam->id}/show","outline-dark");
         return $this->blocks;
     }
 
@@ -90,6 +113,16 @@ class Sidebar
         return $this->blocks;
     }
 
+    private function getSceneOrderOfTotal($exam_id, $scene_id) {
+        $scenes = Scene::select('id')
+            ->where('exam_id', '=', $exam_id)
+            ->orderBy('id')
+            ->get();
+        $idlist = array_flip($scenes->pluck('id')->all());
+        $total = $scenes->count();
+        return sprintf("%d of %d", $idlist[$scene_id]+1, $total);
+    }
+
     public function editUserExam($exam) {
         $this->sbarBlock($exam->name, $exam->head);
         $this->sbarHead("Start Exam", '');
@@ -97,57 +130,37 @@ class Sidebar
         return $this->blocks;
     }
 
-    public function practiceExam(UserExam $userexam, $order) {
-        $this->sbarBlock($userexam->exam->name, $userexam->exam->head);
-        $this->userSceneList($userexam->id, $order);
-        $this->sbarScene("View Score","/prax/{$userexam->id}/show","outline-dark");
-        return $this->blocks;
-    }
-
-    // todo
+    /**
+     * Called from UserExamController@show
+     *
+     * @param PraxExam $praxexam
+     * @return array
+     */
     public function examResult(PraxExam $praxexam) {
         $exam_id = $praxexam->exam->id;
         $this->sbarBlock($praxexam->exam->name, $praxexam->exam->head);
         $this->sbarButton('Back to Overview',"/exam",'dark');
         $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
         //$this->sbarBlock('Started At',$prax->created_at);
-        $this->userSceneList($exam_id, 0); // todo: use $praxexam ??
+        $this->userSceneList($praxexam, 0);
     //    $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
         return $this->blocks;
     }
 
     //-- private functions -- synq with view/components/sidebar.blade.php
 
-    private function userSceneList($prax_id, $order) {
-        // load all userscenes and their userquestions objects
-        $userscenes = UserScene::where('userexam_id','=',$prax_id)->orderBy('order')->get();
+    private function userSceneList(PraxExam $praxexam, $order) {
+        $userscenes = $praxexam->userexam->userscenes;
         foreach($userscenes as $us) {
             $scorder = $us->order;
             $head = "Scene $scorder";
-            $href = "/prax/$prax_id/scene/$scorder";
-            $locked = $us->locked;
-            $col = $locked ? "info" : "dark";
+            $href = "/prax/{$praxexam->userexam->id}/scene/$scorder";
+            $col = $us->locked ? "info" : "dark";
             if ($order != $scorder) {
                 $col = 'outline-' . $col;
             }
             $this->sbarScene($head,$href,$col);
         }
-    }
-
-    /**
-     * 
-     * @param int $exam_id
-     * @param int $scene_id
-     * @return string
-     */
-    private function getSceneOrderOfTotal($exam_id, $scene_id) {
-        $scenes = Scene::select('id')
-                ->where('exam_id', '=', $exam_id)
-                ->orderBy('id')
-                ->get();
-        $idlist = array_flip($scenes->pluck('id')->all());       
-        $total = $scenes->count();
-        return sprintf("%d of %d", $idlist[$scene_id]+1, $total);
     }
 
     

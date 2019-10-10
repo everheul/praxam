@@ -49,13 +49,12 @@ class SceneController extends Controller
             DB::enableQueryLog();
             dd(DB::getQueryLog());
         */
-
         $scenes = $exam->scenes()
                 ->whereRaw("(`scenes`.`head` LIKE '$lf' or `scenes`.`text` LIKE '$lf' or `scenes`.`instructions` LIKE '$lf')")
                 ->orderBy($sortby, $direction)
                 ->paginate($paginate);
 
-        $sidebar = (new Sidebar)->editExamScenes($exam);
+        $sidebar = (new Sidebar)->sbarSceneIndex($exam);
 
         return view('scene.index', compact('exam','scenes','paginate','filter','sortby','direction','sidebar'));
     }
@@ -64,7 +63,8 @@ class SceneController extends Controller
      * Show the scene. Admin mode, action IGNORE.
      * todo: show all fields normally, but with edit icons, to favor editting of single fields.
      *
-     * @param  int  $id
+     * @param  int  $exam_id
+     * @param  int  $scene_id
      * @return \Illuminate\Http\Response
      */
     public function show($exam_id, $scene_id) {

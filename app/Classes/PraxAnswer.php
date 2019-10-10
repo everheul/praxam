@@ -7,17 +7,23 @@ use App\Models\UserAnswer;
 
 class PraxAnswer
 {
-    public $answer;
-    public $useranswer;
+    public $parent = NULL;          //-> PraxQuestion
+    public $answer = NULL;
+    public $useranswer = NULL;
     public $checked = false;
+    public $locked = false;
 
-    public function __construct(Answer $answer) {
+
+    public function setAnswerData(Answer $answer, PraxQuestion $parent = NULL) {
         $this->answer = $answer;
+        $this->parent = $parent;
+        return $this;
     }
 
-    public function setUserAnswer(UserAnswer $useranswer) {
+    public function setUserAnswerData(UserAnswer $useranswer) {
         $this->useranswer = $useranswer;
         $this->checked = true;
+        $this->locked = $this->parent->locked;
         return $this;
     }
     

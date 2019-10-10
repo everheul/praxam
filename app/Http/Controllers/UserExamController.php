@@ -33,37 +33,24 @@ class UserExamController extends Controller
 
     /**
      * Display the Test Result of the specified userexam.
+     * todo: checkUser to Middleware
      *
      * @param  int $id
      * @return \\Illuminate\Http\Response
      */
-    public function show(Request $request, $prax_id) {
+    public function show(Request $request, $userexam_id) {
 
-        if (!$this->checkUser($request, $prax_id)) {
+        if (!$this->checkUser($request, $userexam_id)) {
             return redirect(url("/home"));
         }
 
-        $praxexam = $this->loadPraxExam($prax_id);
+        $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
 
         return View('userexam.show',
             [   'sidebar' => (new Sidebar)->examResult($praxexam),
                 'praxexam' => $praxexam ]
         );
     }
-
-
-    /**
-     * @param  int  $prax_id
-     * @return  PraxExam|bool
-     */
-    private function loadPraxExam($prax_id) {
-        $userExam = UserExam::where('id', '=', $prax_id)
-            ->with('userscenes','userscenes.userquestions','userscenes.userquestions.useranswers')
-            ->firstOrFail();
-        $exam = (new ExamController())->getFullExam($userExam->exam_id);
-        return (new PraxExam($exam))->setUserExam($userExam);
-    }
-    
 
     /**
      * Show the form for creating a new UserExam.
@@ -79,6 +66,7 @@ class UserExamController extends Controller
 
     /**
      * POST
+     * todo:
      *
      * Make a new Practice Exam: a UserExam with UserScenes and UserQuestions.
      * The UserAnswers will be created after answering the questions.

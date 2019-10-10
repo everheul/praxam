@@ -8,35 +8,50 @@ use App\Classes\PraxAnswer;
 
 class PraxQuestion
 {
-    public $question;
-    public $userquestion = null;
-    public $praxanswers = [];
+    public $parent = NULL;          //-> PraxScene
+    public $userquestion = NULL;    //-> UserQuestion
+    public $question = NULL;        //-> Question
+    public $praxanswers;            //-= PraxAnswers Collection
     public $locked = false;
 
-    public function __construct(Question $question) {
-        $this->question = $question;
-        foreach($question->answers->sortBy('order') as $answer) {
-            $this->praxanswers[] = new PraxAnswer($answer);
-        }
+    /**
+     * Load all the data we need to make a complete PraxScene piramide.
+     *
+     * @param int $userscene_id
+     * @return $this
+     */
+    public function loadUserQuestionData(int $userquestion_id) {
+        //DB::enableQueryLog();
+        $userquestion = UserQuestion::where('id', '=', $userquestion_id)
+            ->with('useranswers','question','question.answers')
+            ->firstOrFail();
+        //dd(DB::getQueryLog());
+        $this->setUserSceneData($userquestion);
+        return $this;
     }
 
     /**
-     * @param UserQuestion $userquestion
+     * Create the rest of the PraxScene piramide.
+     *
+     * @param UserScene $userscene
+     * @param UserExam|null $parent
+     * @return $this
      */
-    public function setUserQuestion(UserQuestion $userquestion) {
+    public function setUserQuestionData(UserQuestion $userquestion, PraxScene $parent = NULL) {
+        $this->parent = $parent;
         $this->userquestion = $userquestion;
-        if (!is_null($userquestion->result)) {
-            $this->locked = true;
+        $this->question = $userquestion->question;
+        $this->praxanswers = collect();
+        //dd($userquestion);
+        //- create the PraxAnswers:
+        //- $userquestion->question also has its answers eagerloaded, because useranswers are optional.
+        foreach($userquestion->question->answers as $answer) {
+            $this->praxanswers->add((new PraxAnswer())->setAnswerData($answer, $this));
         }
-        //- add the selected answers in a double loop :-( todo?
         foreach($userquestion->useranswers as $useranswer) {
-            foreach($this->praxanswers as $praxanswer) {
-                if ($praxanswer->answer->id === $useranswer->answer_id) {
-                    $praxanswer->setUserAnswer($useranswer);
-                    break;
-                }
-            }
-            // todo: answer not found??
+            $this->locked = true;
+            // todo: what if..?
+            $this->praxanswers->firstWhere('answer.id', $useranswer->answer_id)->setUserAnswerData($useranswer);
         }
         return $this;
     }

@@ -10,6 +10,7 @@ use App\Helpers\Sidebar;
 use App\Classes\PraxScene;
 use App\Classes\PraxQuestion;
 use App\Classes\PraxAnswer;
+use App\Classes\PraxExam;
 
 class UserSceneController extends Controller
 {
@@ -30,22 +31,25 @@ class UserSceneController extends Controller
     }
 
     /**
-     * Display the scene as part of a test
-     * todo: disable input for questions that are locked, and show the chosen answers.
+     * Display the scene as part of a test.
+     * The (user)exam and all scenes are loaded to fill the sidebar.
+     * todo: a new PraxExam function that just loads what we need here.
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $prax_id, $order) {
+    public function show(Request $request, $userexam_id, $order) {
 
-        if (!$this->checkUser($request, $prax_id)) {
+        if (!$this->checkUser($request, $userexam_id)) {
             return redirect(url("/home"));
         }
-        $userexam = UserExam::where('id', $prax_id)->with('exam')->firstOrFail();
-        $praxScene = $this->loadPraxScene($prax_id, $order);
-        $sidebar = (new SideBar)->practiceExam($userexam, $order);
-        return View('scene.type' . $praxScene->scene->scene_type_id . '.show',
+
+        $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
+        $praxscene = $praxexam->praxscenes->where('userscene.order', $order)->first();
+        $sidebar = (new SideBar)->practiceExam($praxexam, $order);
+
+        return View('scene.type' . $praxscene->scene->scene_type_id . '.show',
             [   'sidebar' => $sidebar,
-                'praxscene' => $praxScene,
+                'praxscene' => $praxscene,
                 'useraction' => 'ANSWER',
             ]);
     }
@@ -54,7 +58,6 @@ class UserSceneController extends Controller
      * @param  int  $prax_id
      * @param  int  $order
      * @return  PraxScene|bool
-     */
     private function loadPraxScene($prax_id, $order) {
         $userScene = UserScene::where('userexam_id','=',$prax_id)
             ->where('order','=',$order)
@@ -63,6 +66,7 @@ class UserSceneController extends Controller
         $scene = (new SceneController())->getFullScene($userScene->scene_id);
         return (new PraxScene($scene))->setUserScene($userScene);
     }
+*/
 
     /**
      * Select the next scene to display when the user selects '' or 'continue'
@@ -135,7 +139,7 @@ class UserSceneController extends Controller
 
     /**
      * Make sure this userExam was created by THIS user.
-     * todo: move to User?
+     * todo: to Middleware
      *
      * @param Request $request
      * @param $prax_id

@@ -2,7 +2,7 @@
 
 /**
  * This is in fact a pivot table between users and exams,
- * but it has to hold a few things more so a Model seemed more practical..?
+ * but it has to hold a few things more so a Model seemed more practical.
  *
  *  CREATE TABLE `userexams` (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
