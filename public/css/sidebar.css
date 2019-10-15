@@ -90,10 +90,10 @@
 .sbarblock>.sbar_head, .sbarlink>.sbar_head {
     font-size: 24px;
     line-height: 20px;
-    margin: 10px auto 0;
+    margin: 4px auto 0;
 }
 .sbarblock>.sbar_text, .sbarlink>.sbar_text {
     font-size: 16px;
     line-height: 18px;
-    margin: 6px auto 4px;
+    margin: 6px auto 0;
 }

@@ -63,8 +63,8 @@ class PraxScene
         $this->scene = $userscene->scene;
         $this->praxquestions = collect();
         //- create the PraxQuestions:
-        foreach($userscene->userquestions as $userquestion) {
-            $this->praxquestions->add((new PraxQuestion())->setUserQuestionData($userquestion, $this));
+        foreach($userscene->userquestions as $index => $userquestion) {
+            $this->praxquestions->add((new PraxQuestion())->setUserQuestionData($userquestion, $this)->setOrder($index+1));
         }
         return $this;
     }
@@ -96,6 +96,7 @@ class PraxScene
         return json_encode($a);
     }
 
+    // todo: obsolete?
     public function nextQuestion() {
         foreach ($this->praxquestions as $key => $praxquestion) {
             if (!$praxquestion->locked) {

@@ -19,10 +19,9 @@ class Sidebar
      * @return array
      */
     public function sbarExamIndex() {
-        $this->sbarHead('All Exams','overview');
+        $this->myPracxam();
         return $this->blocks;
     }
-
     /**
      * Called from: ExamController@show
      * @param Exam $exam
@@ -30,8 +29,9 @@ class Sidebar
      */
     public function sbarExamShow(Exam $exam) {
         $id = $exam->id;
-        $this->sbarLink('All Exams','overview',"/exam");
-        $this->sbarBlock($exam->name, $exam->head);
+        $this->myPracxam();
+        $this->allExams();
+        $this->examLogo($exam);
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
             $this->sbarHead("- = -", 'Admin Controls');
@@ -49,8 +49,9 @@ class Sidebar
      */
     public function sbarSceneIndex($exam) {
         $id = $exam->id;
-        $this->sbarLink('All Exams','overview',"/exam");
-        $this->sbarBlock($exam->name, $exam->head);
+        $this->myPracxam();
+        $this->allExams();
+        $this->examLogo($exam);
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
             $this->sbarHead("- = -", 'Admin Controls');
@@ -65,7 +66,7 @@ class Sidebar
      * Called from HomeController@index
      */
     public function sbarHomeIndex() {
-        $this->sbarLink('All Exams','overview',"/exam");
+        $this->allExams();
         $exams = Exam::get(['id', 'name', 'head']);
         foreach ($exams as $exam) {
             $this->sbarLink($exam->name, $exam->head, "/exam/".$exam->id."/show");
@@ -74,14 +75,16 @@ class Sidebar
     }
 
     /**
-     * The menu during the test, called from
+     * The menu during the test, called from UserSceneController@show
      *
      * @param  PraxExam  $praxexam
      * @param  int  $order
      * @return  array
      */
     public function practiceExam(PraxExam $praxexam, $order) {
-        $this->sbarBlock($praxexam->exam->name, $praxexam->exam->head);
+        $this->myPracxam();
+        $this->allExams();
+        $this->examLogo($praxexam->exam);
         $this->userSceneList($praxexam, $order);
         $this->sbarScene("View Score","/prax/{$praxexam->userexam->id}/show","outline-dark");
         return $this->blocks;
@@ -124,6 +127,7 @@ class Sidebar
     }
 
     public function editUserExam($exam) {
+        $this->sbarLink('Exams','overview',"/exam");
         $this->sbarBlock($exam->name, $exam->head);
         $this->sbarHead("Start Exam", '');
         $this->sbarButton('Cancel',"/exam/".$exam->id."/show",'dark');
@@ -138,9 +142,9 @@ class Sidebar
      */
     public function examResult(PraxExam $praxexam) {
         $exam_id = $praxexam->exam->id;
+        $this->sbarLink('Exams','overview',"/exam");
         $this->sbarBlock($praxexam->exam->name, $praxexam->exam->head);
-        $this->sbarButton('Back to Overview',"/exam",'dark');
-        $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
+//        $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
         //$this->sbarBlock('Started At',$prax->created_at);
         $this->userSceneList($praxexam, 0);
     //    $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
@@ -163,7 +167,19 @@ class Sidebar
         }
     }
 
-    
+
+    private function myPracxam() {
+        $this->sbarLink('My Pracxam','Dashboard',"/home",'secondary');
+    }
+
+    private function allExams() {
+        $this->sbarLink('All Exams','',"/exam",'secondary');
+    }
+
+    private function examLogo(Exam $exam) {
+        $this->sbarBlock($exam->name, $exam->head);
+    }
+
     private function sbarHead($head, $text) {
         $this->blocks[] = ['type' => 'sbar-head', 'head' => $head, 'text' => $text];
     }
@@ -172,8 +188,8 @@ class Sidebar
         $this->blocks[] = ['type' => 'sbar-block', 'head' => $head, 'text' => $text];
     }
 
-    private function sbarLink($head, $text, $href) {
-        $this->blocks[] = ['type' => 'sbar-link', 'head' => $head, 'text' => $text, 'href' => $href ];
+    private function sbarLink($head, $text, $href, $color = 'dark') {
+        $this->blocks[] = ['type' => 'sbar-link', 'head' => $head, 'text' => $text, 'href' => $href, 'color' => $color ];
     }
 
     private function sbarButton($head, $href, $color = 'dark') {

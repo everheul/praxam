@@ -19,9 +19,11 @@
                 </div>
                 @break
             @case('sbar-link')
-                <a class="sbarlink btn btn-outline-dark d-block py-1 mx-3 mt-2" href="{{ $block['href'] }}">
+                <a class="sbarlink btn btn-outline-{{ $block['color'] }} d-block py-2 mx-3 mt-2" href="{{ $block['href'] }}">
                     <div class="sbar_head">{{ $block['head'] }}</div>
-                    <div class="sbar_text">{{ $block['text'] }}</div>
+                    @if(!empty($block['text']))
+                        <div class="sbar_text">{{ $block['text'] }}</div>
+                    @endif
                 </a>
                 @break
             @case('sbar-button')

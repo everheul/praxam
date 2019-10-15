@@ -39,8 +39,8 @@ class PraxAnswer
      * Return the string that holds the correct order of this answer (type 3) if locked
      * @return  string
      */
-    public function orderStr($locked) {
-        return ($locked && $this->answer->correct_order > 0) ? $this->answer->correct_order . '. ' : "";
+    public function orderStr() {
+        return ($this->locked && $this->answer->correct_order > 0) ? $this->answer->correct_order . '. ' : "";
     }
 
     /**
@@ -49,8 +49,8 @@ class PraxAnswer
      *
      * @return string
      */
-    public function coolnessStr($locked) {
-        if ($locked) {
+    public function coolnessStr() {
+        if ($this->locked) {
             $cool = is_null($this->answer->correct_order) ? ($this->answer->is_correct === 1) : ($this->answer->correct_order > 0);
             return $cool ? 'correct ' : 'wrong ';
         }

@@ -37,18 +37,21 @@ Route::prefix('/prax/{exam_id?}')->group(function () {
 	Route::get('/create','UserExamController@create');
 	Route::post('/store','UserExamController@store');
 });
-//- show,
+
 Route::prefix('/prax/{prax_id?}')->group(function () {
 	Route::get('/','UserExamController@show');
 	Route::delete('/','UserExamController@destroy');
 	Route::get('/show','UserExamController@show');
 	Route::get('/destroy','UserExamController@destroy');
-	Route::get('/next','UserExamController@nextScene');
+	Route::get('/next','UserQuestionController@nextQuestion'); //'UserExamController@nextScene');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
 	Route::get('/scene/{order}','UserSceneController@show');
 	Route::get('/scene/{order}/show','UserSceneController@show');
 	Route::get('/scene/{order}/next','UserExamController@nextScene');
+	//- one prax/scene/question action
+	Route::get('/scene/{s_order}/question/{q_order}','UserSceneController@show');
+	Route::get('/scene/{s_order}/question/{q_order}/next','UserQuestionController@nextQuestion');
 });
 
 //- all user answers go to:

@@ -14,7 +14,7 @@ use App\Classes\PraxExam;
 
 class UserExamController extends Controller
 {
-    // used to check user-exam ownership once
+    // used to check user-exam ownership once, todo: to Middleware
     private $user_checked;
 
 
@@ -66,7 +66,7 @@ class UserExamController extends Controller
 
     /**
      * POST
-     * todo:
+     * todo: validate
      *
      * Make a new Practice Exam: a UserExam with UserScenes and UserQuestions.
      * The UserAnswers will be created after answering the questions.
@@ -84,9 +84,14 @@ class UserExamController extends Controller
         $question_type = $request->input('question_type',0);
         $scene_count = $request->input('scene_count',10);
 
+        //- Build a new UserExam, with scenes.
+        //- todo: pick the scenes for a new UserExam in a more sophisticated way.
         $query = DB::table('scenes')
             ->join('exam_scene', function ($join) use ($req_exam_id) {
-                $join->on('scenes.id', '=', 'exam_scene.scene_id')->where('exam_scene.exam_id', '=', $req_exam_id); })
+                $join->on('scenes.id', '=', 'exam_scene.scene_id')
+                    ->where('exam_scene.exam_id', '=', $req_exam_id);
+                }
+            )
             ->join('questions', 'scenes.id', '=', 'questions.scene_id');
         if ($scene_type > 0) {
             $query = $query->where('scenes.scene_type_id', '=', $scene_type);
@@ -118,7 +123,6 @@ class UserExamController extends Controller
 
         return redirect(url("/prax/$user_exam_id/scene/1"));
     }
-
 
 
     /**
@@ -165,7 +169,6 @@ class UserExamController extends Controller
      * @param  int  $exam_id
      * @param  int  $scene_count
      * @return  mixed
-     */
     private function getRandomScenes($exam_id, $scene_count) {
         //- todo: pick the scenes for a Practice Exam in a more sophisticated way,
         //- like the ones never done before, or failed to answer correctly.
@@ -176,20 +179,25 @@ class UserExamController extends Controller
             ->inRandomOrder()
             ->limit($scene_count)->get();
     }
+*/
 
-    private function makeUserExamScenes($prax_id, $scenes) {
-        $order = 1;
-        foreach($scenes as $scene) {
-            $us = (new UserScene())->create(['userexam_id'=>$prax_id, 'scene_id' => $scene->id, 'order' => $order++]);
-            $questions = $this->getSceneQuestionIds($scene);
-            foreach($questions as $question) {
-                (new UserQuestion())->create(['userscene_id' => $us->id, 'question_id' => $question->id]);
+    /**
+    //- todo: pick the scenes for a new Practice Exam in a more sophisticated way.
+     *
+     * @param int $prax_id
+     * @param array $scene_ids
+     */
+    private function makeUserExamScenes($prax_id, $scene_ids) {
+        $scene_order = 1;
+        foreach($scene_ids as $scene_id) {
+            $us = (new UserScene())->create(['userexam_id'=>$prax_id, 'scene_id' => $scene_id, 'order' => $scene_order++]);
+            $question_ids = DB::table('questions')->where('scene_id', '=', $scene_id)->orderBy('order')->orderBy('id')->select('id')->get();
+            // not using question order here, the order has to be 1, 2, 3, etc
+            $question_order = 1;
+            foreach($question_ids as $question_id) {
+                (new UserQuestion())->create(['userscene_id' => $us->id, 'question_id' => $question_id, 'order' => $question_order++ ]);
             }
         }
-    }
-
-    private function getSceneQuestionIds($scene) {
-        return DB::table('questions')->where('scene_id', '=', $scene->id)->orderBy('order')->select('id')->get();
     }
 
 

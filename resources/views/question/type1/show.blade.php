@@ -5,17 +5,17 @@
 <question id="{{ $praxquestion->question->id }}">
     {!! $praxquestion->question->text !!}
     <div class="card-body mt-0 p-2">
-        <form method="POST" action="/answer" id="form_{{ $praxquestion->getFormId() }}" accept-charset="UTF-8">
+        <form method="POST" action="/answer" id="form_{{ $praxquestion->question->id }}" accept-charset="UTF-8">
             {{ csrf_field() }}
             <input name="useraction" type="hidden" value="{{ $useraction }}">
             @if($useraction === 'ANSWER')
-                <input name="userquestion" type="hidden" value="{{ $praxquestion->getFormId() }}">
+                <input name="userquestion" type="hidden" value="{{ $praxquestion->userquestion->id }}">
             @else
                 <input name="exam" type="hidden" value="{{ $exam_id }}">
             @endif
             @foreach ($praxquestion->praxanswers as $praxanswer)
                 <div class="input-group-prepend mb-1">
-                    <div class="{{ $praxanswer->coolnessStr($praxquestion->locked) }}input-group-text minw-25">
+                    <div class="{{ $praxanswer->coolnessStr() }}input-group-text minw-25">
                         <input type="radio" name="answer[]" value="{{ $praxanswer->answer->id }}"{{ $praxanswer->checkedStr() }}{{ $praxquestion->disabledStr() }} />
                         <div class="pl-3 py-0">{{ $praxanswer->answer->text }}</div>
                     </div>
@@ -24,7 +24,7 @@
             <div class="input-group-prepend mt-4">
                 <input class="btn btn-outline-danger px-4 py-1" type="submit" value="Done"{{ $praxquestion->disabledStr() }}>
     @if($praxquestion->locked)
-                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/next">Continue</a>
+                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->order }}/question/{{ $praxquestion->order }}/next">Continue</a>
     @endif
             </div>
         </form>

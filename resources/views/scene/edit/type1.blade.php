@@ -1,6 +1,7 @@
 {{-- scene.edit.type1
      Edit a scene of type 1, its question and answers.
      input: $exam_id, $scene, $sidebar, $lastpage
+     OBSOLETE
 --}}
 
 @extends('layouts.exam')

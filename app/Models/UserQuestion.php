@@ -12,7 +12,7 @@ class UserQuestion extends Model
 
     //- fields that may be filled by create() and update();
     //  all others will be ignored without warning (!)
-    protected $fillable = [ 'userscene_id', 'question_id'];
+    protected $fillable = [ 'userscene_id', 'question_id', 'order'];
 
     /**
      * The relation with userscenes (OneToMany Inverse)
@@ -43,6 +43,7 @@ class UserQuestion extends Model
      *
      * @param Question $question
      * @param array $userAnswerIds
+     * @return bool
      */
     public function calcResult(Question $question, Array $userAnswerIds) {
 

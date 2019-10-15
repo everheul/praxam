@@ -20,7 +20,7 @@
         // more questions; activate the accordion:
         if (sc.type == 2) {
             $("#accordion").accordion({
-                active: {{ $praxscene->nextQuestion() }},
+                active: {{ $active_question }},
                 heightStyle: "content",
                 collapsible: true
             });

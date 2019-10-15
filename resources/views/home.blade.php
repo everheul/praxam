@@ -1,3 +1,7 @@
+{{--
+    HOME
+--}}
+
 @extends('layouts.exam')
 
 {{-- background image test

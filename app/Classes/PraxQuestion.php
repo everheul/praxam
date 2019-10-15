@@ -13,12 +13,13 @@ class PraxQuestion
     public $question = NULL;        //-> Question
     public $praxanswers;            //-= PraxAnswers Collection
     public $locked = false;
+    public $order = 0;              //-  used with type2 scenes
 
     /**
      * Load all the data we need to make a complete PraxScene piramide.
      *
      * @param int $userscene_id
-     * @return $this
+     * @return PraxQuestion
      */
     public function loadUserQuestionData(int $userquestion_id) {
         //DB::enableQueryLog();
@@ -35,20 +36,21 @@ class PraxQuestion
      *
      * @param UserScene $userscene
      * @param UserExam|null $parent
-     * @return $this
+     * @return PraxQuestion
      */
     public function setUserQuestionData(UserQuestion $userquestion, PraxScene $parent = NULL) {
         $this->parent = $parent;
         $this->userquestion = $userquestion;
         $this->question = $userquestion->question;
         $this->praxanswers = collect();
-        //dd($userquestion);
+
         //- create the PraxAnswers:
-        //- $userquestion->question also has its answers eagerloaded, because useranswers are optional.
+        //- userquestion->question has answers eagerloaded, because useranswers are optional.
         foreach($userquestion->question->answers as $answer) {
             $this->praxanswers->add((new PraxAnswer())->setAnswerData($answer, $this));
         }
         foreach($userquestion->useranswers as $useranswer) {
+            //- any answer locks the question
             $this->locked = true;
             // todo: what if..?
             $this->praxanswers->firstWhere('answer.id', $useranswer->answer_id)->setUserAnswerData($useranswer);
@@ -57,12 +59,12 @@ class PraxQuestion
     }
 
     /**
-     * This FormId is only important when there is a userquestion, otherwise it just has to be unique.
-     *
-     * @return mixed
+     * @param  int  $order
+     * @return  PraxQuestion
      */
-    public function getFormId() {
-        return (empty($this->userquestion)) ? $this->question->id : $this->userquestion->id;
+    public function setOrder($order) {
+        $this->order = $order;
+        return $this;
     }
 
     /**

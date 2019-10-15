@@ -1,6 +1,6 @@
 {{-- question.type3.show
      Show a question of type 3 with its (dragable) answers.
-     input: $praxanswer, $praxquestion, $praxscene
+     input: $praxquestion, $praxscene
 --}}
 <question id="{{ $praxquestion->question->id }}">
     {!! $praxquestion->question->text !!}
@@ -19,8 +19,8 @@
                     <div id="choices_{{ $praxquestion->question->id }}{{ $praxquestion->locked ? '_disabled' : '' }}" class="sortable mr-0 mr-sm-1 mr-lg-2 mr-xl-3">
                         @foreach ($praxquestion->praxanswers as $praxanswer)
                             @if(!$praxanswer->checked)
-                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr($praxquestion->locked) }}" value="{{ $praxanswer->answer->id }}">
-                                    {{ $praxanswer->orderStr($praxquestion->locked) }}{{ $praxanswer->answer->text }}
+                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
+                                    {{ $praxanswer->orderStr() }}{{ $praxanswer->answer->text }}
                                 </div>
                             @endif
                         @endforeach
@@ -31,8 +31,8 @@
                     <div id="answers_{{ $praxquestion->question->id }}{{ $praxquestion->locked ? '_disabled' : '' }}" class="sortable ml-0 ml-sm-1 ml-lg-2 ml-xl-3">
                         @foreach ($praxquestion->praxanswers as $praxanswer)
                             @if($praxanswer->checked)
-                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr($praxquestion->locked) }}" value="{{ $praxanswer->answer->id }}">
-                                    {{ $praxanswer->orderStr($praxquestion->locked) }}{{ $praxanswer->answer->text }}
+                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
+                                    {{ $praxanswer->orderStr() }}{{ $praxanswer->answer->text }}
                                 </div>
                             @endif
                         @endforeach
@@ -42,7 +42,7 @@
             <div class="input-group-prepend mt-4">
                 <button id="done_{{ $praxquestion->question->id }}" class="btn btn-outline-danger px-4 py-1"{{ $praxquestion->disabledStr() }}>Done</button>
     @if($praxquestion->locked)
-                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/next">Continue</a>
+                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/question/{{ $praxquestion->order }}/next">Continue</a>
     @endif
             </div>
          </form>

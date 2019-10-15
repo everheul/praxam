@@ -37,36 +37,23 @@ class UserSceneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $userexam_id, $order) {
+    public function show(Request $request, $userexam_id, $s_order, $q_order = 1) {
 
         if (!$this->checkUser($request, $userexam_id)) {
             return redirect(url("/home"));
         }
 
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
-        $praxscene = $praxexam->praxscenes->where('userscene.order', $order)->first();
-        $sidebar = (new SideBar)->practiceExam($praxexam, $order);
+        $praxscene = $praxexam->praxscenes->where('userscene.order', $s_order)->first();
+        $sidebar = (new SideBar)->practiceExam($praxexam, $s_order);
 
         return View('scene.type' . $praxscene->scene->scene_type_id . '.show',
             [   'sidebar' => $sidebar,
                 'praxscene' => $praxscene,
                 'useraction' => 'ANSWER',
+                'active_question' => $q_order - 1
             ]);
     }
-
-    /**
-     * @param  int  $prax_id
-     * @param  int  $order
-     * @return  PraxScene|bool
-    private function loadPraxScene($prax_id, $order) {
-        $userScene = UserScene::where('userexam_id','=',$prax_id)
-            ->where('order','=',$order)
-            ->with('userquestions','userquestions.useranswers')
-            ->firstOrFail();
-        $scene = (new SceneController())->getFullScene($userScene->scene_id);
-        return (new PraxScene($scene))->setUserScene($userScene);
-    }
-*/
 
     /**
      * Select the next scene to display when the user selects '' or 'continue'
