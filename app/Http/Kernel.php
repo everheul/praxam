@@ -61,6 +61,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'args2session' => \App\Http\Middleware\ArgsToSession::class,
+        'exam_owner' => \App\Http\Middleware\ExamOwner::class,
+        'userexam_owner' => \App\Http\Middleware\UserExamOwner::class,
     ];
 
     /**

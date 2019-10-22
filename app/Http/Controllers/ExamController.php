@@ -13,11 +13,12 @@ class ExamController extends Controller
 
     public function __construct() {
         $this->middleware('auth');
+        $this->middleware('exam_owner')->only('edit','update','destroy');
     }
 
     /**
      * Display a brief info of all exams.
-     * TODO: Add 'New' button for admins.
+     * TODO: Add 'New' button.
      *
      * @return \\Illuminate\Http\Response
      */
@@ -30,7 +31,7 @@ class ExamController extends Controller
 
     /**
      * Display all the info of the specified exam.
-     * TODO: Add 'Edit' and 'Delete' buttons for admins.
+     * TODO: Add 'Edit' and 'Delete' buttons.
      *
      * @param  int $id
      * @return \\Illuminate\Http\Response
@@ -63,26 +64,22 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-        dd($request);
+        // todo: validate
+        dd(" -= TODO =- ");
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param  int $exam_id
      * @return \Illuminate\Http\Response
      */
     public function edit($exam_id) {
         $exam = Exam::findOrFail($exam_id);
-        $user = Auth::user();
-        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
-            return View('exam.edit',
-                [   'sidebar' => (new Sidebar)->examEdit($exam),
-                    'exam' => $exam ]
-            );
-        } else {
-            return redirect(url("/home"));
-        }
+        return View('exam.edit',
+            [   'sidebar' => (new Sidebar)->examEdit($exam),
+                'exam' => $exam ]
+        );
     }
 
     /**
@@ -92,41 +89,40 @@ class ExamController extends Controller
      * TODO: image test
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int $id
+     * @param  int $exam_id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $exam_id) {
+        // todo: validate
         $exam = Exam::findOrFail($exam_id);
-        $user = Auth::user();
-        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
-            $exam->fill($request->all());
-            $image = $request->file('newimage');
-            if (!empty($image)) {
-                $image->store('public/images');
-                $exam->image = $image->getFilename();
-            }
-            $exam->update();
+        $exam->fill($request->all());
+        $image = $request->file('newimage');
+        if (!empty($image)) {
+            $image->store('public/images');
+            $exam->image = $image->getFilename();
         }
+        $exam->update();
         return redirect(url("/exam/$exam_id/show"));
     }
 
     /**
      * Soft-delete the exam.
      *
-     * @param  int $id
+     * @param  int $exam_id
      * @return \\Illuminate\Http\Response
      */
-    public function kill($exam_id) {
+    public function destroy($exam_id) {
         $exam = Exam::findOrFail($exam_id);
-        $user = Auth::user();
-        if (($user->isAdmin()) Or ($exam->created_by === $user->id)) {
-            $exam->delete();
-        }
+        $exam->delete();
         return redirect(url("/exam"));
     }
 
     /**
-     * Jump to the next scene (or first) of this exam
+     * Jump to the next (or first) scene of this exam
+     *
+     * @param  int $exam_id
+     * @param  int $scene_id
+     * @return \\Illuminate\Http\Response
      */
     public function nextScene($exam_id, $scene_id = 0) {
 

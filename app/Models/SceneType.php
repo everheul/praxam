@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SceneType extends Model
 {
+    protected $table = 'scene_types';
 
     /**
      * The relation with scenes (OneToMany)

@@ -28,10 +28,10 @@ class Sidebar
      * @return array
      */
     public function sbarExamShow(Exam $exam) {
-        $id = $exam->id;
         $this->myPracxam();
         $this->allExams();
         $this->examLogo($exam);
+        $id = $exam->id;
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
             $this->sbarHead("- = -", 'Admin Controls');
@@ -48,10 +48,10 @@ class Sidebar
      * @return array
      */
     public function sbarSceneIndex($exam) {
-        $id = $exam->id;
         $this->myPracxam();
         $this->allExams();
         $this->examLogo($exam);
+        $id = $exam->id;
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
             $this->sbarHead("- = -", 'Admin Controls');
@@ -99,6 +99,22 @@ class Sidebar
         return $this->blocks;
     }
 
+    public function sceneEdit($scene) {
+        $this->sbarLink('Exams','overview',"/exam");
+        $this->sbarBlock($scene->exam->name, $scene->exam->head);
+        $this->sbarHead("Edit Scene {$scene->id}", 'Admin Controls');
+        $this->sbarButton('Cancel',"/exam/{$scene->exam->id}/scene/{$scene->id}/show/",'dark');
+        return $this->blocks;
+    }
+
+    public function sceneCreate($exam) {
+        $this->myPracxam();
+        $this->allExams();
+        $this->sbarBlock($exam->name, $exam->head);
+        $this->sbarButton('Cancel',"/exam/{$exam->id}/scene",'dark');
+        return $this->blocks;
+    }
+
     /**
      * Called from SceneController@show
      * @param Exam $exam
@@ -141,13 +157,11 @@ class Sidebar
      * @return array
      */
     public function examResult(PraxExam $praxexam) {
-        $exam_id = $praxexam->exam->id;
-        $this->sbarLink('Exams','overview',"/exam");
-        $this->sbarBlock($praxexam->exam->name, $praxexam->exam->head);
-//        $this->sbarButton('New Practice Exam',"/prax/$exam_id/create",'dark');
-        //$this->sbarBlock('Started At',$prax->created_at);
+        $this->myPracxam();
+        $this->allExams();
+        $this->examLogo($praxexam->exam);
         $this->userSceneList($praxexam, 0);
-    //    $this->sbarButton('Delete Practice','/prax/'.$prax->id.'/kill','danger');
+        $this->sbarScene("View Score","/prax/{$praxexam->userexam->id}/show","dark");
         return $this->blocks;
     }
 

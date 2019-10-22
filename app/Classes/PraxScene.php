@@ -16,6 +16,7 @@ class PraxScene
     public $praxquestions;      //-= PraxQuestion Collection
 
     /**
+     * todo: not used yet
      * Load all the data we need to make a complete PraxScene piramide.
      *
      * @param int $userscene_id
@@ -33,6 +34,7 @@ class PraxScene
     }
 
     /**
+     * todo: not used yet
      * Load all the data we need to make a complete PraxScene piramide.
      *
      * @param int $userscene_id
@@ -65,6 +67,22 @@ class PraxScene
         //- create the PraxQuestions:
         foreach($userscene->userquestions as $index => $userquestion) {
             $this->praxquestions->add((new PraxQuestion())->setUserQuestionData($userquestion, $this)->setOrder($index+1));
+        }
+        return $this;
+    }
+
+    /**
+     * @param Scene $scene
+     * @param \App\Classes\PraxExam|NULL $parent
+     * @return $this
+     */
+    public function setAdminSceneData(Scene $scene, PraxExam $parent = NULL) {
+        $this->parent = $parent;
+        $this->scene = $scene;
+        $this->praxquestions = collect();
+        //- create the PraxQuestions:
+        foreach($scene->questions as $index => $question) {
+            $this->praxquestions->add((new PraxQuestion())->setAdminQuestionData($question, $this)->setOrder($index+1));
         }
         return $this;
     }

@@ -48,5 +48,31 @@ class PraxExam
         return $this;
     }
 
+    /**
+     *
+     * @param $exam_id
+     * @return $this
+     */
+    public function loadAdminExamData($exam_id) {
+        $exam = Exam::where('id','=',$exam_id)
+            ->with('scenes','scenes.questions','scenes.questions.answers')
+            ->firstOrFail();
+        $this->setAdminExamData($exam);
+        return $this;
+    }
+
+    /**
+     * @param Exam $exam
+     * @return $this
+     */
+    public function setAdminExamData(Exam $exam) {
+        $this->exam = $exam;
+        $this->praxscenes = collect();
+        foreach($exam->scenes as $scene) {
+            $this->praxscenes->add((new PraxScene())->setAdminSceneData($scene, $this));
+        }
+        return $this;
+    }
+
     
 }

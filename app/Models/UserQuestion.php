@@ -37,44 +37,43 @@ class UserQuestion extends Model
 
     /**
      * Store the Question points (if the answer was correct) or 0 in UserQuestion.
-     * Called from UserQuestionController with the Question and its Answers loaded.
+     * Called from UserQuestionController with the UserQuestion's Question and its Answers loaded.
      * 
      * After this, this UserQuestion will be locked for ever.
      *
      * @param Question $question
-     * @param array $userAnswerIds
+     * @param array $checkedAnswerIds
      * @return bool
      */
-    public function calcResult(Question $question, Array $userAnswerIds) {
+    public function calcResult(Array $checkedAnswerIds) {
 
-        switch ($question->question_type_id) {
-            case 1:
-                $result = $this->calcResultType1($question,$userAnswerIds);
-                break;
-            case 2:
-                $result = $this->calcResultType2($question,$userAnswerIds);
-                break;
-            case 3:
-                $result = $this->calcResultType3($question,$userAnswerIds);
-                break;
-        }
+        //- make sure there is data
+        $this->loadMissing('question','question.answers');
+
+        //- call the right result function
+        $type = $this->question->question_type_id;
+        $calcFunc = "calcResultType$type";
+        $result = $this->{$calcFunc}($checkedAnswerIds);
+
+        //- store the result, lock the question
         $this->result = $result;
         $this->update();
-        return ($result > 0);
+        return $result;
     }
 
     /**
-     * Only one answer is correct and checked, make sure its the right one.
+     * Only one answer is correct & only one is checked, make sure its the right one.
      *
-     * @param $question
-     * @param $userAnswerIds
+     * @param array $checkedAnswerIds
      * @return int
      */
-    private function calcResultType1($question, $userAnswerIds) {
-        foreach($question->answers as $answer) {
-            if ($answer->id == $userAnswerIds[0]) {
-                if ($answer->is_correct) {
-                    return $question->points;
+    private function calcResultType1(array $checkedAnswerIds) {
+        if (count($checkedAnswerIds) === 1) {
+            foreach($this->question->answers as $answer) {
+                if ($answer->id == $checkedAnswerIds[0]) {
+                    if ($answer->is_correct) {
+                        return $this->question->points;
+                    }
                 }
             }
         }
@@ -84,46 +83,48 @@ class UserQuestion extends Model
     /**
      * More answers are correct, make sure all those, and only those, were checked.
      *
-     * @param $question
-     * @param $userAnswerIds
+     * @param array $checkedAnswerIds
      * @return int
      */
-    private function calcResultType2($question, $userAnswerIds) {
-        foreach($question->answers as $answer) {
-            if (in_array($answer->id, $userAnswerIds)) {
+    private function calcResultType2(array $checkedAnswerIds) {
+        foreach($this->question->answers as $answer) {
+            if (in_array($answer->id, $checkedAnswerIds)) {
                 if (!($answer->is_correct)) {
+                    //- wrong answer checked
                     return 0;
                 }
             } else {
                 if ($answer->is_correct) {
+                    //- correct answer missed
                     return 0;
                 }
             }
         }
-        return $question->points;
+        return $this->question->points;
     }
 
     /**
      * More answers are correct and they have to be in the correct order.
      *
-     * @param $question
-     * @param $userAnswerIds
+     * @param array $checkedAnswerIds
      * @return int
      */
-    private function calcResultType3($question,$userAnswerIds) {
-        foreach($question->answers as $answer) {
+    private function calcResultType3(array $checkedAnswerIds) {
+        foreach($this->question->answers as $answer) {
             if ($answer->is_correct) {
-                $pos = $answer->order - 1;
-                if (!((isset($userAnswerIds[$pos])) && ($userAnswerIds[$pos] == $answer->id))) {
+                $pos = $answer->correct_order - 1;
+                if (!((isset($checkedAnswerIds[$pos])) && ($checkedAnswerIds[$pos] == $answer->id))) {
+                    //- it should be there..
                     return 0;
                 }
             } else {
-                if (in_array($answer->id, $userAnswerIds)) {
+                if (in_array($answer->id, $checkedAnswerIds)) {
+                    //- wrong answer selected, order doesn't matter
                     return 0;
                 }
             }
         }
-        return $question->points;
+        return $this->question->points;
     }
 
 

@@ -64,14 +64,7 @@ class Scene extends Model
      * The relation with scene-types (OneToMany Inverse)
      */
     public function sceneType() {
-        return $this->belongsTo('App\Models\SceneType', 'id', 'scene_type_id');
-    }
-
-    /**
-     * The scene-type-name (OneToMany Inverse)
-     */
-    public function sceneTypeName() {
-        return $this->belongsTo('App\Models\SceneType', 'id', 'scene_type_id')->select('name');
+        return $this->belongsTo('App\Models\SceneType', 'scene_type_id', 'id');
     }
 
     /**

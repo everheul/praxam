@@ -16,6 +16,7 @@ class PraxQuestion
     public $order = 0;              //-  used with type2 scenes
 
     /**
+     * todo: not used yet
      * Load all the data we need to make a complete PraxScene piramide.
      *
      * @param int $userscene_id
@@ -33,6 +34,7 @@ class PraxQuestion
 
     /**
      * Create the rest of the PraxScene piramide.
+     * todo: call setAdminQuestionData first?
      *
      * @param UserScene $userscene
      * @param UserExam|null $parent
@@ -58,6 +60,27 @@ class PraxQuestion
         return $this;
     }
 
+
+    /**
+     * Create a PraxScene pyramid without any user data - admin mode.
+     *
+     * @param Question $question
+     * @param PraxScene|NULL $parent
+     * @return $this
+     */
+    public function setAdminQuestionData(Question $question, PraxScene $parent = NULL) {
+        $this->parent = $parent;
+        $this->question = $question;
+        $this->praxanswers = collect();
+
+        //- create the PraxAnswers:
+        foreach($question->answers as $answer) {
+            $this->praxanswers->add((new PraxAnswer())->setAnswerData($answer, $this));
+        }
+        return $this;
+    }
+
+
     /**
      * @param  int  $order
      * @return  PraxQuestion
@@ -72,7 +95,7 @@ class PraxQuestion
      * @return string
      */
     public function disabledStr() {
-        return ($this->locked) ? " disabled" : "";
+        return ($this->locked) ? ' disabled=1' : '';
     }
 
     /**

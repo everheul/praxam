@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\UserQuestion;
 use App\Models\UserExam;
 use App\Models\UserScene;
+use App\Models\Scene;
 use DB;
 use App\Http\Requests\NewPraxRequest;
 use App\Classes\PraxExam;
@@ -20,6 +21,7 @@ class UserExamController extends Controller
 
     public function __construct() {
         $this->middleware('auth');
+        $this->middleware('userexam_owner');
     }
 
     /**
@@ -33,19 +35,13 @@ class UserExamController extends Controller
 
     /**
      * Display the Test Result of the specified userexam.
-     * todo: checkUser to Middleware
      *
-     * @param  int $id
+     * @param  Request  $request
+     * @param  int $userexam_id
      * @return \\Illuminate\Http\Response
      */
     public function show(Request $request, $userexam_id) {
-
-        if (!$this->checkUser($request, $userexam_id)) {
-            return redirect(url("/home"));
-        }
-
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
-
         return View('userexam.show',
             [   'sidebar' => (new Sidebar)->examResult($praxexam),
                 'praxexam' => $praxexam ]
@@ -77,15 +73,15 @@ class UserExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(NewPraxRequest $request, $exam_id) {
-        // todo: check the route $examid with $request->examid ?
 
-        $req_exam_id = $request->input('exam_id',$exam_id);
-        $scene_type = $request->input('scene_type',0);
+        $req_exam_id = $request->input('exam_id', $exam_id);
+        $scene_type = $request->input('scene_type', 0);
         $question_type = $request->input('question_type',0);
         $scene_count = $request->input('scene_count',10);
 
         //- Build a new UserExam, with scenes.
         //- todo: pick the scenes for a new UserExam in a more sophisticated way.
+        /*
         $query = DB::table('scenes')
             ->join('exam_scene', function ($join) use ($req_exam_id) {
                 $join->on('scenes.id', '=', 'exam_scene.scene_id')
@@ -93,18 +89,23 @@ class UserExamController extends Controller
                 }
             )
             ->join('questions', 'scenes.id', '=', 'questions.scene_id');
+        */
+        $query = Scene::where('exam_id', $req_exam_id);
+
         if ($scene_type > 0) {
             $query = $query->where('scenes.scene_type_id', '=', $scene_type);
         }
+
         if ($question_type > 0) {
             $query = $query->where('questions.question_type_id', '=', $question_type);
         }
-        $scene_ids = $query->select('scenes.id')
+
+        $scenes = $query->select('scenes.id')
             ->inRandomOrder()
             ->limit($scene_count)
             ->get();
 
-        $nr = $scene_ids->count();
+        $nr = $scenes->count();
 
         if ($nr === 0) {
             return redirect()->back()->withInput()->withErrors('Sorry. No scenes found for this combination of types.');
@@ -119,7 +120,7 @@ class UserExamController extends Controller
 
         //$scenes = $this->getRandomScenes($exam_id, $scene_count);
 
-        $this->makeUserExamScenes($user_exam_id, $scene_ids);
+        $this->makeUserExamScenes($user_exam_id, $scenes->pluck('id'));
 
         return redirect(url("/prax/$user_exam_id/scene/1"));
     }
@@ -182,24 +183,24 @@ class UserExamController extends Controller
 */
 
     /**
-    //- todo: pick the scenes for a new Practice Exam in a more sophisticated way.
+    * //- todo: pick the scenes for a new Practice Exam in a more sophisticated way.
      *
-     * @param int $prax_id
+     * @param int $userexam_id
      * @param array $scene_ids
      */
-    private function makeUserExamScenes($prax_id, $scene_ids) {
+    private function makeUserExamScenes($userexam_id, $scene_ids) {
+        //dd($scene_ids);
         $scene_order = 1;
         foreach($scene_ids as $scene_id) {
-            $us = (new UserScene())->create(['userexam_id'=>$prax_id, 'scene_id' => $scene_id, 'order' => $scene_order++]);
-            $question_ids = DB::table('questions')->where('scene_id', '=', $scene_id)->orderBy('order')->orderBy('id')->select('id')->get();
-            // not using question order here, the order has to be 1, 2, 3, etc
+            $us = (new UserScene())->create(['userexam_id'=> $userexam_id, 'scene_id' => $scene_id, 'order' => $scene_order++]);
+            $question_ids = DB::table('questions')->where('scene_id', '=', $scene_id)->orderBy('order')->orderBy('id')->select('id')->get()->pluck('id');
+            // not using question order here, that may change, and the order has to be continues from 1.
             $question_order = 1;
             foreach($question_ids as $question_id) {
                 (new UserQuestion())->create(['userscene_id' => $us->id, 'question_id' => $question_id, 'order' => $question_order++ ]);
             }
         }
     }
-
 
     /**
      * Make sure this userExam was created by THIS user.

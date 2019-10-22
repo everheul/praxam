@@ -24,7 +24,7 @@
             <div class="input-group-prepend mt-4">
                 <input class="btn btn-outline-danger px-4 py-1" type="submit" value="Done"{{ $praxquestion->disabledStr() }}>
     @if($praxquestion->locked)
-                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->order }}/question/{{ $praxquestion->order }}/next">Continue</a>
+                <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/question/{{ $praxquestion->question->order }}/next">Continue</a>
     @endif
             </div>
         </form>

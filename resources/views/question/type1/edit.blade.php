@@ -2,8 +2,11 @@
      Edit a question of type 1 - with radiobox answers.
      input: $question
 --}}
-<hr/>
+<hr />
 <p>Question {{ $question->id }}, type 1:</p>
+@include('question.type1.form')
+
+{{--
 <div class="form-group row">
     <label for="q_{{ $question->id }}_text" class="col-sm-2 col-form-label">Question Text</label>
     <div class="col">
@@ -42,6 +45,7 @@
         </table>
     </div>
 </div>
+
 <div class="form-group row">
     <label for="q_{{ $question->id }}_explanation" class="col-sm-2 col-form-label">Explanation 4</label>
     <div class="col-sm-10">
@@ -50,3 +54,4 @@
         </textarea>
     </div>
 </div>
+--}}

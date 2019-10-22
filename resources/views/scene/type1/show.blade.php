@@ -18,4 +18,4 @@
     </div>
 @endsection
 
-@include('scene.show.scripts')
+@include('scene.show_scripts')

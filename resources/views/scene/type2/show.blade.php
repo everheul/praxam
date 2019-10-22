@@ -15,7 +15,9 @@
                 @isset($praxscene->scene->instructions)
                 <div class="instructions">{!! $praxscene->scene->instructions !!}</div>
                 @endisset
+                @isset($praxscene->scene->text)
                 {!!  App\Helpers\Helper::brbrToP($praxscene->scene->text) !!}
+                @endisset
                 @isset($praxscene->scene->image)
                 <img class="mr-auto" src="/img/{{ $praxscene->scene->image }}"{{ $praxscene->getImageSizeStr() }} alt="" >
                 @endisset
@@ -34,4 +36,4 @@
     </div>
 @endsection
 
-@include('scene.show.scripts')
+@include('scene.show_scripts')

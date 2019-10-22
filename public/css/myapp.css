@@ -141,10 +141,12 @@ html, body{
     padding: 20px;
     padding-bottom: 0;
 }
+/*
 .examtext h1, .examtext h2 {
     font-size: 2rem;
     font-weight: 600;
 }
+*/
 .examtext img {
     float: left;
     margin: 0 16px 8px 0;

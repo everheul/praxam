@@ -74,5 +74,34 @@ class UserExam extends Model
         }
         $this->update();
     }
+
+    /** todo: obsolete?
+     * Jump to the next (or first) scene of this userexam that still has to be answered
+     */
+    public function nextScene($order = 0) {
+
+        $userscene = UserScene::where('userexam_id', $this->id)
+            ->where('locked',0)
+            ->where('order','>',$order)
+            ->orderBy('order')
+            ->select('order')
+            ->first();
+
+        if (empty($userscene)) {
+            $userscene = UserScene::where('userexam_id', $this->id)
+                ->where('locked',0)
+                ->orderBy('order')
+                ->select('order')
+                ->first();
+        }
+
+        if (empty($userscene)) {
+            //- no unlocked scenes left, test finished. Show result:
+            return redirect(url("/prax/{$this->id}"));
+        }
+
+        return redirect(url("/prax/{$this->id}/scene/{$userscene->order}"));
+    }
+
     
 }

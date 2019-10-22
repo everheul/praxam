@@ -44,13 +44,6 @@ class Question extends Model
     }
 
     /**
-     * The name of the question_type (OneToMany Inverse)
-     */
-    public function questionTypeName() {
-        return $this->belongsTo('App\Models\QuestionType', 'id', 'question_type_id')->select('name');
-    }
-
-    /**
      * The relation with userquestions (OneToMany)
      */
     public function userquestions() {

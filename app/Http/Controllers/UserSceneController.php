@@ -19,6 +19,7 @@ class UserSceneController extends Controller
 
     public function __construct() {
         $this->middleware('auth');
+        $this->middleware('userexam_owner');
     }
 
     /**
@@ -39,10 +40,6 @@ class UserSceneController extends Controller
      */
     public function show(Request $request, $userexam_id, $s_order, $q_order = 1) {
 
-        if (!$this->checkUser($request, $userexam_id)) {
-            return redirect(url("/home"));
-        }
-
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
         $praxscene = $praxexam->praxscenes->where('userscene.order', $s_order)->first();
         $sidebar = (new SideBar)->practiceExam($praxexam, $s_order);
@@ -51,7 +48,7 @@ class UserSceneController extends Controller
             [   'sidebar' => $sidebar,
                 'praxscene' => $praxscene,
                 'useraction' => 'ANSWER',
-                'active_question' => $q_order - 1
+                'active_question' => $q_order - 1,
             ]);
     }
 
@@ -123,23 +120,5 @@ class UserSceneController extends Controller
         }
         return $prax;
     }     */
-
-    /**
-     * Make sure this userExam was created by THIS user.
-     * todo: to Middleware
-     *
-     * @param Request $request
-     * @param $prax_id
-     * @return bool
-     */
-    private function checkUser(Request $request, $prax_id)
-    {
-        if (empty($this->user_checked)) {
-            $user_exam = UserExam::where('id', $prax_id)->firstOrFail();
-            $this->user_checked = ($user_exam->user_id === $request->user()->id);
-            //- todo: log if false
-        }
-        return $this->user_checked;
-    }
 
 }

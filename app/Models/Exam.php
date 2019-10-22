@@ -24,16 +24,6 @@ class Exam extends Model
     }
 
     /**
-     * The relation with scenes (ManyToMany, using exam_scene)
-     * can be disabled by DBA by setting 'active' to 0
-     *
-    public function scenes() {
-        return $this->belongsToMany('App\Models\Scene')
-            ->wherePivot('active', '=', 1);
-    }
-     */
-
-    /**
      * The relation with scenes (OneToMany)
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -47,8 +37,9 @@ class Exam extends Model
      */
     public function user_count() {
         $count = DB::table('userexams')
-            ->where('exam_id','=',$this->id)
-            ->distinct('user_id')->count('user_id');
+            ->where('exam_id', $this->id)
+            ->distinct('user_id')
+            ->count('user_id');
         return $count;
     }
 

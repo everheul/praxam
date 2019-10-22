@@ -11,8 +11,6 @@ class PraxAnswer
     public $answer = NULL;
     public $useranswer = NULL;
     public $checked = false;
-    public $locked = false;
-
 
     public function setAnswerData(Answer $answer, PraxQuestion $parent = NULL) {
         $this->answer = $answer;
@@ -23,10 +21,17 @@ class PraxAnswer
     public function setUserAnswerData(UserAnswer $useranswer) {
         $this->useranswer = $useranswer;
         $this->checked = true;
-        $this->locked = $this->parent->locked;
         return $this;
     }
-    
+
+    /**
+     * Check the question's 'locked' attribute
+     * @return bool
+     */
+    public function is_locked() {
+        return empty($this->parent) ? false : $this->parent->locked;
+    }
+
     /**
      * Return the string that selects the inputboxes/radioboxes if checked
      * @return  string
@@ -40,7 +45,7 @@ class PraxAnswer
      * @return  string
      */
     public function orderStr() {
-        return ($this->locked && $this->answer->correct_order > 0) ? $this->answer->correct_order . '. ' : "";
+        return ($this->is_locked() && $this->answer->correct_order > 0) ? $this->answer->correct_order . '. ' : "";
     }
 
     /**
@@ -50,7 +55,7 @@ class PraxAnswer
      * @return string
      */
     public function coolnessStr() {
-        if ($this->locked) {
+        if ($this->is_locked()) {
             $cool = is_null($this->answer->correct_order) ? ($this->answer->is_correct === 1) : ($this->answer->correct_order > 0);
             return $cool ? 'correct ' : 'wrong ';
         }

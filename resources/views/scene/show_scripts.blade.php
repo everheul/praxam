@@ -20,7 +20,7 @@
         // more questions; activate the accordion:
         if (sc.type == 2) {
             $("#accordion").accordion({
-                active: {{ $active_question }},
+                active: {{ isset($active_question) ? $active_question : 0 }},
                 heightStyle: "content",
                 collapsible: true
             });

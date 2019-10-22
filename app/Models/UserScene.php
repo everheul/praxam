@@ -46,7 +46,8 @@ class UserScene extends Model
     }
 
     public function userquestion($index = 0) {
-        return $this->userquestions[$index];
+        $this->loadMissing('userquestions');
+        return isset($this->userquestions[$index]) ? $this->userquestions[$index] : NULL;
     }
 
     /**
@@ -61,6 +62,7 @@ class UserScene extends Model
         if (empty($this->locked)) {
             $tot = 0;
             $locked = 1;
+
             $userquestions = $this->userquestions()->select('result')->get();
             foreach ($userquestions as $userquestion) {
                 if (is_null($userquestion->result)) {
@@ -69,6 +71,7 @@ class UserScene extends Model
                     $tot += $userquestion->result;
                 }
             }
+
             $this->result = $tot;
             $this->locked = $locked;
             $this->update();
