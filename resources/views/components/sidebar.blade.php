@@ -6,6 +6,9 @@
     </div>
     @foreach ($sidebar as $block)
         @switch($block['type'])
+            @case('sbar-hr')
+                <hr />
+                @break
             @case('sbar-head')
                 <div class="sbarhead py-1 mx-3 mt-2">
                     <div class="sbar_head">{{ $block['head'] }}</div>

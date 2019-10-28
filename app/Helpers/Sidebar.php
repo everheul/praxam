@@ -34,11 +34,17 @@ class Sidebar
         $id = $exam->id;
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
-            $this->sbarHead("- = -", 'Admin Controls');
+            $this->sbarHead("-", 'Admin Controls');
             $this->sbarButton('Edit Exam',"/exam/$id/edit/",'primary');
             $this->sbarButton('Manage Scenes',"/exam/$id/scene/",'primary');
             $this->sbarDelete('Delete Exam',"/exam/$id/destroy");
         }
+        return $this->blocks;
+    }
+
+    public function sbarNoExam() {
+        $this->myPracxam();
+        $this->allExams();
         return $this->blocks;
     }
 
@@ -54,7 +60,7 @@ class Sidebar
         $id = $exam->id;
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
         if (Auth::user()->isAdmin()) {
-            $this->sbarHead("- = -", 'Admin Controls');
+            $this->sbarHead("-", 'Admin Controls');
             $this->sbarButton('Edit Exam', "/exam/$id/edit/", 'primary');
             $this->sbarButton('Cancel',"/exam/$id/show/",'dark');
             $this->sbarDelete('Delete Exam',"/exam/$id/destroy");
@@ -99,14 +105,6 @@ class Sidebar
         return $this->blocks;
     }
 
-    public function sceneEdit($scene) {
-        $this->sbarLink('Exams','overview',"/exam");
-        $this->sbarBlock($scene->exam->name, $scene->exam->head);
-        $this->sbarHead("Edit Scene {$scene->id}", 'Admin Controls');
-        $this->sbarButton('Cancel',"/exam/{$scene->exam->id}/scene/{$scene->id}/show/",'dark');
-        return $this->blocks;
-    }
-
     public function sceneCreate($exam) {
         $this->myPracxam();
         $this->allExams();
@@ -115,31 +113,71 @@ class Sidebar
         return $this->blocks;
     }
 
+    public function questionCreate(Scene $scene) {
+        $this->myPracxam();
+        $this->allExams();
+        $this->sbarBlock($scene->exam->name, $scene->exam->head);
+        $this->sbarButton('Cancel',"/exam/{$scene->exam->id}/scene/{$scene->id}/edit",'dark');
+        return $this->blocks;
+    }
+
+    public function questionEdit(Scene $scene) {
+        $this->myPracxam();
+        $this->allExams();
+        $this->sbarBlock($scene->exam->name, $scene->exam->head);
+        $this->sbarButton('Cancel',"/exam/{$scene->exam->id}/scene/{$scene->id}/edit",'dark');
+        return $this->blocks;
+    }
+
     /**
      * Called from SceneController@show
      * @param Exam $exam
      * @return array
      */
-    public function sceneExams($scene) {
-        $this->sbarLink($scene->exam->name,$scene->exam->head,"/exam/" . $scene->exam->id . "/show");       
-        //- todo: admin / owner check?
-        $this->sbarHead('Admin Tools', 'Scene ' . $this->getSceneOrderOfTotal($scene->exam->id, $scene->id));
+    public function sceneShow($scene) {
+        $this->myPracxam();
+        $this->allExams();
+        $this->sbarBlock($scene->exam->name, $scene->exam->head);
+        $this->sbarHr();
         $this->sbarButton('Scene List',"/exam/" . $scene->exam->id . '/scene/','dark');
         $this->sbarButton('Next Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/next",'dark');
-        $this->sbarButton('Create Scene',"/exam/" . $scene->exam->id . '/scene/create','success');
         $this->sbarButton('Edit Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/edit",'primary');
         $this->sbarDelete('Delete Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/destroy");
+        $this->sbarButton('Create New Scene',"/exam/" . $scene->exam->id . '/scene/create','success');
         return $this->blocks;
     }
 
-    private function getSceneOrderOfTotal($exam_id, $scene_id) {
-        $scenes = Scene::select('id')
-            ->where('exam_id', '=', $exam_id)
-            ->orderBy('id')
-            ->get();
-        $idlist = array_flip($scenes->pluck('id')->all());
-        $total = $scenes->count();
-        return sprintf("%d of %d", $idlist[$scene_id]+1, $total);
+    /**
+     * Called from QuestionController@show
+     * @param Exam $exam
+     * @return array
+     */
+    public function questionShow($question) {
+        $this->myPracxam();
+        $this->allExams();
+        $this->sbarBlock($question->scene->exam->name, $question->scene->exam->head);
+        $this->sbarHr();
+        $exam_id = $question->scene->exam->id;
+        $this->sbarButton('Scene List',"/exam/$exam_id/scene/",'dark');
+        $this->sbarButton('Next Scene',"/exam/$exam_id/scene/{$question->scene_id}/next",'dark');
+        $this->sbarButton('Edit Scene',"/exam/$exam_id/scene/{$question->scene_id}/edit",'primary');
+        $this->sbarDelete('Delete Scene',"/exam/$exam_id/scene/{$question->scene_id}/destroy");
+        $this->sbarButton('Create New Scene',"/exam/$exam_id/scene/create",'success');
+        return $this->blocks;
+    }
+
+    public function sceneEdit($scene) {
+        $this->myPracxam();
+        $this->allExams();
+        //$scene->loadMissing('exam');
+        $this->sbarBlock($scene->exam->name, $scene->exam->head);
+        $this->sbarHr();
+        $this->sbarButton('Scene List',"/exam/" . $scene->exam->id . '/scene/','dark');
+        $this->sbarButton('Next Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/next/edit",'dark');
+        $this->sbarButton('Show Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/show",'primary');
+        $this->sbarDelete('Delete Scene',"/exam/" . $scene->exam->id . '/scene/' . $scene->id . "/destroy");
+        $this->sbarButton('Create New Scene',"/exam/" . $scene->exam->id . '/scene/create','success');
+        return $this->blocks;
     }
 
     public function editUserExam($exam) {
@@ -196,6 +234,10 @@ class Sidebar
 
     private function sbarHead($head, $text) {
         $this->blocks[] = ['type' => 'sbar-head', 'head' => $head, 'text' => $text];
+    }
+
+    private function sbarHr() {
+        $this->blocks[] = ['type' => 'sbar-hr'];
     }
 
     private function sbarBlock($head, $text) {

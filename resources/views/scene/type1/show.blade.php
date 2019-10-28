@@ -12,7 +12,9 @@
                 @isset($praxscene->scene->head)
                 <h3>{{ $praxscene->scene->head }}</h3>
                 @endisset
-                @include('question.type' . $praxscene->praxquestion()->question->question_type_id . '.show', ['praxquestion' => $praxscene->praxquestion() ])
+                @isset($praxscene->praxquestions[0])
+                    @include('question.type' . $praxscene->praxquestions[0]->question->question_type_id . '.show', ['praxquestion' => $praxscene->praxquestion() ])
+                @endisset
             </div>
         </div>
     </div>

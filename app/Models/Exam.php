@@ -13,7 +13,7 @@ class Exam extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'head', 'intro', 'text', 'image'];
+    protected $fillable = ['created_by', 'name', 'head', 'intro', 'text', 'image'];
 
     /**
      * The relation with userexams (OneToMany)
@@ -41,6 +41,19 @@ class Exam extends Model
             ->distinct('user_id')
             ->count('user_id');
         return $count;
+    }
+
+    /**
+     * @return string
+     */
+    public function imageName() {
+        if (!empty($this->image)) {
+            $pos = strpos($this->image,'_');
+            if (!empty($pos)) {
+                return substr($this->image, $pos + 1);
+            }
+        }
+        return '';
     }
 
 }

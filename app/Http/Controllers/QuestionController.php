@@ -12,6 +12,9 @@ use App\Models\Question;
 use App\Models\QuestionType;
 use App\Models\Scene;
 use Exception;
+use App\Helpers\Sidebar as Sidebar;
+use App\Http\Requests\NewQuestionRequest;
+use App\Classes\PraxQuestion;
 
 class QuestionController extends Controller
 {
@@ -19,133 +22,99 @@ class QuestionController extends Controller
      * Create a new controller instance
      *  and register the middleware needed.
      */
-	public function __construct()
-	{
-	    $this->middleware('auth');
-        $this->middleware('args2session')->only('index');
+	public function __construct() {
+	    $this->middleware('auth'); // ?
+        $this->middleware('exam_owner');
 	}
 
     /**
-     * Display a listing of the questions.
-     *
-     * @param Illuminate\Http\Request $request
-     *
+     * @param  int  $exam_id
+     * @param  int  $scene_id
      * @return Illuminate\View\View
      */
-    public function index(Request $request)
-    {
-        $page_base = str_replace('/','.',$request->path());
-
-        // make Paginator find its settings in session:
-        $this->registerPaginator($request,$page_base);
-
-        // get the global 'paginate' from session root:
-        $paginate = $request->session()->get('paginate', 10);
-
-        // get those as local (page) args:
-        $filter = $request->session()->get($page_base.'.filter', "%");
-        $direction = $request->session()->get($page_base.'.direction', 'asc');
-        $sortby = $request->session()->get($page_base.'.sortby', 'id');
-        //- check the sortby value:
-        if (!in_array($sortby,['question_type_id','order','head'])) $sortby = 'id';
-
-        $questions = Question::
-                    orderBy($sortby, $direction)->
-                    with('questiontype')->
-                    paginate($paginate);
-
-        $data = compact('questions','paginate','filter','sortby','direction');
-
-        return view('crest.questions.index', $data);
+    public function create($exam_id, $scene_id) {
+        $scene = Scene::where('id', '=', $scene_id)->with('exam')->firstOrFail();
+        $question = NULL;
+        $question_types = QuestionType::select('id','name')->pluck('name','id');
+        $sidebar = (new Sidebar())->questionCreate($scene);
+        return view('question.create', compact('scene','question_types','sidebar','question'));
     }
 
     /**
-     * Show the form for creating a new question.
-     *
+     * @param  int  $exam_id
+     * @param  int  $scene_id
+     * @param  int  $question_id
      * @return Illuminate\View\View
      */
-    public function create()
-    {
-        $scenes = Scene::orderBy('head')->pluck('head','id');
-		$questionTypes = QuestionType::orderBy('name')->pluck('name','id');
-        
-        return view('crest.questions.create', compact('scenes','questionTypes'));
+    public function edit($exam_id, $scene_id, $question_id) {
+        $scene = Scene::where('id', '=', $scene_id)->with('exam')->firstOrFail();
+        $question = Question::where('id', '=', $question_id)->with('answers')->first();
+        $question_types = QuestionType::orderBy('name')->pluck('name','id');
+        $sidebar = (new Sidebar())->questionEdit($scene);
+        return view("question.type{$question->question_type_id}.edit", compact('scene','question','question_types','sidebar'));
     }
 
     /**
-     * Store a new question in the storage.
+     * @param  int  $exam_id
+     * @param  int  $scene_id
+     * @param  int  $question_id
+     * @return Illuminate\View\View
+     */
+    public function show($exam_id, $scene_id, $question_id) {
+        $question = Question::where('id', '=', $question_id)->with('scene','scene.exam','answers','questiontype')->firstOrFail();
+        $praxquestion = (new PraxQuestion())->setAdminQuestionData($question);
+        $sidebar = (new Sidebar())->questionShow($question);
+        $useraction = 'IGNORE';
+        return view("question.type{$question->question_type_id}.show", compact('praxquestion','sidebar','useraction'));
+    }
+
+    /** POST
      *
-     * @param App\Http\Requests\QuestionsFormRequest $request
-     *
+     * @param App\Http\Requests\NewQuestionRequest $request
+     * @param  int  $exam_id
+     * @param  int  $scene_id
      * @return Illuminate\Http\RedirectResponse | Illuminate\Routing\Redirector
      */
-    public function store(QuestionsFormRequest $request)
-    {
+    public function store(NewQuestionRequest $request, $exam_id, $scene_id) {
+
+        $data = $request->getData();
+        // todo: check exam/scene id's
+
         try {
-            
-            $data = $request->getData();
-            
-            Question::create($data);
-
-            return redirect()->route('crest.questions.index')
-                ->with('success_message', 'Question was successfully added.');
+            $question = Question::create($data);
+            //- continue editting, to create the answers:
+            return redirect()->route( 'exam.scene.question.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
         } catch (Exception $exception) {
-
             return back()->withInput()
                 ->withErrors(['unexpected_error' => 'Unexpected error occurred while trying to process your request.']);
         }
     }
 
-    /**
-     * Display the specified question.
+    /** POST
      *
-     * @param int $id
-     *
-     * @return Illuminate\View\View
-     */
-    public function show($id)
-    {
-        $question = Question::
-                     with('scene','questiontype')->findOrFail($id);
-
-        return view('crest.questions.show', compact('question'));
-    }
-
-    /**
-     * Show the form for editing the specified question.
-     *
-     * @param int $id
-     *
-     * @return Illuminate\View\View
-     */
-    public function edit($id)
-    {
-        $question = Question::findOrFail($id);
-        $scenes = Scene::orderBy('head')->pluck('head','id');
-		$questionTypes = QuestionType::orderBy('name')->pluck('name','id');
-
-        return view('crest.questions.edit', compact('question','scenes','questionTypes'));
-    }
-
-    /**
-     * Update the specified question in the storage.
-     *
-     * @param int $id
      * @param App\Http\Requests\QuestionsFormRequest $request
-     *
+     * @param  int  $exam_id
+     * @param  int  $scene_id
+     * @param  int  $question_id
      * @return Illuminate\Http\RedirectResponse | Illuminate\Routing\Redirector
      */
-    public function update($id, QuestionsFormRequest $request)
-    {
+    public function update(NewQuestionRequest $request, $exam_id, $scene_id, $question_id) {
+
+        $data = $request->getData();
+        // todo: check exam/scene id's
+
         try {
-            
-            $data = $request->getData();
-            
-            $question = Question::findOrFail($id);
+            $question = Question::findOrFail($question_id);
             $question->update($data);
 
-            return redirect()->route('crest.questions.index')
-                ->with('success_message', 'Question was successfully updated.');
+            if ($request->has('save_show')) {
+                //return redirect(url("/exam/$exam_id/scene/$scene_id/question/{$question->id}/show"));
+                return redirect()->route( 'exam.scene.question.show', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+            } elseif ($request->has('save_stay')) {
+                return redirect()->route( 'exam.scene.question.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+            } else {
+                // ??
+            }
         } catch (Exception $exception) {
 
             return back()->withInput()

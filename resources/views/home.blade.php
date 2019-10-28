@@ -93,7 +93,19 @@
 
             <div class="card w-100 home mt-2">
                 <div class="card-header py-1">
-                    <h3>Your Exams</h3>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-3"></div>
+                            <div class="col-6"><h3>Your Exams</h3></div>
+                            <div class="col-3">
+                                <div class="btn-group btn-group-sm float-right" role="group">
+                                    <a href="/exam/create" class="btn btn-success" title="Create New Exam">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">

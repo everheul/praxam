@@ -39,6 +39,6 @@
             $('#sidebar').toggleClass('active');
             $('#content').toggleClass('active');
         });
+        $('[data-toggle="popover"]').popover({container: 'body'});
     });
-    </script>
 @endpush

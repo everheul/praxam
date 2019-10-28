@@ -7,6 +7,7 @@ use Illuminate\Http\Request as Request;
 use App\Helpers\Sidebar;
 use App\Models\User as User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\NewExamRequest;
 
 class ExamController extends Controller
 {
@@ -51,7 +52,9 @@ class ExamController extends Controller
      * @return \\Illuminate\Http\Response
      */
     public function create() {
-        dd(" -= TODO =- ");
+        return View('exam.create',
+            ['sidebar' => (new Sidebar)->sbarNoExam() ]
+        );
     }
 
     /**
@@ -60,12 +63,31 @@ class ExamController extends Controller
      * Store a newly created exam.
      * TODO
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  NewExamRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) {
-        // todo: validate
-        dd(" -= TODO =- ");
+    public function store(NewExamRequest $request) {
+        $data = $request->getData();
+        $data['created_by'] = $request->user()->id;
+        if ($request->hasFile('newimage')) {
+            $image = $request->file('newimage');
+            if ($image->isValid()) {
+                $name = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('/storage/images/'), $name);
+                $data['image'] = '/storage/images/' . $name;
+            }
+        }
+
+        //dd($data, $request);
+        $exam = Exam::create($data);
+
+        if ($request->has('save_show')) {
+            return redirect(url("/exam/{$exam->id}/show"));
+        } elseif ($request->has('save_stay')) {
+            return redirect(url("/exam/{$exam->id}/edit"));
+        } else {
+            // ??
+        }
     }
 
     /**
@@ -86,23 +108,33 @@ class ExamController extends Controller
      * POST
      *
      * Update the exam.
-     * TODO: image test
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int $exam_id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $exam_id) {
-        // todo: validate
-        $exam = Exam::findOrFail($exam_id);
-        $exam->fill($request->all());
-        $image = $request->file('newimage');
-        if (!empty($image)) {
-            $image->store('public/images');
-            $exam->image = $image->getFilename();
+    public function update(NewExamRequest $request, $exam_id) {
+        $data = $request->getData();
+        if ($request->hasFile('newimage')) {
+            $image = $request->file('newimage');
+            if ($image->isValid()) {
+                $name = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('/storage/images/'), $name);
+                $data['image'] = '/storage/images/' . $name;
+            }
         }
+
+        $exam = Exam::findOrFail($exam_id);
+        $exam->fill($data);
         $exam->update();
-        return redirect(url("/exam/$exam_id/show"));
+
+        if ($request->has('save_show')) {
+            return redirect(url("/exam/{$exam->id}/show"));
+        } elseif ($request->has('save_stay')) {
+            return redirect(url("/exam/{$exam->id}/edit"));
+        } else {
+            // ??
+        }
     }
 
     /**

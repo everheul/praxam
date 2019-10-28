@@ -11,7 +11,7 @@
             @if($useraction === 'ANSWER')
                 <input name="userquestion" type="hidden" value="{{ $praxquestion->userquestion->id }}">
             @else
-                <input name="exam" type="hidden" value="{{ $exam_id }}">
+                <input name="exam" type="hidden" value="{{ $praxquestion->question->scene->exam_id }}">
             @endif
             <div class="row justify-content-center align-items-start mb-4">
                 <div class="col-xl-4 col-lg-5 col-sm-6 mt-1 mb-auto p-0">

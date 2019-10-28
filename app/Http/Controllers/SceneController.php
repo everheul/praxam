@@ -77,9 +77,9 @@ class SceneController extends Controller
     public function show($exam_id, $scene_id) {
         $scene = $this->getFullScene($scene_id);
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
-        $sidebar = (new Sidebar())->sceneExams($scene);
         return View( 'scene.type' . $scene->scene_type_id . '.show',
-            [   'sidebar' => $sidebar,
+            [   'sidebar' => (new Sidebar())->sceneShow($scene),
+                'pagehead' => 'Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'praxscene' => $praxscene,
                 'useraction' => 'IGNORE',
                 'exam_id' => $exam_id,
@@ -114,6 +114,7 @@ class SceneController extends Controller
             // ??
         }
         $scene = Scene::create($request->only('exam_id','head','scene_type_id'));
+
         return redirect("/exam/$exam_id/scene/{$scene->id}/edit");
 /*
         $exam = Exam::findOrFail($exam_id);
@@ -133,12 +134,13 @@ class SceneController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($exam_id, $scene_id) {
+    public function edit( $exam_id, $scene_id) {
         $scene = $this->getFullScene($scene_id);
         $scene_types = SceneType::select('id','name')->pluck('name','id');
         $question_types = QuestionType::select('id','name')->pluck('name','id');
         return View('scene.type' . $scene->scene_type_id . '.edit',
             [   'sidebar' => (new Sidebar)->sceneEdit($scene),
+                'pagehead' => 'Edit Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'scene' => $scene,
                 'scene_types' => $scene_types,
                 'question_types' => $question_types,
@@ -147,27 +149,25 @@ class SceneController extends Controller
     
     /**
      * POST
-     *
-     * Update the specified resource in storage.
-     * todo: load scene questions and answers first (eager loading)
+     * Update the scene.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $exam_id, $scene_id) {
-        $scene = Scene::findOrFail($scene_id);
-        $data = $request->scene;
-        switch ($scene->scene_type_id) {
-            case 1:
-                $scene->head = $data['head'];
+    public function update( NewSceneRequest $request, $exam_id, $scene_id) {
+        if ($exam_id != $request->get('exam_id')) {
+            // ??
         }
-        $scene->save();
-
-        //- todo: save question & answers?
-
-        //- show the scene
-        return redirect("/exam/$exam_id/scene/$scene_id/show");
+        $scene = Scene::findOrFail($scene_id);
+        $scene->update($request->only('head','scene_type_id'));
+        if ($request->has('save_show')) {
+            return redirect(url("/exam/$exam_id/scene/$scene_id/show"));
+        } elseif ($request->has('save_stay')) {
+            return redirect(url("/exam/$exam_id/scene/$scene_id/edit"));
+        } else {
+            // ??
+        }
     }
 
     /**
@@ -194,16 +194,45 @@ class SceneController extends Controller
         }
         return $scene;
     }
-    
+
     /**
-     * Redirect to the next question of this exam
+     * Show the next question of this exam
      * 
-     * @param Request $request
      * @param int $exam_id
      * @param int $scene_id
      * @return Response
      */
-    public function nextScene(Request $request, $exam_id, $scene_id) {
+    public function nextScene($exam_id, $scene_id) {
+        $nextScene = $this->getNextScene($exam_id, $scene_id);
+        if (empty($nextScene)) {
+            return redirect("/exam/$exam_id/scene");
+        } else {
+            return redirect("/exam/$exam_id/scene/{$nextScene->id}");
+        }
+    }
+
+    /**
+     * Edit the next question of this exam
+     *
+     * @param $exam_id
+     * @param $scene_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function editNextScene($exam_id, $scene_id) {
+        $nextScene = $this->getNextScene($exam_id, $scene_id);
+        if (empty($nextScene)) {
+            return redirect("/exam/$exam_id/scene");
+        } else {
+            return redirect("/exam/$exam_id/scene/{$nextScene->id}/edit");
+        }
+    }
+
+    /**
+     * @param $exam_id
+     * @param $scene_id
+     * @return mixed
+     */
+    private function getNextScene($exam_id, $scene_id) {
         $nextScene = Scene::select('id')
             ->where('exam_id', '=', $exam_id)
             ->where('id','>',$scene_id)
@@ -215,11 +244,23 @@ class SceneController extends Controller
                 ->orderBy('id')
                 ->first();
         }
-        if (empty($nextScene)) {
-            return redirect("/exam/$exam_id/scene");
-        } else {
-            return redirect("/exam/$exam_id/scene/{$nextScene->id}");
-        }
+        return $nextScene;
     }
-    
+
+    /**
+     * Get the Scene order index
+     *
+     * @param $exam_id
+     * @param $scene_id
+     * @return string
+     */
+    private function getSceneOrderOfTotal($exam_id, $scene_id) {
+        $scenes = Scene::select('id')
+            ->where('exam_id', '=', $exam_id)
+            ->orderBy('id')
+            ->get();
+        $idlist = array_flip($scenes->pluck('id')->all());
+        return sprintf("%d of %d", $idlist[$scene_id]+1, $scenes->count());
+    }
+
 }

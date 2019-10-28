@@ -29,14 +29,14 @@ class Scene extends Model
     /**
      * @var array
      */
-    protected $fillable = ['scene_type_id', 'chapter', 'head', 'text', 'image'];
+    protected $fillable = ['exam_id','scene_type_id', 'chapter', 'head', 'text', 'image'];
 
     /**
      * The relation with exams
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function exam() {
-        return $this->belongsTo('App\Models\Exam');
+        return $this->belongsTo('App\Models\Exam','exam_id','id');
     }
 
     /**
@@ -77,6 +77,19 @@ class Scene extends Model
         foreach($this->questions as &$question) {
             $question->order = $n++;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function imageName() {
+        if (!empty($this->image)) {
+            $pos = strpos($this->image,'_');
+            if (!empty($pos)) {
+                return substr($this->image, $pos + 1);
+            }
+        }
+        return '';
     }
 
 }

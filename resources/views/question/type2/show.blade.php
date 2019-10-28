@@ -11,7 +11,7 @@
             @if($useraction === 'ANSWER')
                 <input name="userquestion" type="hidden" value="{{ $praxquestion->userquestion->id }}">
             @else
-                <input name="exam" type="hidden" value="{{ $exam_id }}">
+                <input name="exam" type="hidden" value="{{ $praxquestion->question->scene->exam_id }}">
             @endif
             @foreach ($praxquestion->praxanswers as $praxanswer)
                 <div class="input-group-prepend mb-1">
@@ -22,7 +22,7 @@
                 </div>
             @endforeach
             <div class="input-group-prepend mt-4">
-                <input class="btn btn-outline-danger px-4 py-1" type="submit" value="Done"{{ $praxquestion->disabledStr() }}>
+                <input id="done_{{ $praxquestion->question->id }}" class="btn btn-outline-danger px-4 py-1" type="submit" value="Done"{{ $praxquestion->disabledStr() }}>
     @if($praxquestion->locked)
                 <a class="btn btn-primary px-4 py-1 ml-2" href="/prax/{{ $praxscene->userscene->userexam_id }}/scene/{{ $praxscene->userscene->order }}/question/{{ $praxquestion->order }}/next">Continue</a>
     @endif

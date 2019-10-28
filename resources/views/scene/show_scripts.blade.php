@@ -44,7 +44,12 @@
             return true;
         } else {
             // todo: tell the user to give an answer first
-            console.log("No answer selected.");
+            //console.log( event);
+            $(event.target).popover({ content: 'Please answer the question first.', trigger: 'manual' });
+            $(event.target).popover('show');
+            setTimeout(function() {
+                $(event.target).popover('dispose');
+                }, 2000);
         }
         return false;
     }

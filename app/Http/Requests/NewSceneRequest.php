@@ -25,7 +25,7 @@ class NewSceneRequest extends FormRequest
         return [
             'scene_type_id' => 'required|numeric|min:1|max:2',
             'head' => 'required|string|min:1|max:191',
-            'exam_id' => 'required|numeric|min:1',
+            'exam_id' => 'numeric|min:1',
         ];
     }
 }

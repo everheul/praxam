@@ -33,14 +33,14 @@ class Question extends Model
      * The relation with scenes (OneToMany Inverse)
      */
     public function scene() {
-        return $this->belongsTo('App\Models\Scene', 'id', 'scene_id');
+        return $this->belongsTo('App\Models\Scene');
     }
 
     /**
      * The relation with question_types (OneToMany Inverse)
      */
     public function questionType() {
-        return $this->belongsTo('App\Models\QuestionType', 'id', 'question_type_id');
+        return $this->belongsTo('App\Models\QuestionType');
     }
 
     /**

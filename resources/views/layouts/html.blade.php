@@ -23,6 +23,8 @@
     {{-- bootstrap styles: --}}
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
+    <link href="{{ asset('css/myapp.css') }}" rel="stylesheet">
+
     {{-- Font Awesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -32,9 +34,6 @@
     {{-- temporary style thing, clean up when ready! --}}
     <style>
         @stack('style')
-        body {
-            background: #f8fff6;
-        }
     </style>
 </head>
 <body>

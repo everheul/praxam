@@ -69,38 +69,39 @@ Route::post('/answer','UserQuestionController@userAnswer');
  */
 
 //- all exam actions
-Route::get('/exam', 'ExamController@index');
-Route::get('/exam/create','ExamController@create');
-Route::post('/exam/store','ExamController@store');
+Route::get('/exam', 'ExamController@index')->name('exam.index');
+Route::get('/exam/create','ExamController@create')->name('exam.create');
+Route::post('/exam/store','ExamController@store')->name('exam.store');
 Route::prefix('/exam/{exam_id}')->group(function () {
 	Route::get('/','ExamController@show');
-	Route::get('/show','ExamController@show');
-	Route::get('/edit','ExamController@edit');
-	Route::post('/update','ExamController@update');
-	Route::get('/destroy','ExamController@destroy');
+	Route::get('/show','ExamController@show')->name('exam.show');
+	Route::get('/edit','ExamController@edit')->name('exam.edit');
+	Route::post('/update','ExamController@update')->name('exam.update');
+	Route::get('/destroy','ExamController@destroy')->name('exam.destroy');
 	//- all exam/scene actions
-	Route::get('/scene', 'SceneController@index');
-	Route::get('/scene/create','SceneController@create');
-	Route::post('/scene/store','SceneController@store');
+	Route::get('/scene', 'SceneController@index')->name('exam.scene.index');
+	Route::get('/scene/create','SceneController@create')->name('exam.scene.create');
+	Route::post('/scene/store','SceneController@store')->name('exam.scene.store');
 	Route::prefix('/scene/{scene_id}')->group(function () {
 		Route::get('/','SceneController@show');
-		Route::get('/show','SceneController@show');
-		Route::get('/edit','SceneController@edit');
-		Route::post('/update','SceneController@update');
-		Route::get('/destroy','SceneController@destroy');
-		Route::get('/next','SceneController@nextScene');
+		Route::get('/show','SceneController@show')->name('exam.scene.show');
+		Route::get('/edit','SceneController@edit')->name('exam.scene.edit');
+		Route::post('/update','SceneController@update')->name('exam.scene.update');
+		Route::get('/destroy','SceneController@destroy')->name('exam.scene.destroy');
+		Route::get('/next','SceneController@nextScene')->name('exam.scene.next');
+		Route::get('/next/edit','SceneController@editNextScene')->name('exam.scene.next.edit');
 		//- all exam/scene/question actions
 		Route::prefix('/question')->group(function () {
-			Route::get('/', 'QuestionController@index');
-			Route::get('/create', 'QuestionController@create');
-			Route::get('/store', 'QuestionController@store');
-			Route::prefix('/question/{question_id}')->group(function () {
+			Route::get('/', 'QuestionController@index')->name('exam.scene.question.index');
+			Route::get('/create', 'QuestionController@create')->name('exam.scene.question.create');
+			Route::post('/store', 'QuestionController@store')->name('exam.scene.question.store');
+			Route::prefix('/{question_id}')->group(function () {
 				Route::get('/','QuestionController@show');
-				Route::get('/show','QuestionController@show');
-				Route::get('/edit','QuestionController@edit');
-				Route::post('/update','QuestionController@update');
-				Route::get('/destroy','QuestionController@destroy');
-				Route::get('/next','QuestionController@nextQuestion');
+				Route::get('/show','QuestionController@show')->name('exam.scene.question.show');
+				Route::get('/edit','QuestionController@edit')->name('exam.scene.question.edit');
+				Route::post('/update','QuestionController@update')->name('exam.scene.question.update');
+				Route::get('/destroy','QuestionController@destroy')->name('exam.scene.question.destroy');
+				Route::get('/next','QuestionController@nextQuestion')->name('exam.scene.question.next');
 			});
 		});
 	});
