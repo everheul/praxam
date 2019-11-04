@@ -25,14 +25,15 @@
     <div class="row justify-content-left">
         <div class="col home-table">
 
-            <div class="card w-100 home">
+            <div class="card w-100 home headcolor">
                 <div class="card-body p-1">
-                    <h1>Your Tests and Exams</h1>
+                    <h2>My Pracxam</h2>
+                    <h4>Your Tests and Exams</h4>
                 </div>
             </div>
 
             <div class="card w-100 home mt-2">
-                <div class="card-header py-1">
+                <div class="card-header py-1 appcolor">
                     <h3>Tests In Progress</h3>
                 </div>
                 <div class="card-body">
@@ -62,7 +63,7 @@
             </div>
 
             <div class="card w-100 home mt-2">
-                <div class="card-header py-1">
+                <div class="card-header py-1 appcolor">
                     <h3>Finished Tests</h3>
                 </div>
                 <div class="card-body">
@@ -92,7 +93,7 @@
             </div>
 
             <div class="card w-100 home mt-2">
-                <div class="card-header py-1">
+                <div class="card-header py-1 appcolor">
                     <div class="container">
                         <div class="row">
                             <div class="col-3"></div>

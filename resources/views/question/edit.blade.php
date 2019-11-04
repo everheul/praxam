@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row mb-3">
             <div class="card w-100 p-3 appcolor">
-                <h3>Edit Question</h3>
+                <h3>Edit Question {{ $question->order }} of {{ $scene->question_count }}</h3>
                 <h4>Scene: {{ $scene->head }}</h4>
                 <hr />
                 <form method="post" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/{{ $question->id }}/update" enctype="multipart/form-data">
@@ -31,33 +31,10 @@
 
                 </form>
                 <hr />
-
-                {{-- ANSWERS --}}
-                @foreach($question->answers as $key => $answer)
-                <div class="form-group row">
-                    <label class="col-lg-3 col-xl-2 col-form-label">Answer {{ $answer->order }}</label>
-                    <div class="col-lg-9 col-xl-10">
-                        <div class="card">
-                            <div class="card-header p-1">
-                                {{ $answer->text }}
-                                <form method="POST" action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/{{ $answer->id }}/destroy" accept-charset="UTF-8">
-                                    {{ csrf_field() }}
-                                    <div class="btn-group btn-group-sm float-right" role="group">
-                                        <button name="delete" type="submit" class="btn btn-danger" title="Delete Answer" onclick="return confirm(&quot;Click Ok to delete this Answer.&quot;)">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-				
-                <div class="form-group row">
-                    <label class="col-lg-3 col-xl-2 col-form-label"></label>
-                    <div class="col-lg-9 col-xl-10">
-                        <a class="btn btn-primary" href="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/create" role="button">Add Answer</a>
+                <div class="form-group row mb-3">
+                    <label class="col-md-2 pt-2 control-label">Answers</label>
+                    <div class="col-md-10 pl-0">
+                        <a class="btn btn-primary" href="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answers" role="button">Manage Answers</a>
                     </div>
                 </div>
 

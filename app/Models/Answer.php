@@ -29,56 +29,16 @@ class Answer extends Model
     }
 
     /**
-    protected $appends = ['checked','locked','order'];
-
-    public function getCheckedAttribute() {
-        if (empty($this->attributes['checked'])) {
-            $this->attributes['checked'] = false;
+     * used by templates
+     * @return mixed|string
+     */
+    public function getLabel() {
+        $label = "Answer #{$this->order} : ";
+        if (strlen($this->text) > 40) {
+            $label .= substr($this->text, 0, 40) . '...';
+        } else {
+            $label .= $this->text;
         }
-        return $this->attributes['checked'];
+        return $label;
     }
-
-    public function setCheckedAttribute($checked) {
-        $this->attributes['checked'] = boolval($checked);
-    }
-
-    public function getLockedAttribute() {
-        if (empty($this->attributes['locked'])) {
-            $this->attributes['locked'] = false;
-        }
-        return $this->attributes['locked'];
-    }
-
-    public function setLockedAttribute($locked) {
-        $this->attributes['locked'] = boolval($locked);
-    }
-
-    public function getOrderAttribute() {
-        if (empty($this->attributes['order'])) {
-            $this->attributes['order'] = 0;
-        }
-        return $this->attributes['order'];
-    }
-
-    public function setOrderAttribute($order) {
-        $this->attributes['order'] = intval($order);
-    }
-
-    public function disabled() {
-        return ($this->getLockedAttribute()) ? 'disabled=1' : '';
-    }
-
-    public function checked() {
-        return ($this->getCheckedAttribute()) ? 'checked=1' : '';
-    }
-
-    public function coolness() {
-        if ($this->locked) {
-            $cool = is_null($this->correct_order) ? $this->is_correct : $this->correct_order;
-            return $cool ? 'correct' : 'wrong';
-        }
-        return '';
-    }
-**/
-
 }

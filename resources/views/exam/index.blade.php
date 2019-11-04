@@ -1,11 +1,12 @@
 {{-- exam.index
      input: $exams
+
 --}}
 @extends('layouts.exam')
 
 @section('content')
     <div  class="container-fluid">
-            <div class="card-columns" style="column-count: auto;">
+        <div class="card-columns" style="column-count: auto;">
                 @foreach ($exams as $exam)
                 <a href="/exam/{{ $exam->id }}" class="cardlink">
                     <div class="inlink">

@@ -21,7 +21,7 @@
         Instructions
     </label>
     <div class="col pl-0">
-        <textarea name="instructions" id="instid" class="form-control w-100" placeholder="Scene Instructions" rows="3" >{{ $scene->instructions }}</textarea>
+        <textarea name="instructions" id="instid" class="form-control w-100" placeholder="Scene Instructions" rows="3" >{{ old('instructions', optional($scene)->instructions) }}</textarea>
         {!! $errors->first('instructions', '<p class="form-text text-muted">:message</p>') !!}
     </div>
 </div>
@@ -37,7 +37,7 @@
     <div class="col-md-10 pl-0">
         <div class="custom-file">
             <input name="newimage" type="file" class="custom-file-input" id="customFile">
-            <label class="custom-file-label" for="customFile">{{ old('newimage', empty($scene) ? 'Select Image' : $scene->imageName()) }}</label>
+            <label class="custom-file-label" for="customFile">{{ old('newimage', empty(optional($scene)->image) ? 'Select Image' : $scene->imageName()) }}</label>
         </div>
         {!! $errors->first('newimage', '<p class="form-text text-muted">:message</p>') !!}
     </div>

@@ -15,11 +15,11 @@
     @endif
 
     <div class="card">
-        <div class="card-header">
+        <div class="card-header headcolor">
             <div class="float-left mx-3 mt-1"><h2>Exam Scenes</h2></div>
             <div class="dropdown float-left ml-3 mt-1">
-                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sorteren op
+                <button class="btn btn-outline-dark dropdown-toggle appcolor" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Order By
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item" href="?sortby=id"> @if($sortby==='id') <i class="fa fa-arrow-right" aria-hidden="true"></i> @endif Index</a>
@@ -29,8 +29,8 @@
                 </div>
             </div>
             <div class="dropdown float-left ml-3 mt-1">
-                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Richting
+                <button class="btn btn-outline-dark dropdown-toggle appcolor" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Direction
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item" href="?direction=asc"> @if($direction==='asc') <i class="fa fa-arrow-right" aria-hidden="true"></i> @endif Asc (A->Z, 0->9)</a>
@@ -38,8 +38,8 @@
                 </div>
             </div>
             <div class="dropdown float-left ml-3 mt-1">
-                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Aantal
+                <button class="btn btn-outline-dark dropdown-toggle appcolor" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Page Size
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item" href="?paginate=10"> @if($paginate===10) <i class="fa fa-arrow-right" aria-hidden="true"></i> @endif Max 10</a>
@@ -51,27 +51,27 @@
             <div class="float-left ml-3 mt-1">
                 <form class="d-inline-block" action="#" method="GET">
                     <div class="input-group">
-                        <input name="filter" class="form-control py-2 rounded-left" type="search" value="{{ $filter }}" id="search-input">
+                        <input name="filter" class="form-control py-2 rounded-left" type="search" placeholder="*" value="{{ $filter }}" id="search-input">
                         <span class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="commit">
+                            <button class="btn btn-outline-secondary appcolor" type="commit">
                                 <i class="fa fa-search"></i>
                             </button>
                         </span>
                         <span class="input-group-append">
-                            <a class="btn btn-outline-secondary" href="?filter=" type="button">
+                            <a class="btn btn-outline-secondary appcolor" href="?filter=" type="button">
                                 <i class="fa fa-close"></i>
                             </a>
                         </span>
                     </div>
                 </form>
             </div>
-            <div class="float-right ml-3 mr-2 mt-2">
+            {{-- <div class="float-right ml-3 mr-2 mt-2">
                 <div class="btn-group btn-group-sm float-right" role="group">
                     <a href="/exam/{{ $exam->id }}/scene/create" class="btn btn-success" title="Create New Scene">
                         <i class="fa fa-plus" aria-hidden="true"></i>
                     </a>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         @if(count($scenes) == 0)
@@ -81,8 +81,8 @@
         @else
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-sm">
-                    <thead>
+                <table class="table table-borderless table-hover table-sm">
+                    <thead class="appcolor">
                         <tr>
                             <th>Index</th>
                             <th>Head</th>
@@ -99,17 +99,20 @@
                             <td>{{ $scene->question_count }}</td>
                             <td>{{ empty($scene->text) ? '' : substr(strip_tags($scene->text),0,70) . '...' }}</td>
                             <td>
-                                <div class="btn-group btn-group-sm float-right" role="group">
-                                    <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info" title="Show Scene">
-                                        <i class="fa fa-eye" aria-hidden="true"></i>
-                                    </a>
-                                    <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-primary" title="Edit Scene">
-                                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                                    </a>
-                                    <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-danger" title="Delete Scene" onclick="return confirm(&quot;Click Ok to delete this Scene.&quot;)">
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                    </a>
-                                </div>
+                                <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/destroy" accept-charset="UTF-8">
+                                    {{ csrf_field() }}
+                                    <div class="btn-group btn-group-sm float-right" role="group">
+                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info" title="Show Scene">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-primary" title="Edit Scene">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                        </a>
+                                        <button name="delete" type="submit" class="btn btn-danger" title="Delete Scene" onclick="return confirm(&quot;Click Ok to delete Scene.&quot;)">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </form>
                             </td>
                         </tr>
                       @endforeach
@@ -117,8 +120,11 @@
                 </table>
             </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer appcolor">
+            <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/create" role="button">Add Scene</a>
+            <div class="float-right">
             {!! $scenes->render() !!}
+            </div>
         </div>
         @endif
     </div>

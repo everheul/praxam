@@ -86,7 +86,7 @@ class ExamController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the Exam.
      *
      * @param  int $exam_id
      * @return \Illuminate\Http\Response
@@ -94,7 +94,7 @@ class ExamController extends Controller
     public function edit($exam_id) {
         $exam = Exam::findOrFail($exam_id);
         return View('exam.edit',
-            [   'sidebar' => (new Sidebar)->examEdit($exam),
+            [   'sidebar' => (new Sidebar)->sbarExamEdit($exam),
                 'exam' => $exam ]
         );
     }

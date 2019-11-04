@@ -6,7 +6,9 @@
 @section('content')
 <div class="container">
     <div class="row mb-3">
-        <div class="card w-100 p-3">
+        <div class="card w-100 p-3 appcolor">
+            <h3>Edit Exam</h3>
+            <hr />
             <form method="post" action="/exam/{{ $exam->id }}/update" enctype="multipart/form-data" class="form-horizontal">
                 {{ csrf_field() }}
                 <input name="id" type="hidden" value="{{ $exam->id }}">

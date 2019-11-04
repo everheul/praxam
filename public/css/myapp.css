@@ -267,7 +267,9 @@ body {
 /*--- edit ---*/
 .appcolor {
     background: #e6f7e1;
-
+}
+.headcolor {
+    background: #d9ead4;
 }
 .col-form-label {
     word-wrap: normal;
@@ -281,7 +283,7 @@ body {
 }
 .table {
     border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: .35rem;
+    border-radius: 5px;
 }
 
 /*---- home ----*/
@@ -354,4 +356,8 @@ option {
 }
 #question_list {
     background-color: #d9ead4;
+}
+
+.pagination ul {
+    magin-bottom: 0;
 }

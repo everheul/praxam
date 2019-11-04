@@ -6,16 +6,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\QuestionFormRequest;
+use App\Http\Requests\NewAnswerOrderRequest;
 use App\Models\Question;
 use App\Models\QuestionType;
 use App\Models\Scene;
-use Exception;
 use App\Helpers\Sidebar as Sidebar;
 use App\Http\Requests\NewQuestionRequest;
-use App\Classes\PraxQuestion;
 use App\Classes\PraxScene;
+use Exception;
 
 class QuestionController extends Controller
 {
@@ -37,7 +35,7 @@ class QuestionController extends Controller
         $scene = Scene::where('id', '=', $scene_id)->with('exam')->firstOrFail();
         $question = null;
         $question_types = QuestionType::select('id','name')->pluck('name','id');
-        $sidebar = (new Sidebar())->questionCreate($scene);
+        $sidebar = (new Sidebar())->sbarQuestionCreate($scene);
         return view('question.create', compact('scene','question_types','sidebar','question'));
     }
 
@@ -52,8 +50,8 @@ class QuestionController extends Controller
         $question = Question::where('id', '=', $question_id)->with('answers')->firstOrFail();
         //dd($scene,$question);
         $question_types = QuestionType::orderBy('id')->pluck('name','id');
-        $sidebar = (new Sidebar())->questionEdit($scene);
-        return view("question..edit", compact('scene','question','question_types','sidebar')); // type{$question->question_type_id}
+        $sidebar = (new Sidebar())->sbarQuestionEdit($scene);
+        return view("question.edit", compact('scene','question','question_types','sidebar')); // type{$question->question_type_id}
     }
 
     /**
@@ -68,7 +66,7 @@ class QuestionController extends Controller
         $scene = Scene::where('id', '=', $scene_id)->with('exam','sceneType','questions','questions.answers')->firstOrFail();
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
         $question_order = $praxscene->questionOrder($question_id);
-        $sidebar = (new Sidebar())->sceneShow($scene); //- todo: edit question
+        $sidebar = (new Sidebar())->sbarSceneShow($scene); //- todo: edit question
         $useraction = 'IGNORE';
         return View('scene.type' . $praxscene->scene->scene_type_id . '.show', compact('praxscene','sidebar','useraction','question_order'));
     }
@@ -83,11 +81,14 @@ class QuestionController extends Controller
      * @return Illuminate\Http\RedirectResponse | Illuminate\Routing\Redirector
      */
     public function store(NewQuestionRequest $request, $exam_id, $scene_id) {
-
+        //dd($request);
         $scene = Scene::where('id', '=', $scene_id)->firstOrFail();
         $data = $request->getData();
         $data['order'] = $scene->question_count + 1;
 
+        $question = Question::create($data);
+        return redirect()->route( 'exam.scene.question.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+/*
         try {
             $question = Question::create($data);
             //- continue editting, to create the answers:
@@ -95,7 +96,7 @@ class QuestionController extends Controller
         } catch (Exception $exception) {
             return back()->withInput()
                 ->withErrors(['unexpected_error' => 'Unexpected error occurred while trying to process your request.']);
-        }
+        } */
     }
 
     /** POST
@@ -127,6 +128,7 @@ class QuestionController extends Controller
 
     /**
      * Remove the specified question from the storage.
+     * todo: validate?
      *
      * @param int $id
      *
@@ -141,6 +143,47 @@ class QuestionController extends Controller
                     ->with('success_message', 'Question was successfully deleted.');
      }
 
+    /**
+     * @param $exam_id
+     * @param $scene_id
+     * @param $question_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function answers($exam_id, $scene_id, $question_id) {
+        $question = Question::where('id',$question_id)->with('scene','scene.exam','answers')->firstOrFail();
+        $sidebar = (new Sidebar())->sbarQuestionAnswers($question);
+        return view("question.answers", compact('question','sidebar'));
+    }
 
+    /**
+     * @param NewAnswerOrderRequest $request
+     * @param $exam_id
+     * @param $scene_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function order(NewAnswerOrderRequest $request, $exam_id, $scene_id, $question_id) {
+
+        //dd($request);
+
+        // todo: check id's
+
+        $question = Question::where('id', '=', $question_id)
+            ->with('answers')
+            ->firstOrFail();
+
+        $alist = $request->get('answers');
+        if(!empty($alist) && is_array($alist)) {
+            foreach($alist as $answer_id => $order ) {
+                $answer = $question->answers->firstWhere('id', $answer_id );
+                if (!empty($answer)) {
+                    $answer->order = $order;
+                    $answer->save();
+                }
+            }
+        } else dd($request);
+
+        // todo: where to?
+        return redirect("/exam/$exam_id/scene/{$scene_id}/question/$question_id/answers");
+    }
 
 }

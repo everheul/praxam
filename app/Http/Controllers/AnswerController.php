@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\NewAnswerRequest;
+
 
 class AnswerController extends Controller
 {
@@ -11,7 +13,7 @@ class AnswerController extends Controller
     }
 
     /**
-     * todo: auth!
+     * todo: auth! in request?
      *
      * @return \Illuminate\Http\Response
      */

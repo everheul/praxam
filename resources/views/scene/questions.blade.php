@@ -1,17 +1,18 @@
 {{-- QUESTIONS -- SORTABLE LIST
-  todo:
-    - setup sortables to easily change the order of the questions
-    - show / edit / delete buttins for all questions
  --}}
 
-<h4>Scene Questions</h4>
-<hr />
 <div class="form-group row pb-3">
-    <label class="col-md-2 pt-2 control-label" for="submit"></label>
+    <label class="col-md-2 pt-2 control-label" for="submit">
+        Questions
+        <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left" data-html="true"
+                title="You can add, edit, view and delete this scenes' questions here, and change their order by dragging them.">
+            <i class="fa fa-info" aria-hidden="true"></i>
+        </button>
+    </label>
     <div class="col-md-10 pl-0">
-        <div id="question_list" class="card p-1">
+        <div id="questions_list" class="card p-1">
             @foreach($scene->questions->sortBy('order') as $question)
-                <div class="dragable nots card px-3 py-1 m-2 bg-light">
+                <div class="dragable nots card px-3 py-1 m-2 bg-light" id="{{$question->id}}">
                     <div class="row p-1">
                         <div class="col-8 pr-0 pt-1 text-left">
                         {{ $question->getLabel() }}
@@ -41,15 +42,21 @@
 <div class="form-group row mb-3">
     <label class="col-md-2 pt-2 control-label"></label>
     <div class="col-md-10 pl-0">
-        <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/create" role="button">Add Question</a>
+        @if($scene->questions->count() > 1)
+        <form method="POST" id="questions_order" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/order" accept-charset="UTF-8">
+            {{ csrf_field() }}
+            <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/create" role="button">Add Question</a>
+            <button name="save_order" type="submit" class="btn btn-primary ml-3" onclick="return saveOrder()">Save Order</button>
+        </form>
+        @endif
     </div>
 </div>
 
 @push('scripts')
 <script>
     $(function() {
-        // activate sortable on all type 3 questions:
-        $('#question_list').sortable({
+        // activate sortable on question list
+        $('#questions_list').sortable({
                 cursor: "move",
                 scroll: false,
                 // stops page scolling if scrolled down:
@@ -59,6 +66,20 @@
             }
         )
     });
+
+    function saveOrder() {
+        var myForm = $("#questions_order");
+        var order = 1;
+        $("#questions_list .dragable").each(function () {
+                var dom = document.createElement('input');
+                dom.type = 'hidden';
+                dom.name = 'questions[' + $(this).attr('id') + ']';
+                dom.value = order++;
+                myForm.append(dom);
+            });
+        return true;
+    }
+
 </script>
 @endpush
 

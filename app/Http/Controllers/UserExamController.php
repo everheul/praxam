@@ -43,7 +43,7 @@ class UserExamController extends Controller
     public function show(Request $request, $userexam_id) {
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
         return View('userexam.show',
-            [   'sidebar' => (new Sidebar)->examResult($praxexam),
+            [   'sidebar' => (new Sidebar)->sbarPraxResult($praxexam),
                 'praxexam' => $praxexam ]
         );
     }
@@ -56,7 +56,7 @@ class UserExamController extends Controller
      */
     public function create($exam_id) {
         $exam = Exam::findOrFail($exam_id);
-        $sidebar = (new Sidebar)->editUserExam($exam);
+        $sidebar = (new Sidebar)->sbarPraxCreate($exam);
         return view('userexam.create',['sidebar' => $sidebar, 'exam' => $exam]);
     }
     

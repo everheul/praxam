@@ -39,8 +39,16 @@ class User extends Authenticatable // implements MustVerifyEmail
      *
      * @return bool
      */
-    public function isAdmin() : bool {
+    public function isAdmin() {
         return ($this->role === 'admin');
+    }
+
+    /**
+     * @param $exam
+     * @return bool
+     */
+    public function isOwner($exam) {
+        return $exam->created_by === $this->id;
     }
 
 }

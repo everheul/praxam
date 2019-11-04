@@ -62,7 +62,7 @@ class Question extends Model
      * @return mixed|string
      */
     public function getLabel() {
-        $nr = 'Question #' . $this->id . ' : ';
+        $nr = 'Question #' . $this->order . ' : ';
         if (empty($this->head)) {
             if (empty($this->text)) {
                 return 'Question without text';

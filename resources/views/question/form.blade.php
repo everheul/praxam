@@ -11,11 +11,12 @@
         Question Type
     </label>
     <div class="col-md-5 pl-0">
-        <select class="form-control" id="question_type" name="question_type">
+        <select class="form-control" id="question_type" name="question_type_id">
             @foreach ($question_types as $key => $question_type)
                 <option value="{{ $key }}"{{ ($key === optional($question)->question_type_id) ? ' selected' : '' }}>{{ $question_type }}</option>
             @endforeach
         </select>
+        {!! $errors->first('question_type_id', '<p class="form-text text-danger">:message</p>') !!}
     </div>
 </div>
 
@@ -42,8 +43,8 @@
         Question Text
     </label>
     <div class="col-md-9 pl-0">
-                            <textarea name="text" id="textid" class="ckeditor form-control w-100" placeholder="Question Text" maxlength="5000"
-                                      rows="3" >{!! old('text', optional($question)->text) !!}</textarea>
+        <textarea name="text" id="textid" class="ckeditor form-control w-100" placeholder="Question Text" maxlength="5000"
+                rows="3" >{!! old('text', optional($question)->text) !!}</textarea>
         {!! $errors->first('text', '<p class="form-text text-danger">:message</p>') !!}
     </div>
 </div>

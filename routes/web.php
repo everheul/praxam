@@ -88,6 +88,7 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 		Route::get('/edit','SceneController@edit')->name('exam.scene.edit');
 		Route::post('/update','SceneController@update')->name('exam.scene.update');
 		Route::post('/destroy','SceneController@destroy')->name('exam.scene.destroy');
+		Route::post('/order','SceneController@order')->name('exam.scene.order');
 		Route::get('/next','SceneController@nextScene')->name('exam.scene.next');
 		Route::get('/next/edit','SceneController@editNextScene')->name('exam.scene.next.edit');
 		//- all exam/scene/question actions
@@ -101,6 +102,8 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 				Route::get('/edit','QuestionController@edit')->name('exam.scene.question.edit');
 				Route::post('/update','QuestionController@update')->name('exam.scene.question.update');
 				Route::post('/destroy','QuestionController@destroy')->name('exam.scene.question.destroy');
+				Route::get('/answers','QuestionController@answers')->name('exam.scene.question.answers');
+				Route::post('/order','QuestionController@order')->name('exam.scene.question.order');
 				Route::get('/next','QuestionController@nextQuestion')->name('exam.scene.question.next');
 				//- answers
 				Route::prefix('/answer')->group(function () {

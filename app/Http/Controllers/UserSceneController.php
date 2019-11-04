@@ -41,7 +41,7 @@ class UserSceneController extends Controller
 
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
         $praxscene = $praxexam->praxscenes->where('userscene.order', '=', $s_order)->first();
-        $sidebar = (new SideBar)->practiceExam($praxexam, $s_order);
+        $sidebar = (new SideBar)->sbarPraxExam($praxexam, $s_order);
         
         return View('scene.type' . $praxscene->scene->scene_type_id . '.show',
             [   'sidebar' => $sidebar,

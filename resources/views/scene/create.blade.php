@@ -21,7 +21,7 @@
                         <label class="col-md-2 pt-2 control-label" for="submit"></label>
                         <div class="col-md-10 pl-0">
                             <button id="submit" name="submit" class="btn btn-primary mx-0">Create Scene</button>
-                            <a class="btn btn-primary ml-2 px-4" href="/exam/{{ $exam_id }}/scene" role="button">Cancel</a>
+                            <a class="btn btn-primary ml-3 px-4" href="/exam/{{ $exam_id }}/scene" role="button">Cancel</a>
                         </div>
                     </div>
                 </form>

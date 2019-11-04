@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Pagination\Paginator;
 use App\Classes\PraxScene;
 use App\Http\Requests\NewSceneRequest;
+use App\Http\Requests\NewQuestionOrderRequest;
 
 class SceneController extends Controller
 {
     public function __construct() {
         $this->middleware('auth');
         $this->middleware('args2session')->only('index');
-        $this->middleware('exam_owner')->only('edit','update','destroy');
+        $this->middleware('exam_owner')->only('edit','update','destroy','order');
     }
 
     /**
@@ -78,7 +79,7 @@ class SceneController extends Controller
         $scene = $this->getFullScene($scene_id);
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
         return View( 'scene.type' . $scene->scene_type_id . '.show',
-            [   'sidebar' => (new Sidebar())->sceneShow($scene),
+            [   'sidebar' => (new Sidebar())->sbarSceneShow($scene),
                 'pagehead' => 'Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'praxscene' => $praxscene,
                 'useraction' => 'IGNORE',
@@ -95,7 +96,7 @@ class SceneController extends Controller
         $exam = Exam::findOrFail($exam_id);
         $scene_types = SceneType::select('id','name')->pluck('name','id');
         return View( 'scene.create',
-            [   'sidebar' => (new Sidebar())->sceneCreate($exam),
+            [   'sidebar' => (new Sidebar())->sbarSceneCreate($exam),
                 'exam_id' => $exam_id,
                 'scene_types' => $scene_types,
                 'scene' => null,
@@ -120,6 +121,36 @@ class SceneController extends Controller
     }
 
     /**
+     * @param NewQuestionOrderRequest $request
+     * @param $exam_id
+     * @param $scene_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function order(NewQuestionOrderRequest $request, $exam_id, $scene_id) {
+
+        //dd($request);
+
+        // todo: check id's
+
+        $scene = Scene::where('id', '=', $scene_id)
+            ->with('questions')
+            ->firstOrFail();
+
+        $qlist = $request->get('questions');
+        if(!empty($qlist) && is_array($qlist)) {
+            foreach($qlist as $question_id => $order ) {
+                $question = $scene->questions->firstWhere('id', $question_id );
+                if (!empty($question)) {
+                    $question->order = $order;
+                    $question->save();
+                }
+            }
+        } else dd($request);
+
+        return redirect("/exam/$exam_id/scene/{$scene_id}/edit");
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -131,7 +162,7 @@ class SceneController extends Controller
             ->firstOrFail();
         $scene_types = SceneType::select('id','name')->pluck('name','id');
         return View('scene.type' . $scene->scene_type_id . '.edit',
-            [   'sidebar' => (new Sidebar)->sceneEdit($scene),
+            [   'sidebar' => (new Sidebar)->sbarSceneEdit($scene),
                 'pagehead' => 'Edit Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'scene' => $scene,
                 'scene_types' => $scene_types,

@@ -29,7 +29,7 @@ class Scene extends Model
     /**
      * @var array
      */
-    protected $fillable = ['exam_id','scene_type_id', 'chapter', 'head', 'text', 'image'];
+    protected $fillable = ['exam_id','scene_type_id', 'chapter', 'head', 'text', 'image', 'instructions'];
 
     /**
      * The relation with exams
