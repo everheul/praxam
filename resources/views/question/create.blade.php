@@ -17,6 +17,8 @@
                     <input name="exam_id" type="hidden" value="{{ $scene->exam_id }}">
                     <input name="scene_id" type="hidden" value="{{ $scene->id }}">
 
+                    @include('question.form');
+{{--
                     <div class="form-group row {{ $errors->has('question_type_id') ? 'has-error' : '' }}">
                         <label for="question_type_id" class="col-md-2 pt-2 control-label">Question Type</label>
                         <div class="col-md-5">
@@ -72,7 +74,7 @@
                             <a class="btn btn-primary ml-2" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/show" role="button">Cancel</a>
                         </div>
                     </div>
-
+--}}
                 </form>
 
             </div>

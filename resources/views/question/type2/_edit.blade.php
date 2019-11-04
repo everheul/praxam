@@ -1,6 +1,6 @@
-{{-- question.type1.edit
-     Edit a question of type 1 - with radiobox answers.
-     input: $question
+{{-- question.type2.edit
+     Edit a question of type 1 - with checkbox answers.
+     input: $scene, $question
 --}}
 
 @extends('layouts.exam')
@@ -23,7 +23,7 @@
                         <div class="col-md-5">
                             <select class="form-control" id="question_type_id" name="question_type_id">
                                 @foreach ($question_types as $key => $question_type)
-                                    <option value="{{ $key }}"{{ empty($key)?' selected' : '' }}>{{ $question_type }}</option>
+                                    <option value="{{ $key }}"{{ ($key === $question->question_type_id) ? ' selected' : '' }}>{{ $question_type }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -53,7 +53,7 @@
                     <div class="form-group row {{ $errors->has('explanation') ? 'has-error' : '' }}">
                         <label for="explanation" class="col-md-2 pt-2 control-label">Explanation<p>± as long as you need</p></label>
                         <div class="col-md-10">
-                            <textarea name="explanation" id="explanation" class="form-control w-100" placeholder="Explanation" maxlength="5000" rows="3" >{{ old('explanation', optional($question)->explanation) }}</textarea>
+                            <textarea name="explanation" id="explanation" class="ckeditor form-control w-100" placeholder="Explanation" maxlength="5000" rows="3" >{{ old('explanation', optional($question)->explanation) }}</textarea>
                             {!! $errors->first('explanation', '<p class="form-text text-danger">:message</p>') !!}
                         </div>
                     </div>

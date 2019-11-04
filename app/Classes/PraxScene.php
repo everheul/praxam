@@ -92,11 +92,27 @@ class PraxScene
      * @return \App\Classes\PraxAnswer
      */
     public function praxquestion($index = 0) {
+        return $this->praxquestions->first();
+        /*
         if (isset($this->praxquestions[$index])) {
             return $this->praxquestions[$index];
         } else {
             dd("userquestion missing??",$this);
+        }*/
+    }
+
+    /** get the order of this question_id
+     *
+     * @param int $question_id
+     * @return int
+     */
+    public function questionOrder(int $question_id) {
+        $question = $this->praxquestions->firstWhere('question.id', '=', $question_id);
+        //dd($question, $this->praxquestions);
+        if (!empty($question)) {
+            return $question->order - 1;  //- accordion tag
         }
+        return 0;
     }
 
     /**

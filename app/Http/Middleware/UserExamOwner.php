@@ -3,11 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\UserExam;
 
 class UserExamOwner
 {
     /**
-     * redirect a user to HOME when the userexam->user_id doesn't match user->id
+     * redirect a user to HOME when the route's userexam's user_id doesn't match user->id
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next

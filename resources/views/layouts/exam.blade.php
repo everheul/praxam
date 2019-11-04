@@ -34,11 +34,12 @@
 
 @push('scripts')
     <script>
+    // activate sidebar click
     $(document).ready(function () {
         $('.sidebar-arrow').on('click', function () {
             $('#sidebar').toggleClass('active');
             $('#content').toggleClass('active');
         });
-        $('[data-toggle="popover"]').popover({container: 'body'});
     });
+    </script>
 @endpush

@@ -33,8 +33,8 @@ class Sidebar
         $this->examLogo($exam);
         $id = $exam->id;
         $this->sbarButton('Start Test',"/prax/$id/create",'dark');
-        if (Auth::user()->isAdmin()) {
-            $this->sbarHead("-", 'Admin Controls');
+        if ($exam->canEdit(Auth::user())) {
+            $this->sbarHead("<hr />", 'Admin Controls');
             $this->sbarButton('Edit Exam',"/exam/$id/edit/",'primary');
             $this->sbarButton('Manage Scenes',"/exam/$id/scene/",'primary');
             $this->sbarDelete('Delete Exam',"/exam/$id/destroy");

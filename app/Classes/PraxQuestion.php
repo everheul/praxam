@@ -48,8 +48,10 @@ class PraxQuestion
 
         //- create the PraxAnswers:
         //- userquestion->question has answers eagerloaded, because useranswers are optional.
-        foreach($userquestion->question->answers as $answer) {
-            $this->praxanswers->add((new PraxAnswer())->setAnswerData($answer, $this));
+        if (!empty($userquestion->question)) {
+            foreach($userquestion->question->answers as $answer) {
+                $this->praxanswers->add((new PraxAnswer())->setAnswerData($answer, $this));
+            }
         }
         foreach($userquestion->useranswers as $useranswer) {
             //- any answer locks the question

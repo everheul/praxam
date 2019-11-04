@@ -15,38 +15,22 @@
 
     $(function () {
         // display bootstrap tooltips:
-        $('.btooltip').tooltip({container: 'body'});
-/*
-        // handle delete answer click with ajax:
-        $(".del-answer").on("click", function (e) {
-            var answerId = $(this).attr("answerid");
-            // todo: ask conformation
-            // todo: send ajax delete, on OK call this:
-            DeleteRow(this);
-            return false;
-        });
+        $('.btooltip').tooltip({ container: 'body', delay: { "show": 400, "hide": 100 } });
 
-         // handle delete answer click with ajax:
-         $(".add-answer").on("click", function (e) {
-            var answerId = $(this).attr("answerid");
-            // todo: send ajax command? or create post..?
-            return false;
-         });
-*/
         //- disable enter key
         $("input:text").keypress(function(e){
-            if(e.which == 13) {
+            if (e.which == 13) {
                 return false;
             }
         });
 
-        //- copy the image name from invisible type=file input to visible text input
+        /*- copy the image name from invisible type=file input to visible text input
         $('#upload_image').on('change',function () {
             $.each( $(this).prop("files"), function(k,v){
                 $('#show_image').val( v['name'] );
             });
         });
-
+        */
     });
 
     //- by Jacob Stamm

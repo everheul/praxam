@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
+use App\Models\User;
 
 class Exam extends Model
 {
@@ -56,4 +57,40 @@ class Exam extends Model
         return '';
     }
 
+    /**
+     * 
+     * @return bool
+     */
+    public function canEdit($user) {
+        return (($user->isAdmin()) || ($user->id === $this->created_by));
+    }
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function isValid() {
+        
+        $min_scenes = 5;
+        $scene_count = 0;
+        foreach($this->scenes as $scene) {
+            if ($scene->isValid()) {
+                $scene_count++;
+            }
+        }
+        if ($scene_count < $min_scenes) {
+            if ($this->is_valid) {
+                $this->is_valid = 0;
+                $this->save();
+            }
+            return false;
+        } else {
+            if (!$this->is_valid) {
+                $this->is_valid = 1;
+                $this->save();
+            }
+            return true;
+        }
+    }
+    
 }

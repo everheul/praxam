@@ -10,17 +10,25 @@
 
     /* register the buttons of all questions */
     $(function() {
-        // activate sortable on all type 3 questions:
         $.each(ql, function(index, obj){
             $("#done_" + obj.id).click(obj, doneClicked);
             if (obj.type == 3) {
-                $('#choices_' + obj.id + ', #answers_' + obj.id).sortable({connectWith: '.sortable', cursor: "move"});
+                // activate sortable on all type 3 questions:
+                $('#choices_' + obj.id + ', #answers_' + obj.id).sortable({
+                        connectWith: '.sortable',
+                        cursor: "move",
+                        scroll: false,
+                        create: function () {
+                            $(this).height($(this).height());
+                        }
+                    }
+                )
             }
         });
         // more questions; activate the accordion:
         if (sc.type == 2) {
             $("#accordion").accordion({
-                active: {{ isset($active_question) ? $active_question : 0 }},
+                active: {{ isset($question_order) ? $question_order : 0 }},
                 heightStyle: "content",
                 collapsible: true
             });
@@ -28,7 +36,8 @@
     });
 
     function doneClicked(event) {
-        /* the current question id and type are in event.data */
+        /* the current question id and type are in event.data
+        ** convert dragable items to answers */
         if (isAnswered(event.data.id, event.data.type)) {
             var myForm = $("#form_" + event.data.id);
             if (event.data.type == 3) {
@@ -40,20 +49,18 @@
                     myForm.append(dom);
                 });
             }
-            //myForm.submit();
             return true;
         } else {
-            // todo: tell the user to give an answer first
-            //console.log( event);
+            // use a popover to tell the user to give an answer first
             $(event.target).popover({ content: 'Please answer the question first.', trigger: 'manual' });
             $(event.target).popover('show');
             setTimeout(function() {
                 $(event.target).popover('dispose');
                 }, 2000);
+            return false;
         }
-        return false;
     }
-
+/*
     function selectAccordionNext() {
         var busy = true;
         if (sc.type == 2) {
@@ -70,7 +77,7 @@
         }
         return busy;
     }
-
+*/
     function isAnswered(qid, qtype) {
         var ret = false;
         if (qtype == 1) {

@@ -59,10 +59,9 @@ class UserExamController extends Controller
         $sidebar = (new Sidebar)->editUserExam($exam);
         return view('userexam.create',['sidebar' => $sidebar, 'exam' => $exam]);
     }
-
+    
     /**
      * POST
-     * todo: validate
      *
      * Make a new Practice Exam: a UserExam with UserScenes and UserQuestions.
      * The UserAnswers will be created after answering the questions.
@@ -81,16 +80,8 @@ class UserExamController extends Controller
 
         //- Build a new UserExam, with scenes.
         //- todo: pick the scenes for a new UserExam in a more sophisticated way.
-        /*
-        $query = DB::table('scenes')
-            ->join('exam_scene', function ($join) use ($req_exam_id) {
-                $join->on('scenes.id', '=', 'exam_scene.scene_id')
-                    ->where('exam_scene.exam_id', '=', $req_exam_id);
-                }
-            )
-            ->join('questions', 'scenes.id', '=', 'questions.scene_id');
-        */
-        $query = Scene::where('exam_id', $req_exam_id);
+        
+        $query = Scene::where('exam_id', $req_exam_id)->where('is_valid','=',1);
 
         if ($scene_type > 0) {
             $query = $query->where('scenes.scene_type_id', '=', $scene_type);
@@ -100,7 +91,7 @@ class UserExamController extends Controller
             $query = $query->where('questions.question_type_id', '=', $question_type);
         }
 
-        $scenes = $query->select('scenes.id')
+        $scenes = $query->select('scenes.id')->where('is_valid','=',1)
             ->inRandomOrder()
             ->limit($scene_count)
             ->get();
@@ -108,11 +99,14 @@ class UserExamController extends Controller
         $nr = $scenes->count();
 
         if ($nr === 0) {
-            return redirect()->back()->withInput()->withErrors('Sorry. No scenes found for this combination of types.');
+            return redirect()
+                    ->back()
+                    ->withInput()
+                    ->withErrors('Sorry. No valid scenes found for this combination of types.');
         }
 
         if ($nr < $scene_count) {
-            //- todo: add some more scenes!?
+            //- todo: add some other scenes!?
             $scene_count = $nr;
         }
 
@@ -200,24 +194,6 @@ class UserExamController extends Controller
                 (new UserQuestion())->create(['userscene_id' => $us->id, 'question_id' => $question_id, 'order' => $question_order++ ]);
             }
         }
-    }
-
-    /**
-     * Make sure this userExam was created by THIS user.
-     * todo: move to middleware
-     *
-     * @param Request $request
-     * @param $prax_id
-     * @return bool
-     */
-    private function checkUser(Request $request, $prax_id)
-    {
-        if (empty($this->user_checked)) {
-            $user_exam = UserExam::where('id', $prax_id)->firstOrFail();
-            $this->user_checked = ($user_exam->user_id === $request->user()->id);
-            //- todo: log if false
-        }
-        return $this->user_checked;
     }
 
 }

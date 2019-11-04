@@ -10,4 +10,13 @@ class AnswerController extends Controller
         //$this->middleware('auth');
     }
 
+    /**
+     * todo: auth!
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function store(NewAnswerRequest $request, $exam_id, $scene_id, $question_id) {
+        dd($request);
+    }
+    
 }

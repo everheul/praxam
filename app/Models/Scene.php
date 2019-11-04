@@ -91,5 +91,48 @@ class Scene extends Model
         }
         return '';
     }
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function isValid() {
+        
+        $min_questions = 0;
+        switch ($this->scene_type_id) {
+            case 1:
+                $min_questions = 1;
+                break;
+            case 2:
+                $min_questions = 2;
+                break;
+            default:
+                abort(400, 'Unexpected scene type.');
+        }
+        $question_count = 0;
+        $is_valid = 1;
+        foreach($this->questions as $question) {
+            if (!$question->isValid()) {
+                $is_valid = 0;
+            } else {
+                $question_count++;
+            }
+        }
+        if ((!$is_valid) || ($question_count < $min_questions)) {
+            if ($this->is_valid) {
+                $this->is_valid = 0;
+                $this->save();
+            }
+            var_dump("invalid scene: {$this->id}");
+            return false;
+        } else {
+            if (!$this->is_valid) {
+                $this->is_valid = 1;
+                $this->save();
+            }
+            return true;
+        }
+    }
+
 
 }

@@ -24,10 +24,10 @@ class NewExamRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => "required|string|min:0|max:191",
-            "head" => "nullable|string|min:0|max:191",
-            "intro" => "nullable|string|min:0|max:1024",
-            "text" => "required|string",
+            "name" => "required|string|max:191",
+            "head" => "nullable|string|max:191",
+            "intro" => "required|string|max:1024",
+            "text" => "nullable|string",
             "newimage" => 'nullable|image|mimes:jpeg,png,jpg,bmp,gif,svg|max:2048',
         ];
     }

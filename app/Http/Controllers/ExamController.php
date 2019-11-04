@@ -47,13 +47,14 @@ class ExamController extends Controller
 
     /**
      * Show the form for creating a new exam.
-     * TODO
      *
      * @return \\Illuminate\Http\Response
      */
     public function create() {
         return View('exam.create',
-            ['sidebar' => (new Sidebar)->sbarNoExam() ]
+            [   'sidebar' => (new Sidebar)->sbarNoExam(),
+                'exam' => null
+            ]
         );
     }
 
@@ -72,6 +73,7 @@ class ExamController extends Controller
         if ($request->hasFile('newimage')) {
             $image = $request->file('newimage');
             if ($image->isValid()) {
+                // todo: check for previous uploaded image, and delete it.
                 $name = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('/storage/images/'), $name);
                 $data['image'] = '/storage/images/' . $name;
@@ -80,14 +82,7 @@ class ExamController extends Controller
 
         //dd($data, $request);
         $exam = Exam::create($data);
-
-        if ($request->has('save_show')) {
-            return redirect(url("/exam/{$exam->id}/show"));
-        } elseif ($request->has('save_stay')) {
-            return redirect(url("/exam/{$exam->id}/edit"));
-        } else {
-            // ??
-        }
+        return redirect(url("/exam/{$exam->id}/edit"));
     }
 
     /**
@@ -175,6 +170,20 @@ class ExamController extends Controller
             return $this->show($exam_id);
         }
         return redirect(url("/exam/$exam_id/scene/{$scene->id}" ));
+    }
+    
+    /**
+     * 
+     */
+    public function validateAll() {
+        $exams = Exam::with('scenes','scenes.questions','scenes.questions.answers')->get();
+        $valid_count = 0;
+        foreach($exams as $exam) {
+            if ($exam->isValid()) {
+                $valid_count++;
+            }
+        }
+        dd("Valid exams found: $valid_count");
     }
 
 }

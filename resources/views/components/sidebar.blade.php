@@ -11,13 +11,13 @@
                 @break
             @case('sbar-head')
                 <div class="sbarhead py-1 mx-3 mt-2">
-                    <div class="sbar_head">{{ $block['head'] }}</div>
+                    <div class="sbar_head">{!! $block['head'] !!}</div>
                     <div class="sbar_text">{{ $block['text'] }}</div>
                 </div>
                 @break
             @case('sbar-block')
                 <div class="sbarblock py-1 mx-3 mt-2">
-                    <div class="sbar_head">{{ $block['head'] }}</div>
+                    <div class="sbar_head">{!! $block['head'] !!}</div>
                     <div class="sbar_text">{{ $block['text'] }}</div>
                 </div>
                 @break

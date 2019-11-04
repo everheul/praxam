@@ -40,7 +40,7 @@ class User extends Authenticatable // implements MustVerifyEmail
      * @return bool
      */
     public function isAdmin() : bool {
-        return ($this->role == 'admin');
+        return ($this->role === 'admin');
     }
 
 }

@@ -1,6 +1,6 @@
-{{-- question.type2.edit
-     Edit a question of type 1 - with checkbox answers.
-     input: $question
+{{-- question.type3.edit
+     Edit a question of type 3 - with sortable answers.
+     input: $scene, $question
 --}}
 
 @extends('layouts.exam')
@@ -23,7 +23,7 @@
                         <div class="col-md-5">
                             <select class="form-control" id="question_type_id" name="question_type_id">
                                 @foreach ($question_types as $key => $question_type)
-                                    <option value="{{ $key }}"{{ empty($key)?' selected' : '' }}>{{ $question_type }}</option>
+                                    <option value="{{ $key }}"{{ ($key === $question->question_type_id) ? ' selected' : '' }}>{{ $question_type }}</option>
                                 @endforeach
                             </select>
                         </div>

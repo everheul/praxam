@@ -33,17 +33,16 @@ class UserSceneController extends Controller
 
     /**
      * Display the scene as part of a test.
-     * The (user)exam and all scenes are loaded to fill the sidebar.
-     * todo: a new PraxExam function that just loads what we need here.
+     * The (user)exam and scenes are also loaded to fill the sidebar.
      *
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $userexam_id, $s_order, $q_order = 1) {
 
         $praxexam = (new PraxExam())->loadUserExamData($userexam_id);
-        $praxscene = $praxexam->praxscenes->where('userscene.order', $s_order)->first();
+        $praxscene = $praxexam->praxscenes->where('userscene.order', '=', $s_order)->first();
         $sidebar = (new SideBar)->practiceExam($praxexam, $s_order);
-
+        
         return View('scene.type' . $praxscene->scene->scene_type_id . '.show',
             [   'sidebar' => $sidebar,
                 'praxscene' => $praxscene,
@@ -51,74 +50,4 @@ class UserSceneController extends Controller
                 'active_question' => $q_order - 1,
             ]);
     }
-
-    /**
-     * Select the next scene to display when the user selects '' or 'continue'
-     *
-     * @param  UserExam  $userexam
-     * @param  int  $order
-     * @return int
-    private function next( $userexam, $order) {
-        return ($order < $userexam->scene_count) ? $order + 1 : 0;
-    }
-
-    private function loadFullUserscene($userexamId, $order) {
-        return UserScene::where('userexam_id','=',$userexamId)->where('order','=',$order)->with('userquestions','userquestions.useranswers')->firstOrFail();
-        //return $this->enumResults($prax);
-    }
-
-    private function loadFullScene($sceneId) {
-        return (new SceneController())->getFullScene($sceneId);
-        //return Scene::where('id', '=', $sceneId)->with('questions','questions.answers')->firstOrFail();
-    }
-*/
-
-    /**
-     *  Lock the already answered questions.
-     *
-     * @param $scene
-     * @param $userScene
-    private function mergeUserscene($scene, $userScene) {
-        foreach($userScene->userquestions as $userquestion) {
-            if (!is_null($userquestion->result)) {
-                $question = $scene->questions->find($userquestion->question_id);
-                if (!empty($question)) {
-                    $question->locked = true;
-                    foreach($userquestion->useranswers as $useranswer) {
-                        $answer = $question->answers->find($useranswer->answer_id);
-                        if (!empty($answer)) {
-                            $answer->checked = true;
-                            $answer->order = $useranswer->order;
-                        }
-                    }
-                }
-            }
-        }
-        return $scene;
-    }
-**/
-
-    /**
-* Set the UserScenes' result & locked values until locked.
-     *
-     * @param  UserScene  $prax
-     * @return  UserScene
-    private function enumResults(UserScene $prax) {
-        if (empty($prax->locked)) {
-            $tot = 0;
-            $locked = 1;
-            foreach ($prax->userquestions as $uq) {
-                if (is_null($uq->result)) {
-                    $locked = 0;
-                } else {
-                    $tot += $uq->result;
-                }
-            }
-            $prax->locked = $locked;
-            $prax->result = $tot;
-            $prax->update();
-        }
-        return $prax;
-    }     */
-
 }

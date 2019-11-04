@@ -32,7 +32,7 @@ class SceneController extends Controller
         $args = $this->getIndexArgs($request);
         $args['exam'] = Exam::findOrFail($exam_id);
 
-        /* note: the whereRaw below is a workaround for this grouped 'where' does not seem to work with paginate
+        /* note: the whereRaw below is a workaround, for this grouped 'where' does not seem to work with paginate:
               ->where( function($q) use($lf) {
                 $q->where('head', 'LIKE', "'$lf'")->
                 orWhere('text', 'LIKE', "'$lf'")->
@@ -98,6 +98,7 @@ class SceneController extends Controller
             [   'sidebar' => (new Sidebar())->sceneCreate($exam),
                 'exam_id' => $exam_id,
                 'scene_types' => $scene_types,
+                'scene' => null,
             ]);
     }
 
@@ -105,45 +106,35 @@ class SceneController extends Controller
      * POST
      * Store a newly created scene in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  NewSceneRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(NewSceneRequest $request, $exam_id) {
-        //dd($request->all());
         if ($exam_id != $request->get('exam_id')) {
-            // ??
+            //todo: log this.
+            abort(400, 'Unexpected form contents.');
         }
         $scene = Scene::create($request->only('exam_id','head','scene_type_id'));
-
+        //- always go to edit after create, to view the type2 fields &| add questions
         return redirect("/exam/$exam_id/scene/{$scene->id}/edit");
-/*
-        $exam = Exam::findOrFail($exam_id);
-        $question_types = QuestionType::select('id','name')->pluck('name','id');
-        return View( "scene.type{$scene->scene_type_id}.edit",
-            [   'sidebar' => (new Sidebar())->sceneCreate($exam),
-                'exam_id' => $exam_id,
-                'question_types' => $question_types,
-            ]);
-*/
     }
 
     /**
      * Show the form for editing the specified resource.
-     * todo: load scene questions and answers first (eager loading)
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit( $exam_id, $scene_id) {
-        $scene = $this->getFullScene($scene_id);
+        $scene = Scene::where('id', '=', $scene_id)
+            ->with('exam','questions')
+            ->firstOrFail();
         $scene_types = SceneType::select('id','name')->pluck('name','id');
-        $question_types = QuestionType::select('id','name')->pluck('name','id');
         return View('scene.type' . $scene->scene_type_id . '.edit',
             [   'sidebar' => (new Sidebar)->sceneEdit($scene),
                 'pagehead' => 'Edit Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'scene' => $scene,
                 'scene_types' => $scene_types,
-                'question_types' => $question_types,
             ]);
     }
     
@@ -151,22 +142,46 @@ class SceneController extends Controller
      * POST
      * Update the scene.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  NewSceneRequest  $request
+     * @param  int  $exam_id
+     * @param  int  $scene_id
      * @return \Illuminate\Http\Response
      */
     public function update( NewSceneRequest $request, $exam_id, $scene_id) {
-        if ($exam_id != $request->get('exam_id')) {
-            // ??
+        if (($exam_id != $request->get('exam_id')) || ($scene_id != $request->get('scene_id'))) {
+            //todo: log this.
+            abort(400, 'Unexpected form contents.');
         }
         $scene = Scene::findOrFail($scene_id);
-        $scene->update($request->only('head','scene_type_id'));
+        $data = $request->getData();
+        $this->handleUploadImage($data, $request);
+        //dd($data);
+        $scene->update($data);
+        $scene->save();
+
         if ($request->has('save_show')) {
             return redirect(url("/exam/$exam_id/scene/$scene_id/show"));
         } elseif ($request->has('save_stay')) {
             return redirect(url("/exam/$exam_id/scene/$scene_id/edit"));
         } else {
-            // ??
+            //todo: log this.
+            abort(400, 'Unexpected form contents.');
+        }
+    }
+
+    /**
+     * @param array $data
+     * @param NewSceneRequest $request
+     */
+    private function handleUploadImage(Array &$data, NewSceneRequest $request) {
+        if ($request->hasFile('newimage')) {
+            $image = $request->file('newimage');
+            if ($image->isValid()) {
+                // todo: check for previous uploaded image, and delete it.
+                $name = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('/storage/images/'), $name);
+                $data['image'] = '/storage/images/' . $name;
+            }
         }
     }
 
