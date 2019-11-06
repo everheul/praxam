@@ -23,7 +23,6 @@
                         <label class="col-md-2 pt-2 control-label" for="submit"></label>
                         <div class="col-md-10 pl-0">
                             <button id="submit" name="submit" class="btn btn-primary mr-1">Create Question</button>
-                            <a class="btn btn-primary ml-3 px-4" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/show" role="button">Cancel</a>
                         </div>
                     </div>
                 </form>

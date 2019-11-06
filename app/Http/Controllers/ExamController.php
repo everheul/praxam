@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
+use App\Models\Scene;
 use Illuminate\Http\Request as Request;
 use App\Helpers\Sidebar;
 use App\Models\User as User;
@@ -19,7 +20,7 @@ class ExamController extends Controller
 
     /**
      * Display a brief info of all exams.
-     * TODO: Add 'New' button.
+     * TODO: Add 'New' button?
      *
      * @return \\Illuminate\Http\Response
      */
@@ -39,8 +40,12 @@ class ExamController extends Controller
      */
     public function show($exam_id) {
         $exam = Exam::findOrFail($exam_id);
+        // select max(e.updated_at) from scenes where (exam_id = e.id and deleted_at is null)
+        $updated = Scene::where('exam_id', $exam_id)->whereNull('deleted_at')->max('updated_at');
+        $last_change = empty($updated) ? date('d-m-Y', strtotime($exam->updated_at)) : date('d-m-Y', strtotime($updated));
         return View('exam.show',
                ['sidebar' => (new Sidebar)->sbarExamShow($exam),
+                'last_change' => $last_change,
                 'exam' => $exam ]
         );
     }
@@ -60,9 +65,7 @@ class ExamController extends Controller
 
     /**
      * POST
-     *
      * Store a newly created exam.
-     * TODO
      *
      * @param  NewExamRequest  $request
      * @return \Illuminate\Http\Response
@@ -73,7 +76,7 @@ class ExamController extends Controller
         if ($request->hasFile('newimage')) {
             $image = $request->file('newimage');
             if ($image->isValid()) {
-                // todo: check for previous uploaded image, and delete it.
+                // todo: check for previous uploaded image, and delete it.?
                 $name = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('/storage/images/'), $name);
                 $data['image'] = '/storage/images/' . $name;

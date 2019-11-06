@@ -6,6 +6,7 @@ use Closure;
 use App\Models\Exam;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Log;
 
 class ExamOwner
 {
@@ -21,21 +22,21 @@ class ExamOwner
             if ($request->is('exam/*')) {
                 $exam_id = $request->route('exam_id');
                 if (empty($exam_id)) {
-                    Log::critical("Middleware\ExamOwner: No 'exam_id' in route! user_id: " . $request->user()->id . ", request: " . $request);
+                    Log::critical("Middleware\\ExamOwner: No 'exam_id' in route! user_id: " . $request->user()->id . ", request: " . var_export($request->all(),true));
                     abort(400, "Exam id not given.");
                 }
                 if ($request->has('exam_id') && ($request->get('exam_id') != $exam_id)) {
-                    Log::critical("Middleware\ExamOwner: Altered request - 'exam_id' in route does not match form input! user_id: " . $request->user()->id .
+                    Log::critical("Middleware\\ExamOwner: Altered request - 'exam_id' in route does not match form input! user_id: " . $request->user()->id .
                         ", route: " . $request->route()->uri() .
-                        ", request: " . $request);
+                        ", request: " . var_export($request->all(),true));
                     abort(400, 'Unexpected form contents.');
                 }
                 if (!Exam::where('id', '=', $exam_id)
                             ->where('created_by', '=', $request->user()->id)
                             ->exists()) {
-                    Log::critical("Middleware\ExamOwner: User tried access to others exam! user_id: " . $request->user()->id .
+                    Log::critical("Middleware\\ExamOwner: User tried access to others exam! user_id: " . $request->user()->id .
                         ", route: " . $request->route()->uri() .
-                        ", request: " . $request->all());
+                        ", request: " . var_export($request->all(),true));
                     abort(400, 'Unexpected request and/or parameters, incorrect behaviour.');
                 }
             }

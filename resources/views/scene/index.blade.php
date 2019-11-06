@@ -1,17 +1,21 @@
+{{-- scene.index
+     Paginate all scenes
+     input: $exam, $scenes, indexargs..
+--}}
+
+
 @extends('layouts.exam')
 
 @section('content')
 
     @if(Session::has('success_message'))
-        <div class="alert alert-success">
-            <i class="fa fa-check" aria-hidden="true"></i>
-            {!! session('success_message') !!}
-
-            <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-
-        </div>
+    <div class="alert alert-success">
+        <i class="fa fa-check" aria-hidden="true"></i>
+        {!! session('success_message') !!}
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     @endif
 
     <div class="card">
@@ -51,7 +55,7 @@
             <div class="float-left ml-3 mt-1">
                 <form class="d-inline-block" action="#" method="GET">
                     <div class="input-group">
-                        <input name="filter" class="form-control py-2 rounded-left" type="search" placeholder="*" value="{{ $filter }}" id="search-input">
+                        <input name="filter" class="form-control py-2 rounded-left" type="search" placeholder="*" value="{{ str_replace('%','*',$filter) }}" id="search-input">
                         <span class="input-group-append">
                             <button class="btn btn-outline-secondary appcolor" type="commit">
                                 <i class="fa fa-search"></i>
@@ -65,17 +69,12 @@
                     </div>
                 </form>
             </div>
-            {{-- <div class="float-right ml-3 mr-2 mt-2">
-                <div class="btn-group btn-group-sm float-right" role="group">
-                    <a href="/exam/{{ $exam->id }}/scene/create" class="btn btn-success" title="Create New Scene">
-                        <i class="fa fa-plus" aria-hidden="true"></i>
-                    </a>
-                </div>
-            </div> --}}
         </div>
 
         @if(count($scenes) == 0)
         <div class="card-body text-center">
+            {{-- todo:  perfect place to explain how we work!
+            --}}
             <h4>No Scenes Found</h4>
         </div>
         @else
@@ -119,13 +118,11 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div class="card-footer appcolor">
-            <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/create" role="button">Add Scene</a>
-            <div class="float-right">
             {!! $scenes->render() !!}
-            </div>
         </div>
         @endif
+        <div class="card-footer appcolor text-center">
+            <a class="btn btn-primary" href="/exam/{{ $exam->id }}/scene/create" role="button" id="add_scene">Add Scene</a>
+        </div>
     </div>
 @endsection

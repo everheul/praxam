@@ -37,6 +37,12 @@
 
         // display bootstrap tooltips:
         $('.btooltip').tooltip({ container: 'body', delay: { "show": 400, "hide": 100 } });
+
+        // show selected image name:
+        $('.custom-file-input').on('change', function() {
+            let fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').addClass("selected").html(fileName);
+        });
     });
 </script>
 @endpush

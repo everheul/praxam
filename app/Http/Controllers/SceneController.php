@@ -1,5 +1,11 @@
 <?php
 
+/*  SceneController
+ *
+ * todo:
+ * update exams e set e.scene_count = (select count(*) from scenes where exam_id = e.id and deleted_at is null)
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -44,10 +50,12 @@ class SceneController extends Controller
         */
 
         $sqlfilter = Helper::likeFilter($args['filter']);
+        //DB::enableQueryLog();
         $args['scenes'] = $args['exam']->scenes()
                 ->whereRaw("(`scenes`.`head` LIKE '$sqlfilter' or `scenes`.`text` LIKE '$sqlfilter' or `scenes`.`instructions` LIKE '$sqlfilter')")
                 ->orderBy($args['sortby'], $args['direction'])
                 ->paginate($args['paginate']);
+        //dd(DB::getQueryLog());
         $args['sidebar'] = (new Sidebar)->sbarSceneIndex($args['exam']);
         return view('scene.index', $args);
     }
@@ -61,7 +69,7 @@ class SceneController extends Controller
         $page_base = str_replace('/','.',$request->path());
         $this->registerPaginator($request,$page_base);
         $paginate = $request->session()->get('paginate', 10);
-        $filter = $request->session()->get($page_base.'.filter', "");
+        $filter = $request->session()->get($page_base.'.filter', "%");
         $direction = $request->session()->get($page_base.'.direction', 'asc');
         $sortby = $request->session()->get($page_base.'.sortby', 'id');
         if (!in_array($sortby,['id','text','question_count','head'])) $sortby = 'id';
@@ -307,6 +315,21 @@ class SceneController extends Controller
             ->get();
         $idlist = array_flip($scenes->pluck('id')->all());
         return sprintf("%d of %d", $idlist[$scene_id]+1, $scenes->count());
+    }
+
+    /**
+     * called on store and destroy.
+     * todo: should be an event?
+     *
+     * @param Exam $exam
+     */
+    private function calcSceneCount(Exam $exam) {
+        $exam->scene_count = DB::table('scenes')
+            ->where('exam_id',$exam->id)
+            ->where('is_public', 1)
+            ->whereNull('deleted_at')
+            ->count();
+        $exam->save();
     }
 
 }

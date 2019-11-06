@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="card w-100 home mt-2">
+            <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
                     <h3>Tests In Progress</h3>
                 </div>
@@ -62,20 +62,20 @@
                 </div>
             </div>
 
-            <div class="card w-100 home mt-2">
+            <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
                     <h3>Finished Tests</h3>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">
                         <thead>
-                        <tr>
-                            <th>Exam</th>
-                            <th>Finished</th>
-                            <th>Score</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
+                            <tr>
+                                <th>Exam</th>
+                                <th>Finished</th>
+                                <th>Score</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                         @foreach($hystory as $prax)
@@ -92,32 +92,20 @@
                 </div>
             </div>
 
-            <div class="card w-100 home mt-2">
+            <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-3"></div>
-                            <div class="col-6"><h3>Your Exams</h3></div>
-                            <div class="col-3">
-                                <div class="btn-group btn-group-sm float-right" role="group">
-                                    <a href="/exam/create" class="btn btn-success" title="Create New Exam">
-                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>Your Exams</h3>
                 </div>
-                <div class="card-body">
+                 <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">
                         <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Created</th>
-                            <th>Testers</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
+                            <tr>
+                                <th>Name</th>
+                                <th>Created</th>
+                                <th>Testers</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                         @foreach($exams as $exam)
@@ -133,19 +121,6 @@
                     </table>
                 </div>
             </div>
-
-{{--
-            @if(Auth::user()->isAdmin())
-                <div class="card w-100 home mt-2">
-                    <div class="card-header py-1">
-                        <h3>Admin Dashboard</h3>
-                </div>
-                    <div class="card-body">
-                        todo
-                    </div>
-                </div>
-            @endif
---}}
         </div>
     </div>
 </div>

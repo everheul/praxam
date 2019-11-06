@@ -14,6 +14,7 @@ use App\Helpers\Sidebar as Sidebar;
 use App\Http\Requests\NewQuestionRequest;
 use App\Classes\PraxScene;
 use Exception;
+use DB;
 
 class QuestionController extends Controller
 {
@@ -23,7 +24,7 @@ class QuestionController extends Controller
      */
 	public function __construct() {
 	    $this->middleware('auth'); // ?
-        $this->middleware('exam_owner');
+            $this->middleware('exam_owner');
 	}
 
     /**
@@ -46,12 +47,12 @@ class QuestionController extends Controller
      * @return Illuminate\View\View
      */
     public function edit($exam_id, $scene_id, $question_id) {
-        $scene = Scene::where('id', '=', $scene_id)->with('exam')->firstOrFail();
-        $question = Question::where('id', '=', $question_id)->with('answers')->firstOrFail();
-        //dd($scene,$question);
+        //$scene = Scene::where('id', '=', $scene_id)->with('exam')->firstOrFail();
+        $question = Question::where('id', '=', $question_id)->with('answers','scene','scene.exam')->firstOrFail();
+        //dd($question);
         $question_types = QuestionType::orderBy('id')->pluck('name','id');
-        $sidebar = (new Sidebar())->sbarQuestionEdit($scene);
-        return view("question.edit", compact('scene','question','question_types','sidebar')); // type{$question->question_type_id}
+        $sidebar = (new Sidebar())->sbarQuestionEdit($question);
+        return view("question.edit", compact('question','question_types','sidebar')); // type{$question->question_type_id}
     }
 
     /**
@@ -87,6 +88,8 @@ class QuestionController extends Controller
         $data['order'] = $scene->question_count + 1;
 
         $question = Question::create($data);
+        $this->calcQuestionCount($scene);
+
         return redirect()->route( 'exam.scene.question.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
 /*
         try {
@@ -108,9 +111,9 @@ class QuestionController extends Controller
      * @return Illuminate\Http\RedirectResponse | Illuminate\Routing\Redirector
      */
     public function update(NewQuestionRequest $request, $exam_id, $scene_id, $question_id) {
+        //dd($request);
 
         $data = $request->getData();
-        //dd($data);
         // todo: check exam/scene id's
 
         $question = Question::findOrFail($question_id);
@@ -136,9 +139,8 @@ class QuestionController extends Controller
      */
     public function destroy($exam_id, $scene_id, $question_id) {
         $question = Question::where('id',$question_id)->with('scene')->firstOrFail();
-        $question->scene->question_count -= 1;
-        $question->scene->update();
         $question->delete();
+        $this->calcQuestionCount($question->scene);
         return redirect()->route('exam.scene.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id])
                     ->with('success_message', 'Question was successfully deleted.');
      }
@@ -152,7 +154,10 @@ class QuestionController extends Controller
     public function answers($exam_id, $scene_id, $question_id) {
         $question = Question::where('id',$question_id)->with('scene','scene.exam','answers')->firstOrFail();
         $sidebar = (new Sidebar())->sbarQuestionAnswers($question);
-        return view("question.answers", compact('question','sidebar'));
+        $correct = $question->answers->filter( function($answer, $key) {
+            return $answer->is_correct;
+        })->sortBy('correct_order');
+        return view("question.answers", compact('question','sidebar','correct'));
     }
 
     /**
@@ -170,20 +175,66 @@ class QuestionController extends Controller
         $question = Question::where('id', '=', $question_id)
             ->with('answers')
             ->firstOrFail();
-
+        
         $alist = $request->get('answers');
         if(!empty($alist) && is_array($alist)) {
-            foreach($alist as $answer_id => $order ) {
+            foreach($alist as $answer_label => $order) {
+                $answer_id = substr($answer_label,7); // answer_<ID>
                 $answer = $question->answers->firstWhere('id', $answer_id );
                 if (!empty($answer)) {
                     $answer->order = $order;
-                    $answer->save();
+                    $answer->is_correct = 0;
+                    $answer->correct_order = 0;
+                } else {
+                    // todo: what?
+                    dd($alist);
                 }
             }
-        } else dd($request);
+        }
+        
+        $alist = $request->get('correct');
+        if(!empty($alist) && is_array($alist)) {
+            foreach($alist as $answer_label => $order) {
+                $answer_id = substr($answer_label,12); // // copy_answer_<ID>
+                $answer = $question->answers->firstWhere('id', $answer_id );
+                if (!empty($answer)) {
+                    $answer->is_correct = 1;
+                    $answer->correct_order = $order;
+                } else {
+                    // todo: what?
+                    dd($alist);
+                }
+            }
+        }
+        
+        //- save all answers:
+        foreach($question->answers as $answer) {
+            $answer->save();
+        }
 
-        // todo: where to?
-        return redirect("/exam/$exam_id/scene/{$scene_id}/question/$question_id/answers");
+        if ($request->has('save_show')) {
+            return redirect()->route( 'exam.scene.question.show', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+        } elseif ($request->has('save_stay')) {
+            return redirect()->route( 'exam.scene.question.answers', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+        } else {
+            // ??
+        }
+
+    }
+
+    /**
+     * called on store and destroy.
+     * todo: should be an event?
+     *
+     * @param Scene $scene
+     */
+    private function calcQuestionCount(Scene $scene) {
+        $scene->question_count = DB::table('questions')
+            ->where('scene_id',$scene->id)
+            ->where('is_public', 1)
+            ->whereNull('deleted_at')
+            ->count();
+        $scene->save();
     }
 
 }

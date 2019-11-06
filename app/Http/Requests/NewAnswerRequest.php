@@ -24,7 +24,7 @@ class NewAnswerRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'answertxt' => 'required|string',
         ];
     }
 }

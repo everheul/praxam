@@ -42,13 +42,15 @@
 <div class="form-group row mb-3">
     <label class="col-md-2 pt-2 control-label"></label>
     <div class="col-md-10 pl-0">
-        @if($scene->questions->count() > 1)
         <form method="POST" id="questions_order" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/order" accept-charset="UTF-8">
             {{ csrf_field() }}
-            <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/create" role="button">Add Question</a>
-            <button name="save_order" type="submit" class="btn btn-primary ml-3" onclick="return saveOrder()">Save Order</button>
+            @if($scene->questions->count() < 9)
+                <a class="btn btn-primary" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/create" role="button">Add Question</a>
+            @endif
+            @if($scene->questions->count() > 1)
+                <button name="save_order" type="submit" class="btn btn-primary ml-3" onclick="return saveOrder()">Save Order</button>
+            @endif
         </form>
-        @endif
     </div>
 </div>
 

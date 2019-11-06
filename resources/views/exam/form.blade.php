@@ -48,7 +48,7 @@
     <div class="col-sm-10 pl-0">
         <div class="custom-file">
             <input name="newimage" type="file" class="custom-file-input" id="customFile">
-            <label class="custom-file-label" for="customFile">{{ old('newimage', empty($exam) ? 'Select Image' : $exam->imageName()) }}</label>
+            <label class="custom-file-label text-truncate" for="customFile">{{ old('newimage', empty(optional($exam)->image) ? 'Select Image' : $exam->imageName()) }}</label>
         </div>
         {{-- obsolete? does custom-file work?
         <input type="text" class="form-control" id="show_image" placeholder="Select Image" disabled>

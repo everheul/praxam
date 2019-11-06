@@ -361,3 +361,29 @@ option {
 .pagination ul {
     magin-bottom: 0;
 }
+
+.exam_cardhead {
+    display: inline-flex;
+    margin: 2px;
+    padding: 3px 12px 4px;
+    margin-right: 0;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    border-top-color: #FFF;
+    border-left-color: #EEE;
+    border-right-color: #EEE;
+    border-bottom-color: #DDD;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0));
+}
+
+
+
+
+
+
+
+
+
+
+

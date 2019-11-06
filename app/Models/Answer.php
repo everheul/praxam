@@ -12,7 +12,7 @@ class Answer extends Model
     /**
      * @var array
      */
-    protected $fillable = ['text', 'is_correct', 'order', 'correct_order'];
+    protected $fillable = ['text', 'is_correct', 'order', 'correct_order', 'question_id'];
 
     /**
      * The relation with questions (OneToMany Inverse)
@@ -28,17 +28,4 @@ class Answer extends Model
         return $this->hasMany('App\Models\UserAnswer', 'answer_id', 'id');
     }
 
-    /**
-     * used by templates
-     * @return mixed|string
-     */
-    public function getLabel() {
-        $label = "Answer #{$this->order} : ";
-        if (strlen($this->text) > 40) {
-            $label .= substr($this->text, 0, 40) . '...';
-        } else {
-            $label .= $this->text;
-        }
-        return $label;
-    }
 }

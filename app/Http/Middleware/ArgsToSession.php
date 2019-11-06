@@ -127,6 +127,8 @@ class ArgsToSession
         $s = trim($s);
         $s = stripslashes($s);
         $s = htmlspecialchars($s);
+        //- replace stars for procent (dos to sql)
+        $s = str_replace('*','%',$s);
         return $s;
     }
 
