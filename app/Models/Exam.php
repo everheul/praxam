@@ -145,7 +145,7 @@ class Exam extends Model
         $this->scene_count = 0;
         $this->is_valid = 1;
         foreach($this->scenes as $scene) {
-            $this->$scene_count++;
+            $this->scene_count++;
             $errmsg = $scene->validityCheck();
             if ($scene->is_public) {
                 $public_scenes++;

@@ -17,7 +17,7 @@
 
                 <div class="form-group row">
                     <label for="introid" class="col col-form-label"></label>
-                    <div class="col-sm-10 pl-0">
+                    <div class="col-sm-10">
                         <button name="save_stay" type="submit" class="btn btn-primary">Save &amp; Stay</button>
                         <button name="save_show" type="submit" class="btn btn-primary ml-2">Save &amp; Show</button>
                     </div>

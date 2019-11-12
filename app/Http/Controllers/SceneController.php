@@ -21,6 +21,7 @@ use Illuminate\Pagination\Paginator;
 use App\Classes\PraxScene;
 use App\Http\Requests\NewSceneRequest;
 use App\Http\Requests\NewQuestionOrderRequest;
+use File;
 
 class SceneController extends Controller
 {
@@ -202,7 +203,7 @@ class SceneController extends Controller
             // user wants to publish, or had it published: check validity:
             $errmsg = $scene->validityCheck();
         }
-
+        //dd($errmsg,$scene);
         $scene->save();
         $scene->exam->countScenes();
 

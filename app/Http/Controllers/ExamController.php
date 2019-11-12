@@ -9,6 +9,7 @@ use App\Helpers\Sidebar;
 use App\Models\User as User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\NewExamRequest;
+use File;
 
 class ExamController extends Controller
 {
@@ -140,7 +141,9 @@ class ExamController extends Controller
         }
         $exam->save();
         
-        if ($request->has('save_show')) {
+        if (!empty($errmsg)) {
+            return back()->withErrors(['is_public' => $errmsg]);
+        } elseif ($request->has('save_show')) {
             return redirect(url("/exam/{$exam->id}/show"));
         } elseif ($request->has('save_stay')) {
             return redirect(url("/exam/{$exam->id}/edit"));

@@ -2,8 +2,8 @@
      input: $exam (may be null)
 --}}
 
-<div class="form-group row{{ $errors->has('is_public') ? ' has-error' : '' }}">
-    <label for="imageid" class="col col-lg-2 col-form-label">
+<div class="form-group row">
+    <label for="imageid" class="col col-lg-2 col-form-label @error('is_public')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left" data-html="true"
                 title="Visibility to <b>other users</b>. You can publish your exam as soon as you've made and published at least <b>five scenes</b> for it.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -18,11 +18,12 @@
                 <div class="pl-3 py-0">{{ optional($exam)->is_public ? 'Published' : 'Not Published' }}</div>
             </div>
         </div>
+        @error('is_public') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
 
-<div class="form-group row{{ $errors->has('name') ? ' has-error' : '' }}">
-    <label for="nameid" class="col col-lg-2 col-form-label">
+<div class="form-group row">
+    <label for="nameid" class="col col-lg-2 col-form-label @error('name')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
                 title="This must be unique, as well as short, for our layout. Try to stay under three words.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -31,6 +32,7 @@
     </label>
     <div class="col-lg-5">
         <input name="name" type="text" class="form-control" id="nameid" placeholder="Exam Title" value="{{ old('name', optional($exam)->name) }}">
+        @error('name') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
     @if(!empty(optional($exam)->image))
         <div class="col-lg-5 pl-0 pr-2 float-right">
@@ -38,8 +40,9 @@
         </div>
     @endif
 </div>
-<div class="form-group row{{ $errors->has('head') ? ' has-error' : '' }}">
-    <label for="headid" class="col col-lg-2 col-form-label">
+
+<div class="form-group row">
+    <label for="headid" class="col col-lg-2 col-form-label @error('head')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
                 title="The subtitle, to tell just a little bit more about your exam. Still short though, for our layout. Try to stay under six words.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -48,10 +51,12 @@
     </label>
     <div class="col-lg-5">
         <input name="head" type="text" class="form-control" id="headid" placeholder="Sub Title" value="{{ old('head', optional($exam)->head) }}">
+        @error('head') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
-<div class="form-group row{{ $errors->has('newimage') ? ' has-error' : '' }}">
-    <label for="imageid" class="col col-lg-2 col-form-label">
+
+<div class="form-group row">
+    <label for="imageid" class="col col-lg-2 col-form-label @error('newimage')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
                 title="A nice, suggestive image of ± 500x500 pixels is what you need here. Take your time, it should be good.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -63,11 +68,12 @@
             <input name="newimage" type="file" class="custom-file-input" id="customFile">
             <label class="custom-file-label text-truncate" for="customFile">{{ old('newimage', empty(optional($exam)->image) ? 'Select Image' : $exam->imageName()) }}</label>
         </div>
+        @error('newimage') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
 
-<div class="form-group row{{ $errors->has('intro') ? ' has-error' : '' }}">
-    <label for="introid" class="col col-lg-2 col-form-label">
+<div class="form-group row">
+    <label for="introid" class="col col-lg-2 col-form-label @error('intro')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
                 title="This could be all one needs to read before taking your exam. A thirty to fifty motivating words should do.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -76,10 +82,12 @@
     </label>
     <div class="col-lg-10">
         <textarea name="intro" class="form-control" type="text" id="introid" rows="3" placeholder="Introduction">{{ old('intro', optional($exam)->intro) }}</textarea>
+        @error('intro') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
-<div class="form-group row{{ $errors->has('text') ? ' has-error' : '' }}">
-    <label for="textid" class="col col-lg-2 col-form-label">
+
+<div class="form-group row">
+    <label for="textid" class="col col-lg-2 col-form-label @error('text')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
                 title="Write down everything there is to tell about your exam here. You can use the styles to make it look good.">
             <i class="fa fa-info" aria-hidden="true"></i>
@@ -88,5 +96,6 @@
     </label>
     <div class="col-lg-10">
         <textarea name="text" class="form-control" id="textid" placeholder="Description">{{ old('text', optional($exam)->text) }}</textarea>
+        @error('text') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
