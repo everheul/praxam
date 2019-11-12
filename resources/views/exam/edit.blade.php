@@ -23,6 +23,13 @@
                     </div>
                 </div>
             </form>
+            <hr />
+            <div class="form-group row mb-3">
+                <label class="col-lg-2 col-form-label">Scenes</label>
+                <div class="col-lg-10">
+                    <a class="btn btn-primary" href="/exam/{{ $exam->id }}/scene" role="button">Manage Scenes</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

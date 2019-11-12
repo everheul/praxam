@@ -55,6 +55,7 @@
             <div class="float-left ml-3 mt-1">
                 <form class="d-inline-block" action="#" method="GET">
                     <div class="input-group">
+
                         <input name="filter" class="form-control py-2 rounded-left" type="search" placeholder="*" value="{{ str_replace('%','*',$filter) }}" id="search-input">
                         <span class="input-group-append">
                             <button class="btn btn-outline-secondary appcolor" type="commit">
@@ -101,7 +102,11 @@
                                 <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/destroy" accept-charset="UTF-8">
                                     {{ csrf_field() }}
                                     <div class="btn-group btn-group-sm float-right" role="group">
-                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info" title="Show Scene">
+                                        <span class="btn btn-info {{ ($scene->is_valid) ? ($scene->is_public) ? 'bg-success' : 'bg-warning' : 'bg-danger' }}"
+                                              title="{{ ($scene->is_valid) ? ($scene->is_public) ? 'Published' : 'Not Published' : 'Not Valid' }}">
+                                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                        </span>
+                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info bg-light" title="Show Scene">
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                         </a>
                                         <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-primary" title="Edit Scene">
