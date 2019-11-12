@@ -20,7 +20,9 @@
                     {!! $exam->text !!}
                 </div>
                 <div class="card-footer appcolor text-center">
+                    @if($exam->is_public)
                     <a class="btn btn-primary" href="/prax/{{ $exam->id }}/create" role="button" id="add_scene">Test Your Knowledge</a>
+                    @endif
                 </div>
             </div>
         </div>

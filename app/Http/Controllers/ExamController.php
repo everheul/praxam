@@ -20,15 +20,22 @@ class ExamController extends Controller
 
     /**
      * Display a brief info of all exams.
-     * TODO: Add 'New' button?
      *
      * @return \\Illuminate\Http\Response
      */
     public function index() {
+        $exams = Exam::select('id','name','head','intro','image')
+                ->whereNull('deleted_at')
+                ->where(function($q) {
+                        if (!Auth::user()->isAdmin()) {
+                            $q->where('is_public', 1)->orWhere('created_by', Auth::id());
+                        }
+                    })->get();
+        //dd($exams);           
         return View('exam.index',
-            ['sidebar' => (new Sidebar)->sbarExamIndex(),
-                'exams' => Exam::get(['id','name','head','intro','image'])
-        ]);
+            [ 'sidebar' => (new Sidebar)->sbarExamIndex(),
+                'exams' => $exams,
+            ]);
     }
 
     /**
@@ -38,10 +45,22 @@ class ExamController extends Controller
      * @return \\Illuminate\Http\Response
      */
     public function show($exam_id) {
-        $exam = Exam::findOrFail($exam_id);
+        
+        $exam = Exam::where('id', $exam_id)
+                ->whereNull('deleted_at')
+                ->where(function($q) {
+                    if (!Auth::user()->isAdmin()) {
+                        $q->where('is_public', 1)->orWhere('created_by', Auth::id());
+                    }
+              })->firstOrFail();
+        
         // select max(e.updated_at) from scenes where (exam_id = e.id and deleted_at is null)
-        $updated = Scene::where('exam_id', $exam_id)->whereNull('deleted_at')->max('updated_at');
+        $updated = Scene::where('exam_id', $exam_id)
+                ->whereNull('deleted_at')
+                ->max('updated_at');
+        
         $last_change = empty($updated) ? date('d-m-Y', strtotime($exam->updated_at)) : date('d-m-Y', strtotime($updated));
+        
         return View('exam.show',
                ['sidebar' => (new Sidebar)->sbarExamShow($exam),
                 'last_change' => $last_change,
@@ -111,13 +130,16 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(NewExamRequest $request, $exam_id) {
-
         $data = $request->getData();
         $exam = Exam::findOrFail($exam_id);
         $this->handleUploadImage($exam, $data, $request);
-        $data['is_public'] = $exam->canPublish($request->get('is_public'));
-        $exam->update($data);
-
+        $exam->fill($data);
+        if ($exam->is_public) {
+            // user wants to publish, or had it published: check validity:
+            $errmsg = $exam->validityCheck();
+        }
+        $exam->save();
+        
         if ($request->has('save_show')) {
             return redirect(url("/exam/{$exam->id}/show"));
         } elseif ($request->has('save_stay')) {
@@ -168,7 +190,7 @@ class ExamController extends Controller
     }
     
     /**
-     * 
+     * dev routine
      */
     public function validateAll() {
         $exams = Exam::with('scenes','scenes.questions','scenes.questions.answers')->get();

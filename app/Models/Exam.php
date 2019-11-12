@@ -65,11 +65,12 @@ class Exam extends Model
         return (($user->isAdmin()) || ($user->id === $this->created_by));
     }
 
-    /**
+    /** todo: obsolete?
+     * 
      * @param int $userwantsto
      * @return int
      */
-    public function canPublish(int $userwantsto) {
+    public function _canPublish(int $userwantsto) {
         if ($userwantsto) {
             //- user wants to publish
             $scene_count = DB::table('scenes')
@@ -100,10 +101,11 @@ class Exam extends Model
     }
 
     /**
+     * todo: obsolete?
      * 
      * @return boolean
      */
-    public function isValid() {
+    public function _isValid() {
         
         $min_scenes = 5;
         $scene_count = 0;
@@ -125,6 +127,38 @@ class Exam extends Model
             }
             return true;
         }
+    }
+    
+    /**
+     *  set the scene_count, is_valid and is_public values,
+     *  and return the error string for 'Publish Scene'
+     *
+     * @return string
+     */
+    public function validityCheck() {
+        $errmsg = '';
+        $min_scenes = 5;
+
+        $this->loadMissing('scenes');
+        
+        $public_scenes = 0;
+        $this->scene_count = 0;
+        $this->is_valid = 1;
+        foreach($this->scenes as $scene) {
+            $this->$scene_count++;
+            $errmsg = $scene->validityCheck();
+            if ($scene->is_public) {
+                $public_scenes++;
+            }
+        }
+        if ($public_scenes < $min_scenes) {
+            $errmsg = "You don't have enough published scenes yet, you need at least 5.";
+            $this->is_valid = 0;
+        }
+        if (!$this->is_valid) {
+            $this->is_public = 0;
+        }
+        return $errmsg;
     }
     
 }

@@ -68,7 +68,7 @@ class Scene extends Model
     }
 
     /**
-     * todo: set in db!
+     * todo: set in db! obsolete?
      *
      * @param  Scene  $scene
      */
@@ -79,11 +79,12 @@ class Scene extends Model
         }
     }
 
-    /**
+    /** todo: obsolete?
+     * 
      * @param int $userwantsto
      * @return int
      */
-    public function canPublish(int $userwantsto) {
+    public function _canPublish(int $userwantsto) {
         if ($userwantsto) {
             //- user wants to publish
             switch($this->scene_type_id) {

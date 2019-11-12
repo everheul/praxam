@@ -34,6 +34,8 @@ class PraxExam
     }
 
     /**
+     * Link all the models to the right prax
+     * 
      * @param UserExam $userexam
      * @return $this
      */
@@ -49,6 +51,7 @@ class PraxExam
     }
 
     /**
+     * Admin/Owner
      *
      * @param $exam_id
      * @return $this
@@ -75,6 +78,8 @@ class PraxExam
     }
 
     /**
+     * find the right scene - prax scenes are displayed by order
+     * 
      * @param int $order
      * @return null|Scene
      */
