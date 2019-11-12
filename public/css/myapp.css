@@ -176,7 +176,7 @@ body {
 #scene-show img {
     max-width: 100%;
 }
-#scene-show .instructions p {
+#scene-show .instructions {
     padding: 5px 8px;
     margin-bottom: 12px;
     border: 1px solid rgba(0,200,0,.5);
@@ -332,9 +332,12 @@ label p {
     opacity: 0.6;
 }
 .btooltip {
-    float: right;
     margin-top: -4px;
-    margin-right: -4px;
+    margin-left: -2px;
+    margin-right: 6px;
+}
+.col-form-label {
+    white-space: nowrap;
 }
 .tooltip-inner {
     text-align: left;
@@ -361,6 +364,8 @@ option {
 .pagination ul {
     magin-bottom: 0;
 }
+/*
+-- klapraampjes
 
 .exam_cardhead {
     display: inline-flex;
@@ -376,13 +381,23 @@ option {
     border-bottom-color: #DDD;
     background-image: linear-gradient(rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0));
 }
-
-
-
-
-
-
-
+*/
+.exam_cardhead {
+    display: inline-flex;
+    background: #e6f7e1;
+    white-space: nowrap;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #6c757d; /* muted */
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-right: 0;
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.35rem;
+}
 
 
 

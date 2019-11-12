@@ -19,7 +19,7 @@
                 {!!  App\Helpers\Helper::brbrToP($praxscene->scene->text) !!}
                 @endisset
                 @isset($praxscene->scene->image)
-                <img class="mr-auto" src="/img/{{ $praxscene->scene->image }}"{{ $praxscene->getImageSizeStr() }} alt="" >
+                <img class="mr-auto" src="{{ $praxscene->scene->image }}"{{ $praxscene->getImageSizeStr() }} alt="" >
                 @endisset
                 <div class="row justify-content-center px-3">
                     <div id="accordion" class="accordion mt-2 w-100">

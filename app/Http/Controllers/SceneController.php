@@ -84,7 +84,8 @@ class SceneController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($exam_id, $scene_id) {
-        $scene = $this->getFullScene($scene_id);
+        $scene = Scene::where('id', '=', $scene_id)->with('exam','sceneType','questions','questions.answers')->firstOrFail();
+        $scene->setQuestionsOrder(); //- todo
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
         return View( 'scene.type' . $scene->scene_type_id . '.show',
             [   'sidebar' => (new Sidebar())->sbarSceneShow($scene),
@@ -136,8 +137,6 @@ class SceneController extends Controller
      */
     public function order(NewQuestionOrderRequest $request, $exam_id, $scene_id) {
 
-        //dd($request);
-
         // todo: check id's
 
         $scene = Scene::where('id', '=', $scene_id)
@@ -187,21 +186,34 @@ class SceneController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update( NewSceneRequest $request, $exam_id, $scene_id) {
+        //dd($request);
         if (($exam_id != $request->get('exam_id')) || ($scene_id != $request->get('scene_id'))) {
-            //todo: log this.
+            // todo
             abort(400, 'Unexpected form contents.');
         }
-        $scene = Scene::findOrFail($scene_id);
+        $scene = Scene::where('id', '=', $scene_id)
+            ->with('exam')
+            ->firstOrFail();
         $data = $request->getData();
-        $this->handleUploadImage($data, $request);
-        //dd($data);
-        $scene->update($data);
-        $scene->save();
+        $this->handleUploadImage($scene, $data, $request);
+        $scene->fill($data);
 
-        if ($request->has('save_show')) {
+        if ($scene->is_public) {
+            // user wants to publish, or had it published: check validity:
+            $errmsg = $scene->validityCheck();
+        }
+
+        $scene->save();
+        $scene->exam->countScenes();
+
+        if (!empty($errmsg)) {
+            return back()->withErrors(['is_public' => $errmsg]);
+        } elseif ($request->has('save_show')) {
             return redirect(url("/exam/$exam_id/scene/$scene_id/show"));
         } elseif ($request->has('save_stay')) {
             return redirect(url("/exam/$exam_id/scene/$scene_id/edit"));
+        } elseif ($request->has('save_next')) {
+            return redirect(url("/exam/$exam_id/scene/$scene_id/next/edit"));
         } else {
             //todo: log this.
             abort(400, 'Unexpected form contents.');
@@ -212,41 +224,36 @@ class SceneController extends Controller
      * @param array $data
      * @param NewSceneRequest $request
      */
-    private function handleUploadImage(Array &$data, NewSceneRequest $request) {
+    private function handleUploadImage(Scene $scene, Array &$data, NewSceneRequest $request) {
         if ($request->hasFile('newimage')) {
             $image = $request->file('newimage');
             if ($image->isValid()) {
-                // todo: check for previous uploaded image, and delete it.
                 $name = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('/storage/images/'), $name);
                 $data['image'] = '/storage/images/' . $name;
+                // check for previous uploaded image, and delete it.
+                if (!empty($scene->image)) {
+                    File::delete(public_path($scene->image));
+                }
             }
         }
     }
 
     /**
      * Soft-delete the specified scene.
+     * todo! Prevent deletion of scenes that are used in a test!
+     * Offer to 'un-public' to stop usage from now.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($exam_id, $scene_id) {
-        $scene = Scene::findOrFail($scene_id);
+        $scene = Scene::where('id', '=', $scene_id)
+            ->with('exam') //- todo: delete questions/answers too?
+            ->firstOrFail();
         $scene->delete();
+        $scene->exam->countScenes();
         return redirect("/exam/$exam_id/scene");
-    }
-
-    //--------
-
-    /**
-     * get a scene with its question(s) and answers
-     */
-    public function getFullScene($scene_id) {
-        $scene = Scene::where('id', '=', $scene_id)->with('exam','sceneType','questions','questions.answers')->firstOrFail();
-        if ($scene->scene_type_id == 2) {
-            $scene->setQuestionsOrder();
-        }
-        return $scene;
     }
 
     /**
@@ -315,21 +322,6 @@ class SceneController extends Controller
             ->get();
         $idlist = array_flip($scenes->pluck('id')->all());
         return sprintf("%d of %d", $idlist[$scene_id]+1, $scenes->count());
-    }
-
-    /**
-     * called on store and destroy.
-     * todo: should be an event?
-     *
-     * @param Exam $exam
-     */
-    private function calcSceneCount(Exam $exam) {
-        $exam->scene_count = DB::table('scenes')
-            ->where('exam_id',$exam->id)
-            ->where('is_public', 1)
-            ->whereNull('deleted_at')
-            ->count();
-        $exam->save();
     }
 
 }

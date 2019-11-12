@@ -14,7 +14,7 @@ class Exam extends Model
     /**
      * @var array
      */
-    protected $fillable = ['created_by', 'name', 'head', 'intro', 'text', 'image'];
+    protected $fillable = ['created_by', 'name', 'head', 'intro', 'text', 'image', 'is_public'];
 
     /**
      * The relation with userexams (OneToMany)
@@ -58,13 +58,47 @@ class Exam extends Model
     }
 
     /**
-     * 
+     * todo
      * @return bool
      */
     public function canEdit($user) {
         return (($user->isAdmin()) || ($user->id === $this->created_by));
     }
-    
+
+    /**
+     * @param int $userwantsto
+     * @return int
+     */
+    public function canPublish(int $userwantsto) {
+        if ($userwantsto) {
+            //- user wants to publish
+            $scene_count = DB::table('scenes')
+                ->where('exam_id', $this->id)
+                ->whereNull('deleted_at')
+                ->where('is_public', 1)
+                ->count();
+            if($scene_count >= 5) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * called on update and destroy of scenes.
+     * todo: should be an event?
+     *
+     * @param Exam $exam
+     */
+    public function countScenes() {
+        $this->scene_count = DB::table('scenes')
+            ->where('exam_id',$this->id)
+            ->where('is_public', 1)
+            ->whereNull('deleted_at')
+            ->count();
+        $this->save();
+    }
+
     /**
      * 
      * @return boolean

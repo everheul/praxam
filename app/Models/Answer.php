@@ -18,7 +18,7 @@ class Answer extends Model
      * The relation with questions (OneToMany Inverse)
      */
     public function question() {
-        return $this->belongsTo('App\Models\Question', 'id', 'question_id');
+        return $this->belongsTo('App\Models\Question');
     }
 
     /**

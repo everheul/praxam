@@ -1,18 +1,18 @@
 {{-- QUESTIONS -- SORTABLE LIST
  --}}
 
-<div class="form-group row pb-3">
-    <label class="col-md-2 pt-2 control-label" for="submit">
-        Questions
+<div class="form-group row">
+    <label class="col col-lg-2 col-form-label" for="submit">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left" data-html="true"
                 title="You can add, edit, view and delete this scenes' questions here, and change their order by dragging them.">
             <i class="fa fa-info" aria-hidden="true"></i>
         </button>
+        Questions
     </label>
-    <div class="col-md-10 pl-0">
-        <div id="questions_list" class="card p-1">
+    <div class="col-lg-10">
+        <div id="questions_list" class="card pt-2 pb-3 px-3">
             @foreach($scene->questions->sortBy('order') as $question)
-                <div class="dragable nots card px-3 py-1 m-2 bg-light" id="{{$question->id}}">
+                <div class="dragable card px-2 py-0 mt-2 mb-0 mx-0 appcolor" id="{{$question->id}}">
                     <div class="row p-1">
                         <div class="col-8 pr-0 pt-1 text-left">
                         {{ $question->getLabel() }}
@@ -39,9 +39,10 @@
         </div>
     </div>
 </div>
+
 <div class="form-group row mb-3">
-    <label class="col-md-2 pt-2 control-label"></label>
-    <div class="col-md-10 pl-0">
+    <label class="col col-lg-2 col-form-label"></label>
+    <div class="col-lg-10">
         <form method="POST" id="questions_order" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/order" accept-charset="UTF-8">
             {{ csrf_field() }}
             @if($scene->questions->count() < 9)

@@ -74,5 +74,17 @@ class PraxExam
         return $this;
     }
 
-    
+    /**
+     * @param int $order
+     * @return null|Scene
+     */
+    public function userSceneByOrder(int $order) {
+        foreach($this->praxscenes as $praxscene) {
+            if ($praxscene->userscene->order === $order) {
+                return $praxscene->userscene;
+            }
+        }
+        return null;
+    }
+
 }

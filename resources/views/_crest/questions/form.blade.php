@@ -11,7 +11,7 @@
 			@endforeach
         </select>
         
-        {!! $errors->first('scene_id', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('scene_id', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -27,7 +27,7 @@
 			@endforeach
         </select>
         
-        {!! $errors->first('question_type_id', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('question_type_id', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -35,7 +35,7 @@
     <label for="order" class="col-md-2 pt-2 control-label">Order</label>
     <div class="col-md-10">
         <input class="form-control" name="order" type="text" id="order" value="{{ old('order', optional($question)->order) }}" min="0" max="65535" required="true" placeholder="Enter order here...">
-        {!! $errors->first('order', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('order', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -43,7 +43,7 @@
     <label for="head" class="col-md-2 pt-2 control-label">Head</label>
     <div class="col-md-10">
         <input class="form-control" name="head" type="text" id="head" value="{{ old('head', optional($question)->head) }}" maxlength="191" placeholder="Enter head here...">
-        {!! $errors->first('head', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('head', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -51,7 +51,7 @@
     <label for="text" class="col-md-2 pt-2 control-label">Text</label>
     <div class="col-md-10">
         <input class="form-control" name="text" type="text" id="text" value="{{ old('text', optional($question)->text) }}" maxlength="5000" placeholder="Enter text here...">
-        {!! $errors->first('text', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('text', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -59,7 +59,7 @@
     <label for="explanation" class="col-md-2 pt-2 control-label">Explanation</label>
     <div class="col-md-10">
         <input class="form-control" name="explanation" type="text" id="explanation" value="{{ old('explanation', optional($question)->explanation) }}" maxlength="5000" placeholder="Enter explanation here...">
-        {!! $errors->first('explanation', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('explanation', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -67,7 +67,7 @@
     <label for="points" class="col-md-2 pt-2 control-label">Points</label>
     <div class="col-md-10">
         <input class="form-control" name="points" type="text" id="points" value="{{ old('points', optional($question)->points) }}" min="-32768" max="32767" placeholder="Enter points here...">
-        {!! $errors->first('points', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('points', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 
@@ -75,7 +75,7 @@
     <label for="answer_count" class="col-md-2 pt-2 control-label">Answer Count</label>
     <div class="col-md-10">
         <input class="form-control" name="answer_count" type="text" id="answer_count" value="{{ old('answer_count', optional($question)->answer_count) }}" min="0" placeholder="Enter answer count here...">
-        {!! $errors->first('answer_count', '<p class="form-text text-danger">:message</p>') !!}
+        {!! $errors->first('answer_count', '<div class="form-text text-danger m-0">:message</div>') !!}
     </div>
 </div>
 

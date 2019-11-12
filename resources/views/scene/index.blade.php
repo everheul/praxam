@@ -19,7 +19,7 @@
     @endif
 
     <div class="card">
-        <div class="card-header headcolor">
+        <div class="card-header headcolor pb-0 pt-2">
             <div class="float-left mx-3 mt-1"><h2>Exam Scenes</h2></div>
             <div class="dropdown float-left ml-3 mt-1">
                 <button class="btn btn-outline-dark dropdown-toggle appcolor" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

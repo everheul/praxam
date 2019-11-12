@@ -20,8 +20,8 @@
                     @include('question.form')
 
                     <div class="form-group row">
-                        <label class="col-md-2 pt-2 control-label" for="submit"></label>
-                        <div class="col-md-10 pl-0">
+                        <label class="col-lg-2 col-form-label" for="submit"></label>
+                        <div class="col-lg-10">
                             <button id="submit" name="submit" class="btn btn-primary mr-1">Create Question</button>
                         </div>
                     </div>

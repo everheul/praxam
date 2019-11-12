@@ -3,6 +3,7 @@
      input: $praxquestion, $praxscene
 --}}
 <question id="{{ $praxquestion->question->id }}">
+    {!! $praxquestion->questionHeadStr() !!}
     {!! $praxquestion->question->text !!}
     <div class="card-body mt-0 p-2">
          <form method="POST" action="/answer" id="form_{{ $praxquestion->question->id }}" accept-charset="UTF-8">

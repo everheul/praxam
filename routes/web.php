@@ -105,6 +105,7 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 				Route::get('/answers','QuestionController@answers')->name('exam.scene.question.answers');
 				Route::post('/order','QuestionController@order')->name('exam.scene.question.order');
 				Route::get('/next','QuestionController@nextQuestion')->name('exam.scene.question.next');
+				Route::get('/next/edit','QuestionController@editNextQuestion')->name('exam.scene.question.next');
 				//- answers
 				Route::prefix('/answer')->group(function () {
 					Route::post('/store','AnswerController@store')->name('exam.scene.question.answer.store');

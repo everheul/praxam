@@ -93,12 +93,6 @@ class PraxScene
      */
     public function praxquestion($index = 0) {
         return $this->praxquestions->first();
-        /*
-        if (isset($this->praxquestions[$index])) {
-            return $this->praxquestions[$index];
-        } else {
-            dd("userquestion missing??",$this);
-        }*/
     }
 
     /** get the order of this question_id
@@ -148,7 +142,7 @@ class PraxScene
     {
         $image = $this->scene->image;
         if (!empty($image)) {
-            $size = getimagesize(public_path() . '/img/' . $image);
+            $size = getimagesize(public_path($image));
             if (!empty($size)) {
                 $width = ($size[0] > 0) ? (($size[0] < 9999) ? $size[0] : 0) : 0;
                 $height = ($size[1] > 0) ? (($size[1] < 9999) ? $size[1] : 0) : 0;

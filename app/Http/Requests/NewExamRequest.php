@@ -29,6 +29,7 @@ class NewExamRequest extends FormRequest
             "intro" => "required|string|max:1024",
             "text" => "nullable|string",
             "newimage" => 'nullable|image|mimes:jpeg,png,jpg,bmp,gif,svg|max:2048',
+            'is_public' => 'numeric|min:0|max:1',
         ];
     }
 
@@ -38,7 +39,7 @@ class NewExamRequest extends FormRequest
      * @return array
      */
     public function getData() {
-        return $this->only(['name', 'head', 'intro', 'text']);
+        return $this->only(['name', 'head', 'intro', 'text', 'is_public']);
     }
 
 }

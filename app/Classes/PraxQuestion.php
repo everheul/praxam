@@ -83,13 +83,28 @@ class PraxQuestion
     }
 
 
-    /**
+    /** todo
      * @param  int  $order
      * @return  PraxQuestion
      */
     public function setOrder($order) {
         $this->order = $order;
         return $this;
+    }
+
+    /**
+     * Returns the string to display 'head'
+     * @return string
+     */
+    public function questionHeadStr() {
+        $scene = $this->parent->scene;
+        switch ($scene->scene_type_id) {
+            case 1: //- todo: constants
+                break;
+            case 2:
+                return empty($this->question->head) ? '' : "<h4>{$this->question->head}</h4>";
+        }
+        return '';
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\NewAnswerRequest;
 Use App\Models\Answer;
+Use App\Models\Question;
 use DB;
 
 class AnswerController extends Controller

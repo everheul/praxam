@@ -11,12 +11,11 @@
             <hr />
             <form method="post" action="/exam/store" enctype="multipart/form-data" class="form-horizontal">
                 {{ csrf_field() }}
-                @include('exam.form');
+                @include('exam.form')
                 <div class="form-group row">
-                    <label for="introid" class="col col-form-label"></label>
-                    <div class="col-sm-10">
+                    <label for="introid" class="col col-md-2 col-form-label"></label>
+                    <div class="col-md-10 pl-0">
                         <button name="save_edit" type="submit" class="btn btn-primary">Create Exam</button>
-                        <a class="btn btn-primary ml-2 px-4" href="/home" role="button">Cancel</a>
                     </div>
                 </div>
             </form>

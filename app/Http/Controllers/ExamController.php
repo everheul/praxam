@@ -33,7 +33,6 @@ class ExamController extends Controller
 
     /**
      * Display all the info of the specified exam.
-     * TODO: Add 'Edit' and 'Delete' buttons.
      *
      * @param  int $id
      * @return \\Illuminate\Http\Response
@@ -57,7 +56,7 @@ class ExamController extends Controller
      */
     public function create() {
         return View('exam.create',
-            [   'sidebar' => (new Sidebar)->sbarNoExam(),
+            [   'sidebar' => (new Sidebar)->sbarExamCreate(),
                 'exam' => null
             ]
         );
@@ -112,19 +111,12 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(NewExamRequest $request, $exam_id) {
-        $data = $request->getData();
-        if ($request->hasFile('newimage')) {
-            $image = $request->file('newimage');
-            if ($image->isValid()) {
-                $name = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('/storage/images/'), $name);
-                $data['image'] = '/storage/images/' . $name;
-            }
-        }
 
+        $data = $request->getData();
         $exam = Exam::findOrFail($exam_id);
-        $exam->fill($data);
-        $exam->update();
+        $this->handleUploadImage($exam, $data, $request);
+        $data['is_public'] = $exam->canPublish($request->get('is_public'));
+        $exam->update($data);
 
         if ($request->has('save_show')) {
             return redirect(url("/exam/{$exam->id}/show"));
@@ -187,6 +179,26 @@ class ExamController extends Controller
             }
         }
         dd("Valid exams found: $valid_count");
+    }
+
+
+    /**
+     * @param array $data
+     * @param NewSceneRequest $request
+     */
+    private function handleUploadImage(Exam $exam, Array &$data, NewExamRequest $request) {
+        if ($request->hasFile('newimage')) {
+            $image = $request->file('newimage');
+            if ($image->isValid()) {
+                $name = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('/storage/images/'), $name);
+                $data['image'] = '/storage/images/' . $name;
+                // check for previous uploaded image, and delete it.
+                if (!empty($exam->image)) {
+                    File::delete(public_path($exam->image));
+                }
+            }
+        }
     }
 
 }

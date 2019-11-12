@@ -14,14 +14,14 @@
 
                 @if($question->answers->count() > 0)
                 <div class="form-group row">
-                    <label class="col-md-2 pt-2 control-label" for="submit">
-                        Answers
+                    <label class="col-lg-2 pt-2 col-form-label" for="submit">
                         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left" data-html="true"
                                 title="You can edit or delete answers here, and change their order by dragging them.">
                             <i class="fa fa-info" aria-hidden="true"></i>
                         </button>
+                        Answers
                     </label>
-                    <div class="col-md-5 pl-0">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header p-2 text-center">
                                 <h5 class="mb-0 mt-1">All Answers</h5>
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5 pl-0">
+                    <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header p-2 text-center">
                                 <h5 class="mb-0 mt-1">Correct Answer(s)</h5>
@@ -66,7 +66,7 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="btn-group btn-group-sm float-right" role="group">
-                                                <button name="delete" type="submit" class="btn btn-danger delete_answer" title="Delete Answer">
+                                                <button name="delete" type="submit" dragger="copy_answer_{{$answer->id}}" class="btn btn-danger remove_answer" title="Delete Answer">
                                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                                 </button>
                                             </div>
@@ -79,9 +79,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group row mb-3">
-                    <label class="col-md-2 pt-2 control-label"></label>
-                    <div class="col-md-10 pl-0">
+                <div class="form-group row">
+                    <label class="col col-lg-2 col-form-label"></label>
+                    <div class="col-md-10">
                         <form method="POST" id="answers_order" action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/order" accept-charset="UTF-8">
                             {{ csrf_field() }}
                             <button name="save_stay" type="submit" class="btn btn-primary" onclick="return saveOrder()">Save & Stay</button>
@@ -94,14 +94,14 @@
 
 
                 <div class="form-group row">
-                    <label class="col-md-2 pt-2 control-label" for="submit">
-                        Add Answers
+                    <label class="col-lg-2 col-form-label" for="submit">
                         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left" data-html="true"
                                 title="You can add one or more answers here; one on each line.">
                             <i class="fa fa-info" aria-hidden="true"></i>
                         </button>
+                        Add Answers
                     </label>
-                    <div class="col-md-10 pl-0">
+                    <div class="col-lg-10">
                         <form method="POST" id="answer_txt" action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/store" accept-charset="UTF-8">
                             {{ csrf_field() }}
                             <textarea name="answertxt" class="form-control w-100 mb-3" placeholder="Answer Text" rows="3" ></textarea>
@@ -153,7 +153,8 @@
                 //- change the label:
                 $(ui.item).find("span[name=a_label]").text("Correct :");
                 //- change click event target and add draggers id:
-                $(ui.item).find("button").unbind('click').on('click', removeAnswer).attr('dragger',newid);
+                $(ui.item).find("button").unbind('click').on('click', removeAnswer);
+                $(ui.item).find("button").attr('dragger',newid);
             }
         });
         $('.delete_answer').on('click', deleteAnswer);
@@ -169,6 +170,7 @@
     function removeAnswer(event) {
         event.stopPropagation();
         dragger = $(event.currentTarget).attr('dragger');
+        console.log(event,dragger);
         $('#' + dragger).remove();
         return false;
     }

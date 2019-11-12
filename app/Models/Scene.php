@@ -29,7 +29,7 @@ class Scene extends Model
     /**
      * @var array
      */
-    protected $fillable = ['exam_id','scene_type_id', 'chapter', 'head', 'text', 'image', 'instructions'];
+    protected $fillable = ['exam_id', 'scene_type_id', 'chapter', 'head', 'text', 'image', 'instructions', 'is_public'];
 
     /**
      * The relation with exams
@@ -43,7 +43,7 @@ class Scene extends Model
      * The relation with questions (OneToMany)
      */
     public function questions() {
-        return $this->hasMany('App\Models\Question', 'scene_id', 'id')->orderBy('order')->orderBy('id');
+        return $this->hasMany('App\Models\Question')->orderBy('order')->orderBy('id');
     }
 
     /**
@@ -80,6 +80,23 @@ class Scene extends Model
     }
 
     /**
+     * @param int $userwantsto
+     * @return int
+     */
+    public function canPublish(int $userwantsto) {
+        if ($userwantsto) {
+            //- user wants to publish
+            switch($this->scene_type_id) {
+                case 1:
+                    return ($this->questions->count() > 0) ? 1 : 0;
+                case 2:
+                    return ($this->questions->count() > 1) ? 1 : 0;
+            }
+        }
+        return 0;
+    }
+
+    /**
      * @return string
      */
     public function imageName() {
@@ -93,11 +110,16 @@ class Scene extends Model
     }
     
     /**
-     * 
-     * @return boolean
+     *  set the question_count and is_valid values,
+     *  and return the error string for 'Publish Scene'
+     *
+     * @return string
      */
-    public function isValid() {
-        
+    public function validityCheck() {
+        $errmsg = '';
+
+        $this->loadMissing('questions','questions.answers');
+
         $min_questions = 0;
         switch ($this->scene_type_id) {
             case 1:
@@ -109,29 +131,28 @@ class Scene extends Model
             default:
                 abort(400, 'Unexpected scene type.');
         }
-        $question_count = 0;
-        $is_valid = 1;
+
+        $this->question_count = 0;
+        $this->is_valid = 1;
         foreach($this->questions as $question) {
-            if (!$question->isValid()) {
-                $is_valid = 0;
-            } else {
-                $question_count++;
-            }
-        }
-        if ((!$is_valid) || ($question_count < $min_questions)) {
-            if ($this->is_valid) {
+            $this->question_count++;
+            $errmsg = $question->validityCheck();
+            if (!$question->is_valid) {
                 $this->is_valid = 0;
-                $this->save();
             }
-            var_dump("invalid scene: {$this->id}");
-            return false;
-        } else {
-            if (!$this->is_valid) {
-                $this->is_valid = 1;
-                $this->save();
-            }
-            return true;
         }
+
+        if ($this->question_count < $min_questions) {
+            $q = ($min_questions > 1) ? "$min_questions questions" : "1 question";
+            $errmsg = "You need at least $q to publish this scene.";
+            $this->is_valid = 0;
+        }
+
+        if (!$this->is_valid) {
+            $this->is_public = 0;
+        }
+
+        return $errmsg;
     }
 
 

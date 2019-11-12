@@ -34,6 +34,7 @@ class UserSceneController extends Controller
     /**
      * Display the scene as part of a test.
      * The (user)exam and scenes are also loaded to fill the sidebar.
+     * todo: find-and-show any changes made by the author since the test was done
      *
      * @return \Illuminate\Http\Response
      */

@@ -17,15 +17,15 @@
                     <input name="exam_id" type="hidden" value="{{ $scene->exam_id }}">
                     <input name="scene_id" type="hidden" value="{{ $scene->id }}">
 
-                    @include('scene.type1.form')
                     @include('scene.type2.form')
 
                     <div class="form-group row mb-0">
-                        <label class="col-md-2 pt-2 control-label" for="submit"></label>
-                        <div class="col-md-10 pl-0">
+                        <label class="col-lg-2 col-form-label" for="submit"></label>
+                        <div class="col-lg-10">
                             <button name="save_stay" type="submit" class="btn btn-primary">Save &amp; Stay</button>
-                            <button name="save_show" type="submit" class="btn btn-primary ml-2">Save &amp; Show</button>
-                            <a class="btn btn-primary ml-2 px-4" href="/exam/{{ $scene->exam_id }}/scene" role="button">Cancel</a>
+                            <button name="save_show" type="submit" class="btn btn-primary ml-3">Save &amp; Show</button>
+                            <button name="save_next" type="submit" class="btn btn-primary ml-3">Save &amp; Next</button>
+                    {{--        <a class="btn btn-primary ml-2 px-4" href="/exam/{{ $scene->exam_id }}/scene" role="button">Cancel</a>  --}}
                         </div>
                     </div>
 

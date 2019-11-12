@@ -56,7 +56,8 @@ class QuestionController extends Controller
     }
 
     /**
-     * show the whole scene, with this question active
+     * show the whole scene (like scene.show), but with this question active
+     * todo: find-and-show any changes made since the test was done
      *
      * @param  int  $exam_id
      * @param  int  $scene_id
@@ -65,6 +66,7 @@ class QuestionController extends Controller
      */
     public function show($exam_id, $scene_id, $question_id) {
         $scene = Scene::where('id', '=', $scene_id)->with('exam','sceneType','questions','questions.answers')->firstOrFail();
+        $scene->setQuestionsOrder(); //- todo
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
         $question_order = $praxscene->questionOrder($question_id);
         $sidebar = (new Sidebar())->sbarSceneShow($scene); //- todo: edit question
@@ -116,8 +118,10 @@ class QuestionController extends Controller
         $data = $request->getData();
         // todo: check exam/scene id's
 
-        $question = Question::findOrFail($question_id);
-        $question->update($data);
+        $question = Question::where('id',$question_id)->with('answers')->firstOrFail();
+        $question->fill($data);
+        //$question->validityCheck();  done by scene
+        $question->save();
 
         if ($request->has('save_show')) {
             //return redirect(url("/exam/$exam_id/scene/$scene_id/question/{$question->id}/show"));
@@ -131,6 +135,8 @@ class QuestionController extends Controller
 
     /**
      * Remove the specified question from the storage.
+     * todo! Prevent deletion of questions that were used in a test!
+     * Offer to 'un-public' to stop usage from now.
      * todo: validate?
      *
      * @param int $id
@@ -143,7 +149,18 @@ class QuestionController extends Controller
         $this->calcQuestionCount($question->scene);
         return redirect()->route('exam.scene.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id])
                     ->with('success_message', 'Question was successfully deleted.');
-     }
+    }
+
+
+    // todo!
+    public function nextQuestion() {
+
+    }
+
+    public function editNextQuestion() {
+
+    }
+
 
     /**
      * @param $exam_id
@@ -231,7 +248,6 @@ class QuestionController extends Controller
     private function calcQuestionCount(Scene $scene) {
         $scene->question_count = DB::table('questions')
             ->where('scene_id',$scene->id)
-            ->where('is_public', 1)
             ->whereNull('deleted_at')
             ->count();
         $scene->save();

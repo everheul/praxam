@@ -25,6 +25,7 @@ class NewSceneRequest extends FormRequest
         return [
             'exam_id' => 'numeric|min:1',
             'scene_id' => 'numeric|min:1',
+            'is_public' => 'numeric',
             'scene_type_id' => 'required|numeric|min:1|max:2',
             'head' => 'required|string|min:1|max:191',
             "text" => "nullable|string",
@@ -39,7 +40,7 @@ class NewSceneRequest extends FormRequest
      * @return array
      */
     public function getData() {
-        return $this->only(['head','scene_type_id','text','instructions']);
+        return $this->only(['head','scene_type_id','text','instructions','is_public']);
     }
 
 }

@@ -27,7 +27,7 @@ class Question extends Model
      *
      * @var array
      */
-    protected $fillable = [ 'scene_id', 'question_type_id', 'order', 'head', 'text', 'explanation', 'points', 'answer_count'];
+    protected $fillable = [ 'scene_id', 'question_type_id', 'order', 'head', 'text', 'explanation', 'points', 'answer_count', 'is_valid'];
 
     /**
      * The relation with scenes (OneToMany Inverse)
@@ -75,11 +75,24 @@ class Question extends Model
     }
 
     /**
-     * 
-     * @return boolean
+     *  set the answer_count and is_valid values,
+     *  and return the error string for 'Publish Scene'
+     *
+     * @return string
      */
-    public function isValid() {
-        
+    public function validityCheck() {
+
+        $msg = '';
+        $answer_count = 0;
+        $correct_answers = 0;
+        foreach($this->answers as $answer) {
+            $answer_count++;
+            if ($answer->is_correct) {
+                $correct_answers++;
+            }
+        }
+        $this->answer_count = $answer_count;
+
         $min_answers = 0;
         $min_correct = 0;
         $max_correct = 0;
@@ -92,41 +105,31 @@ class Question extends Model
             case 2:
                 $min_answers = 3;
                 $min_correct = 1;
-                $max_correct = -1; // count-1
+                $max_correct = $answer_count - 1;
                 break;
             case 3:
                 $min_answers = 4;
                 $min_correct = 2;
-                $max_correct = 0; // count
+                $max_correct = $answer_count;
                 break;
             default:
                 abort(400, 'Unexpected question type.');
         }
-        $answer_count = 0;
-        $correct_answers = 0;
-        foreach($this->answers as $answer) {
-            $answer_count++;
-            if ($answer->is_correct) {
-                $correct_answers++;
-            }
-        }
-        if ($max_correct <= 0) {
-            $max_correct = $answer_count + $max_correct;
-        }
-        if (($answer_count < $min_answers) || ($correct_answers < $min_correct) || ($correct_answers > $max_correct)) {
-            if ($this->is_valid) {
-                $this->is_valid = 0;
-                $this->save();
-            }
-            var_dump("invalid question: {$this->id}");
-            return false;
+
+        $this->is_valid = 0;
+        if ($answer_count < $min_answers) {
+            $msg = "Question {$this->order} needs more answers.";
+        } elseif ($correct_answers < $min_correct) {
+            $msg = "Question {$this->order} needs more correct answers.";
+        } elseif ($correct_answers > $max_correct) {
+            $msg = "Question {$this->order} has too many correct answers.";
         } else {
-            if (!$this->is_valid) {
-                $this->is_valid = 1;
-                $this->save();
-            }
-            return true;
+            $this->is_valid = 1;
         }
+
+        $this->save();
+
+        return $msg;
     }
 
 }
