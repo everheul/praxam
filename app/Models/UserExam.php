@@ -26,6 +26,8 @@ class UserExam extends Model
 {
     use SoftDeletes;
 
+    private $max_score = 0;
+
     //- no standard name for the user tables, for better readability.
     protected $table = 'userexams';
 
@@ -103,5 +105,32 @@ class UserExam extends Model
         return redirect(url("/prax/{$this->id}/scene/{$userscene->order}"));
     }
 
-    
+    /**
+     * todo: add this to the userexam table!
+     *
+     * note: questions.deleted_at is ignored.
+     *
+     * @return int
+     */
+    private function getMaxScore() {
+        if (empty($this->max_score)) {
+            $this->max_score = DB::table('userscenes')
+                ->join('userquestions', 'userquestions.userscene_id', '=', 'userscenes.id')
+                ->join('questions', 'userquestions.question_id', '=', 'questions.id')
+                ->where('userscenes.userexam_id', $this->id)
+                ->sum('questions.points');
+        }
+        return $this->max_score;
+    }
+
+    /**
+     * display the result as a percentage of the total-of-points
+     *
+     * @return string
+     */
+    public function resultStr() {
+        $perc = $this->result * 100 / $this->getMaxScore();
+        return number_format($perc, 1) . ' %';
+    }
+
 }

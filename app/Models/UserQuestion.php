@@ -25,7 +25,7 @@ class UserQuestion extends Model
      * The relation with questions (OneToMany Inverse)
      */
     public function question() {
-        return $this->belongsTo('App\Models\Question', 'question_id', 'id');
+        return $this->belongsTo('App\Models\Question')->withTrashed();
     }
 
     /**

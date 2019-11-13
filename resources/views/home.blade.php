@@ -1,5 +1,7 @@
 {{--
     HOME
+    A complete overview of the (un-)finisched tests and created exams of this user.
+    todo: show more usefull info
 --}}
 
 @extends('layouts.exam')
@@ -19,7 +21,6 @@
 }
 @endpush
 --}}
-
 @section('content')
 <div class="container">
     <div class="row justify-content-left">
@@ -27,22 +28,22 @@
 
             <div class="card w-100 home headcolor">
                 <div class="card-body p-1">
-                    <h2>My Pracxam</h2>
-                    <h4>Your Tests and Exams</h4>
+                    <h2 class="m-0">My Pracxam</h2>
+                    <h4 class="m-0 text-secondary">Your Dashboard</h4>
                 </div>
             </div>
 
             <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
-                    <h3>Tests In Progress</h3>
+                    <h4>Tests In Progress</h4>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">
                         <thead>
                         <tr>
-                            <th>Exam</th>
-                            <th>Started</th>
+                            <th>Tested</th>
                             <th>Scenes</th>
+                            <th>Started</th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -51,8 +52,8 @@
                         @foreach($working as $prax)
                             <tr>
                                 <td>{{ $prax->exam->name }}</td>
-                                <td>{{ $prax->created_at }}</td>
                                 <td>{{ $prax->scene_count }}</td>
+                                <td>{{ date('d-m-Y', strtotime($prax->created_at)) }}</td>
                                 <td><a href="/prax/{{ $prax->id }}/next" class="btn btn-outline-secondary btn-sm">Continue</a></td>
                                 <td><a href="/prax/{{ $prax->id }}/destroy" class="btn btn-outline-secondary btn-sm" onclick="return confirm(&quot;Are you sure you want to delete this Test?&quot;)">Delete</a></td>
                             </tr>
@@ -64,15 +65,15 @@
 
             <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
-                    <h3>Finished Tests</h3>
+                    <h4>Finished Tests</h4>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">
                         <thead>
                             <tr>
-                                <th>Exam</th>
-                                <th>Finished</th>
+                                <th>Tested</th>
                                 <th>Score</th>
+                                <th>Hours Taken</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -81,9 +82,9 @@
                         @foreach($hystory as $prax)
                             <tr>
                                 <td>{{ $prax->exam->name }}</td>
-                                <td>{{ $prax->finished_at }}</td>
-                                <td>{{ $prax->result }}</td>
-                                <td><a href="/prax/{{ $prax->id }}/next" class="btn btn-outline-secondary btn-sm">Explore</a></td>
+                                <td>{{ $prax->resultStr() }}</td>
+                                <td>{{ $prax->created_at->diffInHours($prax->finished_at) . ':' . $prax->created_at->diff($prax->finished_at)->format('%I:%S') }}</td>
+                                <td><a href="/prax/{{ $prax->id }}/next" class="btn btn-outline-secondary btn-sm">Review</a></td>
                                 <td><a href="/prax/{{ $prax->id }}/destroy" class="btn btn-outline-secondary btn-sm" onclick="return confirm(&quot;Are you sure you want to delete this Test?&quot;)">Delete</a></td>
                             </tr>
                         @endforeach
@@ -94,7 +95,7 @@
 
             <div class="card w-100 home mt-3">
                 <div class="card-header py-1 appcolor">
-                    <h3>Your Exams</h3>
+                    <h4>Your Exams</h4>
                 </div>
                  <div class="card-body">
                     <table class="table table-borderless table-hover table-sm mb-0">
