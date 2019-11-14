@@ -6,6 +6,14 @@
 
 @extends('layouts.exam')
 
+@push('style')
+.tbltxt {
+    margin: 0;
+    padding: 0;
+    padding-top: 3px;
+}
+@endpush
+
 {{-- background image test
 @push('style')
 #content {
@@ -34,28 +42,38 @@
             </div>
 
             <div class="card w-100 home mt-3">
-                <div class="card-header py-1 appcolor">
-                    <h4>Tests In Progress</h4>
+                <div class="card-header pt-2 pb-0 headcolor">
+                    <h5>Tests In Progress</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless table-hover table-sm mb-0">
-                        <thead>
-                        <tr>
-                            <th>Tested</th>
-                            <th>Scenes</th>
-                            <th>Started</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="appcolor">
+                            <tr>
+                                <th>Tested</th>
+                                <th>Scenes</th>
+                                <th>Started</th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                         @foreach($working as $prax)
                             <tr>
-                                <td>{{ $prax->exam->name }}</td>
-                                <td>{{ $prax->scene_count }}</td>
-                                <td>{{ date('d-m-Y', strtotime($prax->created_at)) }}</td>
-                                <td><a href="/prax/{{ $prax->id }}/next" class="btn btn-outline-secondary btn-sm">Continue</a></td>
-                                <td><a href="/prax/{{ $prax->id }}/destroy" class="btn btn-outline-secondary btn-sm" onclick="return confirm(&quot;Are you sure you want to delete this Test?&quot;)">Delete</a></td>
+                                <td><div class="tbltxt">{{ $prax->exam->name }}</div></td>
+                                <td><div class="tbltxt">{{ $prax->scene_count }}</div></td>
+                                <td><div class="tbltxt">{{ date('d-m-Y', strtotime($prax->created_at)) }}</div></td>
+                                <td>
+                                    <form method="POST" action="/prax/{{ $prax->id }}/destroy" accept-charset="UTF-8">
+                                        {{ csrf_field() }}
+                                        <div class="btn-group btn-group-sm float-right" role="group">
+                                            <a href="/prax/{{ $prax->id }}/next" class="btn btn-info bg-light" title="Continue Test">
+                                                <i class="fa fa-play-circle" aria-hidden="true"></i>
+                                            </a>
+                                            <button name="delete" type="submit" class="btn btn-danger ml-a" title="Delete Test" onclick="return confirm(&quot;Are you sure you want to delete this test?&quot;)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -64,28 +82,38 @@
             </div>
 
             <div class="card w-100 home mt-3">
-                <div class="card-header py-1 appcolor">
-                    <h4>Finished Tests</h4>
+                <div class="card-header pt-2 pb-0 headcolor">
+                    <h5>Finished Tests</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless table-hover table-sm mb-0">
-                        <thead>
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="appcolor">
                             <tr>
                                 <th>Tested</th>
                                 <th>Score</th>
                                 <th>Hours Taken</th>
-                                <th></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach($hystory as $prax)
                             <tr>
-                                <td>{{ $prax->exam->name }}</td>
-                                <td>{{ $prax->resultStr() }}</td>
-                                <td>{{ $prax->created_at->diffInHours($prax->finished_at) . ':' . $prax->created_at->diff($prax->finished_at)->format('%I:%S') }}</td>
-                                <td><a href="/prax/{{ $prax->id }}/next" class="btn btn-outline-secondary btn-sm">Review</a></td>
-                                <td><a href="/prax/{{ $prax->id }}/destroy" class="btn btn-outline-secondary btn-sm" onclick="return confirm(&quot;Are you sure you want to delete this Test?&quot;)">Delete</a></td>
+                                <td><div class="tbltxt">{{ $prax->exam->name }}</div></td>
+                                <td><div class="tbltxt">{{ $prax->resultStr() }}</div></td>
+                                <td><div class="tbltxt">{{ $prax->created_at->diffInHours($prax->finished_at) . ':' . $prax->created_at->diff($prax->finished_at)->format('%I:%S') }}</div></td>
+                                <td>
+                                    <form method="POST" action="/prax/{{ $prax->id }}/destroy" accept-charset="UTF-8">
+                                        {{ csrf_field() }}
+                                        <div class="btn-group btn-group-sm float-right" role="group">
+                                            <a href="/prax/{{ $prax->id }}/next" class="btn btn-info bg-light" title="Review Test">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+                                            <button name="delete" type="submit" class="btn btn-danger ml-a" title="Delete Test" onclick="return confirm(&quot;Are you sure you want to delete this test?&quot;)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -94,28 +122,55 @@
             </div>
 
             <div class="card w-100 home mt-3">
-                <div class="card-header py-1 appcolor">
-                    <h4>Your Exams</h4>
+                <div class="card-header pt-2 pb-0 headcolor">
+                    <h5>Your Exams</h5>
                 </div>
                  <div class="card-body">
-                    <table class="table table-borderless table-hover table-sm mb-0">
-                        <thead>
+                     <table class="table table-hover table-sm mb-0">
+                         <thead class="appcolor">
                             <tr>
+                                <th></th>
+                                <th>Index</th>
                                 <th>Name</th>
                                 <th>Created</th>
                                 <th>Testers</th>
-                                <th></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach($exams as $exam)
                             <tr>
-                                <td>{{ $exam->name }}</td>
-                                <td>{{ $exam->created_at }}</td>
-                                <td>{{ $exam->user_count() }}</td>
-                                <td><a href="/exam/{{ $exam->id }}/show" class="btn btn-outline-secondary btn-sm">Manage</a></td>
-                                <td><a href="/exam/{{ $exam->id }}/destroy" class="btn btn-outline-secondary btn-sm" onclick="return confirm(&quot;Are you sure you want to delete this Exam?&quot;)">Delete</a></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm float-left" role="group">
+                                        <span class="btn btn-info {{ ($exam->is_valid) ? ($exam->is_public) ? 'bg-success' : 'bg-warning' : 'bg-danger' }}"
+                                              title="{{ ($exam->is_valid) ? ($exam->is_public) ? 'Published' : 'Not Published' : 'Not Valid' }}">
+                                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td><div class="tbltxt">{{ $exam->id }}</div></td>
+                                <td><div class="tbltxt">{{ $exam->name }}</div></td>
+                                <td><div class="tbltxt">{{ $exam->created_at->format('d-m-Y') }}</div></td>
+                                <td><div class="tbltxt">{{ $exam->user_count() }}</div></td>
+                                <td>
+                                    <form method="POST" action="/exam/{{ $exam->id }}/destroy" accept-charset="UTF-8">
+                                        {{ csrf_field() }}
+                                        <div class="btn-group btn-group-sm float-right" role="group">
+                                            <a href="/exam/{{ $exam->id }}/show" class="btn btn-info bg-light ml-a" title="Show Exam">
+                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="/exam/{{ $exam->id }}/edit" class="btn btn-primary ml-a" title="Edit Exam">
+                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="/exam/{{ $exam->id }}/scene" class="btn btn-secondary ml-a" title="Manage Scenes">
+                                                <i class="fa fa-bars" aria-hidden="true"></i>
+                                            </a>
+                                            <button name="delete" type="submit" class="btn btn-danger ml-a" title="Delete Exam" onclick="return confirm(&quot;Are you sure you want to delete this exam?&quot;)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

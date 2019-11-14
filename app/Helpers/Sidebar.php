@@ -21,9 +21,9 @@ class Sidebar
 
     /**
      * Called from HomeController@index
-     * todo: limit ?
      */
     public function sbarHomeIndex() {
+        //- get all, for this use visible, exams:
         $exams = Exam::select(['id', 'name', 'head'])
             ->whereNull('deleted_at')
             ->where(function($q) {
@@ -34,7 +34,7 @@ class Sidebar
             ->orderBy('created_at')
             ->limit(3)
             ->get();
-
+        //- fill the sidebar:
         $this->allExams();
         $this->sbarHead("<hr />", $exams->count() > 2 ? 'Top 3 Exams' : 'Available Exams');
         foreach ($exams as $exam) {

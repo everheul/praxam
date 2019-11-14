@@ -14,8 +14,9 @@
                 @include('exam.form')
                 <div class="form-group row">
                     <label for="introid" class="col col-md-2 col-form-label"></label>
-                    <div class="col-md-10 pl-0">
+                    <div class="col-md-10">
                         <button name="save_edit" type="submit" class="btn btn-primary">Create Exam</button>
+                        <a class="btn btn-outline-primary ml-3 px-4" href="/home" role="button">Cancel</a>
                     </div>
                 </div>
             </form>

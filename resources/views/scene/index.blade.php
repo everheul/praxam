@@ -84,6 +84,7 @@
                 <table class="table table-borderless table-hover table-sm">
                     <thead class="appcolor">
                         <tr>
+                            <th></th>
                             <th>Index</th>
                             <th>Head</th>
                             <th>Questions</th>
@@ -94,6 +95,14 @@
                     <tbody>
                       @foreach($scenes as $scene)
                         <tr>
+                            <td>
+                                <div class="btn-group btn-group-sm float-left" role="group">
+                                    <span class="btn btn-info {{ ($scene->is_valid) ? ($scene->is_public) ? 'bg-success' : 'bg-warning' : 'bg-danger' }}"
+                                          title="{{ ($scene->is_valid) ? ($scene->is_public) ? 'Published' : 'Not Published' : 'Not Valid' }}">
+                                        <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                            </td>
                             <td>{{ $scene->id }}</td>
                             <td>{{ $scene->head }}</td>
                             <td>{{ $scene->question_count }}</td>
@@ -102,17 +111,13 @@
                                 <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/destroy" accept-charset="UTF-8">
                                     {{ csrf_field() }}
                                     <div class="btn-group btn-group-sm float-right" role="group">
-                                        <span class="btn btn-info {{ ($scene->is_valid) ? ($scene->is_public) ? 'bg-success' : 'bg-warning' : 'bg-danger' }}"
-                                              title="{{ ($scene->is_valid) ? ($scene->is_public) ? 'Published' : 'Not Published' : 'Not Valid' }}">
-                                            <i class="fa fa-user-circle" aria-hidden="true"></i>
-                                        </span>
-                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info bg-light" title="Show Scene">
+                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info bg-light ml-a" title="Show Scene">
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                         </a>
-                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-primary" title="Edit Scene">
+                                        <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/edit" class="btn btn-primary ml-a" title="Edit Scene">
                                             <i class="fa fa-pencil" aria-hidden="true"></i>
                                         </a>
-                                        <button name="delete" type="submit" class="btn btn-danger" title="Delete Scene" onclick="return confirm(&quot;Click Ok to delete Scene.&quot;)">
+                                        <button name="delete" type="submit" class="btn btn-danger ml-a" title="Delete Scene" onclick="return confirm(&quot;Click Ok to delete Scene.&quot;)">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
