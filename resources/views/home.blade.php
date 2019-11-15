@@ -7,11 +7,7 @@
 @extends('layouts.exam')
 
 @push('style')
-.tbltxt {
-    margin: 0;
-    padding: 0;
-    padding-top: 3px;
-}
+
 @endpush
 
 {{-- background image test

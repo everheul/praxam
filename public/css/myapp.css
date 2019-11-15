@@ -10,6 +10,7 @@ html, body{
 }
 body {
     background: #f8fff6;
+    overflow-y: scroll;
 }
 
 #mainapp {
@@ -43,19 +44,22 @@ body {
 #toprow {
     z-index: 900;
     display: block;
-/*    position: absolute; */
     top: 0;
     left: 0;
     height: 62px;
     width: 100%;
     border-bottom: 1px solid #d9ead4;
 }
+
 #navbarSupportedContent {
     background-color: #d9ead4;
     border-radius: .25rem;
     padding: 4px 8px;
     z-index: 999;
     transition: none;
+    background-image: url('/img/logo.png');
+    background-repeat: no-repeat;
+    background-position: left top;
 }
 #menu-toggler {
     background-color: #D2E0CE;
@@ -283,7 +287,6 @@ body {
 }
 .table {
     border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 5px;
 }
 
 /*---- home ----*/
@@ -405,6 +408,14 @@ option {
     margin-left: 2px !important;
 }
 
+/* table text, to vert. center text with buttons on the same row */
+.tbltxt {
+    margin: 0;
+    padding: 0;
+    padding-top: 3px;
+}
 
-
+.pagination {
+    margin-bottom: 0;
+}
 

@@ -1,12 +1,9 @@
-{{-- components / toprow
-    named slots:
+{{--
+    components.toprow
     arguments: $align (left,=right)
 --}}
 <div id="toprow" class="navbar navbar-expand-md navbar-light bg-faded appcolor">
     <div  class="container">
-        <a class="navbar-brand" href="{{ url('/') }}">
-            {{ config('app.name') }}
-        </a>
         {{-- the (invisible) hamburger --}}
         <button id="menu-toggler" class="navbar-toggler navbar-dark collapsed" type="button" data-toggle="collapse"
                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -17,7 +14,7 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             @if ($align == 'left')
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ml-auto">
             @else
                 <ul class="navbar-nav ml-auto">
             @endif

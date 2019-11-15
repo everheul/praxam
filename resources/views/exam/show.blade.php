@@ -1,16 +1,21 @@
-{{-- exam.show
+{{--
+     exam.show
      input: $exam
 --}}
+
 @extends('layouts.exam')
 
 @section('content')
     <div class="container">
-        <div class="row justify-content-center mb-3">
-            <div class="card">
-                <div class="card-header headcolor pb-0 pt-2">
-                    <div class="exam_cardhead text-muted">Scenes Available: <span class="ml-2 text-dark"> {{ $exam->scene_count }}</span></div>
-                    <div class="exam_cardhead text-muted">Created At:  <span class="ml-2 text-dark"> {{ $exam->created_at->format('d-m-Y') }}</span></div>
-                    <div class="exam_cardhead text-muted">Last Change:  <span class="ml-2 text-dark"> {{ $last_change }}</span></div>
+        <div class="row mb-3">
+            <div class="card w-100">
+                <div class="card-header headcolor pb-0 pt-2 pl-1">
+                    <div class="exam_cardhead text-muted">Owner: <span class="ml-2 text-dark"> {{ $exam->owner() }}</span></div>
+                    <div class="exam_cardhead text-muted">Scenes: <span class="ml-2 text-dark"> {{ $exam->scene_count }}</span></div>
+                    <div class="exam_cardhead text-muted">Created:  <span class="ml-2 text-dark"> {{ $exam->created_at->format('d-m-Y') }}</span></div>
+                    <div class="exam_cardhead text-muted">Changed:  <span class="ml-2 text-dark"> {{ $last_change }}</span></div>
+                    <div class="exam_cardhead text-muted">Testers:  <span class="ml-2 text-dark"> todo </span></div>
+                    <div class="exam_cardhead text-muted">Avg. Score:  <span class="ml-2 text-dark"> todo </span></div>
                 </div>
                 <div class="examtext card-body">
                     <img class="card-img-left" src="{{ asset($exam->image) }}" alt="">

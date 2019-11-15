@@ -26,7 +26,6 @@
                             <button name="save_stay" type="submit" class="btn btn-primary">Save &amp; Stay</button>
                             <button name="save_show" type="submit" class="btn btn-primary ml-2">Save &amp; Show</button>
                             <button name="save_next" type="submit" class="btn btn-primary ml-2">Save &amp; Next</button>
-                        {{--    <a class="btn btn-primary ml-2 px-4" href="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/show" role="button">Cancel</a>    --}}
                         </div>
                     </div>
 

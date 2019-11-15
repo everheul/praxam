@@ -128,6 +128,8 @@ class QuestionController extends Controller
             return redirect()->route( 'exam.scene.question.show', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
         } elseif ($request->has('save_stay')) {
             return redirect()->route( 'exam.scene.question.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
+        } elseif ($request->has('save_next')) {
+            return redirect()->route( 'exam.scene.question.next.edit', ['exam_id' => $exam_id, 'scene_id' => $scene_id, 'question_id' => $question->id] );
         } else {
             // ??
         }
@@ -151,14 +153,60 @@ class QuestionController extends Controller
                     ->with('success_message', 'Question was successfully deleted.');
     }
 
-
-    // todo!
-    public function nextQuestion() {
-
+    /**
+     * @param $exam_id
+     * @param $scene_id
+     * @param $question_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function nextQuestion($exam_id, $scene_id, $question_id) {
+        $nextId = $this->getNextQuestion($exam_id, $scene_id, $question_id);
+        if (empty($nextId)) {
+            return redirect("/exam/$exam_id/scene/$scene_id/edit");
+        } else {
+            return redirect("/exam/$exam_id/scene/$scene_id/question/$nextId");
+        }
     }
 
-    public function editNextQuestion() {
+    /**
+     * @param $exam_id
+     * @param $scene_id
+     * @param $question_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function editNextQuestion($exam_id, $scene_id, $question_id) {
+        $nextId = $this->getNextQuestion($exam_id, $scene_id, $question_id);
+        if (empty($nextId)) {
+            return redirect("/exam/$exam_id/scene/$scene_id/edit");
+        } else {
+            return redirect("/exam/$exam_id/scene/$scene_id/question/$nextId/edit");
+        }
+    }
 
+    /**
+     *  select q2.id from questions q2
+        join questions q1 on (q1.scene_id = q2.scene_id AND q2.order > q1.order)
+        where q1.id = {$question_id}
+        order by q2.order limit 1
+     *
+     * @param $exam_id
+     * @param $scene_id
+     * @param $question_id
+     * @return int | null
+     */
+    private function getNextQuestion($exam_id, $scene_id, $question_id) {
+        //DB::enableQueryLog();
+        $id = DB::table('questions as q2')
+            ->join('questions as q1', function ($q) {
+                $q->on('q1.scene_id', '=', 'q2.scene_id')
+                    ->on('q2.order', '>', 'q1.order');
+            })
+            ->where('q1.id','=',$question_id)
+            ->orderBy('q2.order')
+            ->limit(1)
+            ->value('q2.id');
+        ///dd($id, DB::getQueryLog());
+        return $id;
     }
 
 

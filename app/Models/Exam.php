@@ -65,6 +65,18 @@ class Exam extends Model
         return (($user->isAdmin()) || ($user->id === $this->created_by));
     }
 
+    /**
+     * Return the name of the owner
+     * @return string
+     */
+    public function owner() {
+        $user = User::find($this->created_by);
+        if (!empty($user)) {
+            return $user->email;
+        }
+        return '';
+    }
+
     /** todo: obsolete?
      * 
      * @param int $userwantsto
