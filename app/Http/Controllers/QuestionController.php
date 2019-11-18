@@ -23,8 +23,9 @@ class QuestionController extends Controller
      *  and register the middleware needed.
      */
 	public function __construct() {
-	    $this->middleware('auth'); // ?
-            $this->middleware('exam_owner');
+	    $this->middleware('auth');
+	    $this->middleware('check_exam_route');
+        $this->middleware('exam_owner');
 	}
 
     /**
@@ -217,7 +218,7 @@ class QuestionController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function answers($exam_id, $scene_id, $question_id) {
-        $question = Question::where('id',$question_id)->with('scene','scene.exam','answers')->firstOrFail();
+        $question = Question::where('id',$question_id)->with('scene','scene.exam','answers','questionType')->firstOrFail();
         $sidebar = (new Sidebar())->sbarQuestionAnswers($question);
         $correct = $question->answers->filter( function($answer, $key) {
             return $answer->is_correct;

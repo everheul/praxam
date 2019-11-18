@@ -25,19 +25,13 @@ class ExamOwner
                     Log::critical("Middleware\\ExamOwner: No 'exam_id' in route! user_id: " . $request->user()->id . ", request: " . var_export($request->all(),true));
                     abort(400, "Exam id not given.");
                 }
-                if ($request->has('exam_id') && ($request->get('exam_id') != $exam_id)) {
-                    Log::critical("Middleware\\ExamOwner: Altered request - 'exam_id' in route does not match form input! user_id: " . $request->user()->id .
-                        ", route: " . $request->route()->uri() .
-                        ", request: " . var_export($request->all(),true));
-                    abort(400, 'Unexpected form contents.');
-                }
                 if (!Exam::where('id', '=', $exam_id)
                             ->where('created_by', '=', $request->user()->id)
                             ->exists()) {
                     Log::critical("Middleware\\ExamOwner: User tried access to others exam! user_id: " . $request->user()->id .
                         ", route: " . $request->route()->uri() .
                         ", request: " . var_export($request->all(),true));
-                    abort(400, 'Unexpected request and/or parameters, incorrect behaviour.');
+                    abort(400, 'Unexpected request, incorrect behaviour.');
                 }
             }
         }

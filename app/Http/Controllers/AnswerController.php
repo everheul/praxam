@@ -12,6 +12,7 @@ class AnswerController extends Controller
 {
     public function __construct() {
         $this->middleware('auth');
+        $this->middleware('check_exam_route');
         $this->middleware('exam_owner');
     }
 
@@ -21,9 +22,6 @@ class AnswerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(NewAnswerRequest $request, $exam_id, $scene_id, $question_id) {
-        
-        // todo: check id's & user
-        
         //- create the answers:
         $atxt = preg_split('/\r\n|\n|\r/',$request->get('answertxt'));
         $order = 1;

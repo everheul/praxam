@@ -110,7 +110,8 @@
                                     <td><div class="tbltxt">{{ empty($scene->text) ? '' : substr(strip_tags($scene->text),0,70) . '...' }}</div></td>
                                     <td>
                                         <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/destroy" accept-charset="UTF-8">
-                                            {{ csrf_field() }}
+                                            @method('delete')
+                                            @csrf
                                             <div class="btn-group btn-group-sm float-right" role="group">
                                                 <a href="/exam/{{ $exam->id }}/scene/{{ $scene->id }}/show" class="btn btn-info bg-light ml-a" title="Show Scene">
                                                     <i class="fa fa-eye" aria-hidden="true"></i>

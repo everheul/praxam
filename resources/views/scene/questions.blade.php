@@ -19,7 +19,8 @@
                         </div>
                         <div class="col-4 pr-1">
                             <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/{{ $question->id }}/destroy" accept-charset="UTF-8">
-                                {{ csrf_field() }}
+                                @method('delete')
+                                @csrf
                                 <div class="btn-group btn-group-sm float-right" role="group">
                                     <a href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/{{ $question->id }}/show" class="btn btn-info" title="Show Question">
                                         <i class="fa fa-eye" aria-hidden="true"></i>

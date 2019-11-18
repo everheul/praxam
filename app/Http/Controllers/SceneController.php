@@ -28,6 +28,7 @@ class SceneController extends Controller
     public function __construct() {
         $this->middleware('auth');
         $this->middleware('args2session')->only('index');
+        $this->middleware('check_exam_route');
         $this->middleware('exam_owner')->only('edit','update','destroy','order');
     }
 

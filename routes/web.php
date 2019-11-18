@@ -35,14 +35,13 @@ Route::get('/prax', 'HomeController@index');
 Route::prefix('/prax/{exam_id}')->group(function () {
 	//- note: these two use the exam id, no user-exam yet!
 	Route::get('/create','UserExamController@create');
-	Route::post('/store','UserExamController@store');
+	Route::post('/store','UserExamController@store');	// newpraxrequest
 });
 
 Route::prefix('/prax/{prax_id}')->group(function () {
 	Route::get('/','UserExamController@show');
-	Route::delete('/','UserExamController@destroy');
 	Route::get('/show','UserExamController@show');
-	Route::get('/destroy','UserExamController@destroy');
+	Route::delete('/destroy','UserExamController@destroy');
 	Route::get('/next','UserQuestionController@nextQuestion'); //'UserExamController@nextScene');
 	//- all prax/scene actions
 	Route::get('/scene', 'UserSceneController@index');
@@ -55,7 +54,7 @@ Route::prefix('/prax/{prax_id}')->group(function () {
 });
 
 //- all user answers go to:
-Route::post('/answer','UserQuestionController@userAnswer');
+Route::post('/answer','UserQuestionController@userAnswer');	// answerrequest
 
 
 //--- authorized ADMINS and EXAM OWNERS
@@ -71,13 +70,13 @@ Route::post('/answer','UserQuestionController@userAnswer');
 //- all exam actions
 Route::get('/exam', 'ExamController@index')->name('exam.index');
 Route::get('/exam/create','ExamController@create')->name('exam.create');
-Route::post('/exam/store','ExamController@store')->name('exam.store');
+Route::post('/exam/store','ExamController@store')->name('exam.store');	// newexamrequest
 Route::prefix('/exam/{exam_id}')->group(function () {
 	Route::get('/','ExamController@show');
 	Route::get('/show','ExamController@show')->name('exam.show');
 	Route::get('/edit','ExamController@edit')->name('exam.edit');
-	Route::post('/update','ExamController@update')->name('exam.update');
-	Route::post('/destroy','ExamController@destroy')->name('exam.destroy');
+	Route::post('/update','ExamController@update')->name('exam.update');	// NewExamRequest
+	Route::delete('/destroy','ExamController@destroy')->name('exam.destroy');	// NewExamRequest
 	//- all exam/scene actions
 	Route::get('/scene', 'SceneController@index')->name('exam.scene.index');
 	Route::get('/scene/create','SceneController@create')->name('exam.scene.create');
@@ -87,7 +86,7 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 		Route::get('/show','SceneController@show')->name('exam.scene.show');
 		Route::get('/edit','SceneController@edit')->name('exam.scene.edit');
 		Route::post('/update','SceneController@update')->name('exam.scene.update');
-		Route::post('/destroy','SceneController@destroy')->name('exam.scene.destroy');
+		Route::delete('/destroy','SceneController@destroy')->name('exam.scene.destroy');
 		Route::post('/order','SceneController@order')->name('exam.scene.order');
 		Route::get('/next','SceneController@nextScene')->name('exam.scene.next');
 		Route::get('/next/edit','SceneController@editNextScene')->name('exam.scene.next.edit');
@@ -101,7 +100,7 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 				Route::get('/show','QuestionController@show')->name('exam.scene.question.show');
 				Route::get('/edit','QuestionController@edit')->name('exam.scene.question.edit');
 				Route::post('/update','QuestionController@update')->name('exam.scene.question.update');
-				Route::post('/destroy','QuestionController@destroy')->name('exam.scene.question.destroy');
+				Route::delete('/destroy','QuestionController@destroy')->name('exam.scene.question.destroy');
 				Route::get('/answers','QuestionController@answers')->name('exam.scene.question.answers');
 				Route::post('/order','QuestionController@order')->name('exam.scene.question.order');
 				Route::get('/next','QuestionController@nextQuestion')->name('exam.scene.question.next');
@@ -109,7 +108,7 @@ Route::prefix('/exam/{exam_id}')->group(function () {
 				//- answers
 				Route::prefix('/answer')->group(function () {
 					Route::post('/store','AnswerController@store')->name('exam.scene.question.answer.store');
-					Route::post('/{answer_id}/destroy','AnswerController@destroy')->name('exam.scene.question.answer.destroy');
+					Route::delete('/{answer_id}/destroy','AnswerController@destroy')->name('exam.scene.question.answer.destroy');
 				});
 			});
 		});

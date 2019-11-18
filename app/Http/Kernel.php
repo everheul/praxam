@@ -63,6 +63,7 @@ class Kernel extends HttpKernel
         'args2session' => \App\Http\Middleware\ArgsToSession::class,
         'exam_owner' => \App\Http\Middleware\ExamOwner::class,
         'userexam_owner' => \App\Http\Middleware\UserExamOwner::class,
+        'check_exam_route' => \App\Http\Middleware\CheckExamRoute::class,
     ];
 
     /**

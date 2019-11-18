@@ -35,8 +35,10 @@
                                             <span name="a_label" class="text-secondary">Answer {{ $answer->order }}: </span> <span name="a_text">{{ $answer->text }}</span>
                                         </div>
                                         <div class="col-4">
-                                            <form method="POST" action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/{{ $answer->id }}/destroy" accept-charset="UTF-8">
-                                                {{ csrf_field() }}
+                                            <form method="POST" accept-charset="UTF-8"
+                                                    action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/{{ $answer->id }}/destroy">
+                                                @method('delete')
+                                                @csrf
                                                 <div class="btn-group btn-group-sm float-right" role="group">
                                                     <button name="delete" type="submit" class="btn btn-danger delete_answer" title="Delete Answer">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -54,7 +56,7 @@
                     <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header p-2 text-center">
-                                <h5 class="mb-0 mt-1">Correct Answer(s)</h5>
+                                <h5 class="mb-0 mt-1">{{ $question->questionType->name }}</h5>
                             </div>
                             <div id="correct_answers" class="card-body p-1">
                 {{-- correct answers in correct order --}}

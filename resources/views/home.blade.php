@@ -59,7 +59,8 @@
                                 <td><div class="tbltxt">{{ date('d-m-Y', strtotime($prax->created_at)) }}</div></td>
                                 <td>
                                     <form method="POST" action="/prax/{{ $prax->id }}/destroy" accept-charset="UTF-8">
-                                        {{ csrf_field() }}
+                                        @method('delete')
+                                        @csrf
                                         <div class="btn-group btn-group-sm float-right" role="group">
                                             <a href="/prax/{{ $prax->id }}/next" class="btn btn-info bg-light" title="Continue Test">
                                                 <i class="fa fa-play-circle" aria-hidden="true"></i>
@@ -99,7 +100,8 @@
                                 <td><div class="tbltxt">{{ $prax->created_at->diffInHours($prax->finished_at) . ':' . $prax->created_at->diff($prax->finished_at)->format('%I:%S') }}</div></td>
                                 <td>
                                     <form method="POST" action="/prax/{{ $prax->id }}/destroy" accept-charset="UTF-8">
-                                        {{ csrf_field() }}
+                                        @method('delete')
+                                        @csrf
                                         <div class="btn-group btn-group-sm float-right" role="group">
                                             <a href="/prax/{{ $prax->id }}/next" class="btn btn-info bg-light" title="Review Test">
                                                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -150,7 +152,8 @@
                                 <td><div class="tbltxt">{{ $exam->user_count() }}</div></td>
                                 <td>
                                     <form method="POST" action="/exam/{{ $exam->id }}/destroy" accept-charset="UTF-8">
-                                        {{ csrf_field() }}
+                                        @method('delete')
+                                        @csrf
                                         <div class="btn-group btn-group-sm float-right" role="group">
                                             <a href="/exam/{{ $exam->id }}/show" class="btn btn-info bg-light ml-a" title="Show Exam">
                                                 <i class="fa fa-eye" aria-hidden="true"></i>
