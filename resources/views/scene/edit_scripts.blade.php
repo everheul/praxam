@@ -24,14 +24,6 @@
             }
         });
 
-        /*- copy the image name from invisible type=file input to visible text input
-        $('#upload_image').on('change',function () {
-            $.each( $(this).prop("files"), function(k,v){
-                $('#show_image').val( v['name'] );
-            });
-        });
-        */
-
         // show selected image name (bootstrap style):
         $('.custom-file-input').on('change', function() {
             let fileName = $(this).val().split('\\').pop();

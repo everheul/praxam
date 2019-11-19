@@ -70,9 +70,9 @@ class Exam extends Model
      * @return string
      */
     public function owner() {
-        $user = User::find($this->created_by);
-        if (!empty($user)) {
-            return $user->email;
+        $owner = User::find($this->created_by);
+        if (!empty($owner)) {
+            return $owner->name;
         }
         return '';
     }
