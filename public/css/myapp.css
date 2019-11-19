@@ -49,17 +49,22 @@ body {
     height: 62px;
     width: 100%;
     border-bottom: 1px solid #d9ead4;
+    background-image: url('/img/logo.png');
+    background-repeat: no-repeat;
+    background-position: 20px 10px;
 }
 
 #navbarSupportedContent {
-    background-color: #d9ead4;
+    background-image: linear-gradient(to right, rgba(217, 234, 212, 0), rgba(217, 234, 212, 1)); 
+/*    background-color: #d9ead4; */
     border-radius: .25rem;
     padding: 4px 8px;
     z-index: 999;
     transition: none;
-    background-image: url('/img/logo.png');
-    background-repeat: no-repeat;
-    background-position: left top;
+}
+#navbarSupportedContent.navbar-collapse.collapse.show {
+    background-image: none;
+    background-color: #d9ead4;
 }
 #menu-toggler {
     background-color: #D2E0CE;

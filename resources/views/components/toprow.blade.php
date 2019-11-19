@@ -1,23 +1,12 @@
 {{--
     components.toprow
-    arguments: $align (left,=right)
+    arguments: 
 --}}
-<div id="toprow" class="navbar navbar-expand-md navbar-light bg-faded appcolor">
-    <div  class="container">
-        {{-- the (invisible) hamburger --}}
-        <button id="menu-toggler" class="navbar-toggler navbar-dark collapsed" type="button" data-toggle="collapse"
-                data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-            <span class="navbar-toggler-icon cross"></span>
-            <span class="navbar-toggler-icon hamburger"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            @if ($align == 'left')
-                <ul class="navbar-nav ml-auto">
-            @else
-                <ul class="navbar-nav ml-auto">
-            @endif
+<div id="toprow" class="navbar navbar-expand navbar-light bg-faded appcolor">
+    <div  class="container-fluid pr-3">
+        <div class="collapse navbar-collapse pr-5" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto mr-5">
                 @guest
                 {{-- Authentication Links --}}
                 <li class="nav-item">
@@ -51,3 +40,4 @@
         </div>
     </div>
 </div>
+
