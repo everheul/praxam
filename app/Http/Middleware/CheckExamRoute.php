@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\Scene;
 use App\Models\Question;
 use App\Models\Answer;
+use Log;
 
 class CheckExamRoute
 {
