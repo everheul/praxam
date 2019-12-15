@@ -18,7 +18,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//- auth settings
+Auth::routes([
+	'register' => true,
+	'verify' => false,	// use middleware('verified') if true
+	'reset' => true,
+]);
+
 
 //--- authorized USERS only
 
