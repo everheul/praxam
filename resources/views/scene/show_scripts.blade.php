@@ -60,24 +60,7 @@
             return false;
         }
     }
-/*
-    function selectAccordionNext() {
-        var busy = true;
-        if (sc.type == 2) {
-            var active = $('#accordion').accordion('option', 'active');
-            $.each(ql, function(index, obj){
-                // todo: activate the next unanswered question
-                if ((busy) && (index > active)) {
-                    if ($("#done_" + obj.id).prop('disabled') != true) {
-                        $("#accordion").accordion({ active: index}); // "option", 'active', index);
-                        busy = false;
-                    }
-                }
-            });
-        }
-        return busy;
-    }
-*/
+
     function isAnswered(qid, qtype) {
         var ret = false;
         if (qtype == 1) {

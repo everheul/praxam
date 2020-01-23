@@ -1,9 +1,6 @@
 {{-- scene.type1.edit
      Edit a scene of type 1, its question and answers.
      input: $scene (with: exam, questions, answers), $sidebar
-
-                            <a class="btn btn-danger" href="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/destroy" role="button" onclick="return confirm(&quot;Click OK to delete this Scene. Warning: this cannot be undone!&quot;)">Delete</a>
-     todo: add/delete/edit question options
 --}}
 
 @extends('layouts.exam')
@@ -40,4 +37,4 @@
     </div>
 @endsection
 
-@include('scene.edit_scripts')
+@include('exam.edit_scripts')

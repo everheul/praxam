@@ -323,6 +323,9 @@ option {
 .pagination ul {
     magin-bottom: 0;
 }
+.drag {
+    cursor: move;
+}
 /*
 -- klapraampjes
 

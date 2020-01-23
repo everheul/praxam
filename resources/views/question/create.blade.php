@@ -33,4 +33,4 @@
     </div>
 @endsection
 
-@include('scene.edit_scripts')
+@include('exam.edit_scripts')

@@ -33,13 +33,13 @@
 @endsection
 
 @push('scripts')
-    <script>
-    // activate sidebar click
-    $(document).ready(function () {
-        $('.sidebar-arrow').on('click', function () {
-            $('#sidebar').toggleClass('active');
-            $('#content').toggleClass('active');
-        });
+<script>
+// activate sidebar click
+$(document).ready(function () {
+    $('.sidebar-arrow').on('click', function () {
+        $('#sidebar').toggleClass('active');
+        $('#content').toggleClass('active');
     });
-    </script>
+});
+</script>
 @endpush

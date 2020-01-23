@@ -46,7 +46,7 @@ class Sidebar
     }
 
     public function sbarNoExam() {
-        //$this->myPracxam();
+        //$this->myPraxam();
         $this->allExams();
         return $this->blocks;
     }
@@ -61,7 +61,7 @@ class Sidebar
      * @return array
      */
     public function sbarExamIndex() {
-        $this->myPracxam();
+        $this->myPraxam();
         return $this->blocks;
     }
 
@@ -71,7 +71,7 @@ class Sidebar
      * @return array
      */
     public function sbarExamShow(Exam $exam) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->examLogo($exam);
         $id = $exam->id;
@@ -94,7 +94,7 @@ class Sidebar
      * @return array
      */
     public function sbarExamCreate() {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         return $this->blocks;
     }
@@ -108,7 +108,7 @@ class Sidebar
      */
     public function sbarExamEdit($exam) {
         $id = $exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->examLogo($exam);
         $this->sbarButton('Show Exam',"/exam/$id/show",'dark');
@@ -127,7 +127,7 @@ class Sidebar
      * @return array
      */
     public function sbarSceneIndex($exam) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->examLogo($exam);
         $id = $exam->id;
@@ -148,7 +148,7 @@ class Sidebar
      * @return array
      */
     public function sbarSceneShow($scene) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($scene->exam->name, $scene->exam->head);
         $this->sbarButton('Show Exam',"/exam/$scene->exam_id/show",'dark');
@@ -163,7 +163,7 @@ class Sidebar
     }
 
     public function sbarSceneCreate($exam) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($exam->name, $exam->head);
         $this->sbarButton('Show Exam',"/exam/$exam->id/show",'dark');
@@ -181,7 +181,7 @@ class Sidebar
      */
     public function sbarSceneEdit($scene) {
         $exam_id = $scene->exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         //$scene->loadMissing('exam');
         $this->sbarBlock($scene->exam->name, $scene->exam->head);
@@ -208,7 +208,7 @@ class Sidebar
     public function sbarQuestionShow(Question $question) {
         $scene = $question->scene;
         $exam_id = $question->scene->exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($question->scene->exam->name, $question->scene->exam->head);
         $this->sbarButton('Show Exam',"/exam/$exam_id/show",'dark');
@@ -224,7 +224,7 @@ class Sidebar
 
     public function sbarQuestionCreate(Scene $scene) {
         $exam_id = $scene->exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($scene->exam->name, $scene->exam->head);
         $this->sbarButton('Show Exam',"/exam/$exam_id/show",'dark');
@@ -239,7 +239,7 @@ class Sidebar
     public function sbarQuestionEdit(Question $question ) {
         $scene = $question->scene;
         $exam_id = $scene->exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($scene->exam->name, $scene->exam->head);
         $this->sbarButton('Show Exam',"/exam/$exam_id/show",'dark');
@@ -259,7 +259,7 @@ class Sidebar
 
     public function sbarQuestionAnswers(Question $question) {
         $exam_id = $question->scene->exam->id;
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->sbarBlock($question->scene->exam->name, $question->scene->exam->head);
         $this->sbarButton('Show Exam',"/exam/$exam_id/show",'dark');
@@ -303,7 +303,7 @@ class Sidebar
      * @return  array
      */
     public function sbarPraxExam(PraxExam $praxexam, $order) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->examLogo($praxexam->exam);
         $this->userSceneList($praxexam, $order);
@@ -324,7 +324,7 @@ class Sidebar
      * @return array
      */
     public function sbarPraxResult(PraxExam $praxexam) {
-        $this->myPracxam();
+        $this->myPraxam();
         $this->allExams();
         $this->examLogo($praxexam->exam);
         $this->userSceneList($praxexam, 0);
@@ -349,8 +349,8 @@ class Sidebar
         }
     }
 
-    private function myPracxam() {
-        $this->sbarLink('My Pracxam','Dashboard',"/home",'secondary');
+    private function myPraxam() {
+        $this->sbarLink('My Praxam','Dashboard',"/home",'secondary');
     }
 
     private function allExams() {

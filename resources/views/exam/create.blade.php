@@ -25,17 +25,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script src="{{ asset('vendor/unisharp/laravel-ckeditor/ckeditor.js') }}" type="application/javascript"></script>
-<script>
-    $(function() {
-        CKEDITOR.replace( 'textid' );
-        // display bootstrap tooltips:
-        $('.btooltip').tooltip({ container: 'body', delay: { "show": 400, "hide": 100 } });
-        $('.custom-file-input').on('change', function() {
-            let fileName = $(this).val().split('\\').pop();
-            $(this).next('.custom-file-label').addClass("selected").html(fileName);
-        });
-    });
-</script>
-@endpush
+@include('exam.edit_scripts')

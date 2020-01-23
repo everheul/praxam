@@ -54,3 +54,4 @@
         @error('scene_type_id') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>
+

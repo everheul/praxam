@@ -32,7 +32,7 @@
 
             <div class="card w-100 home headcolor">
                 <div class="card-body p-1">
-                    <h2 class="m-0">My Pracxam</h2>
+                    <h2 class="m-0">My Praxam</h2>
                     <h4 class="m-0 text-secondary">Your Dashboard</h4>
                 </div>
             </div>

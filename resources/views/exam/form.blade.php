@@ -95,7 +95,7 @@
         Description
     </label>
     <div class="col-lg-10">
-        <textarea name="text" class="form-control" id="textid" placeholder="Description">{{ old('text', optional($exam)->text) }}</textarea>
+        <textarea name="text" class="ckeditor form-control" id="textid" placeholder="Description">{{ old('text', optional($exam)->text) }}</textarea>
         @error('text') <div class="form-text text-danger m-0">{{ $message }}</div> @enderror
     </div>
 </div>

@@ -12,7 +12,7 @@
 @section('content')
     <div class="container content">
         <div class="title m-b-md">
-            Pracxam
+            Praxam
         </div>
         <div class="links">
             <a href="/exam">Our Practice Exams</a>
