@@ -10,7 +10,7 @@ use App\Classes\PraxAnswer;
 
 class PraxScene
 {
-    public $parent = NULL;      //-> PraxExam
+    public $parent = null;      //-> PraxExam
     public $userscene = null;   //-> UserScene
     public $scene = null;       //-> Scene
     public $praxquestions;      //-= PraxQuestion Collection

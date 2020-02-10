@@ -29,7 +29,7 @@ class Scene extends Model
     /**
      * @var array
      */
-    protected $fillable = ['exam_id', 'scene_type_id', 'chapter', 'head', 'text', 'image', 'instructions', 'is_public'];
+    protected $fillable = ['exam_id', 'scene_type_id', 'order', 'chapter', 'head', 'text', 'image', 'instructions', 'is_public'];
 
     /**
      * The relation with exams
@@ -111,6 +111,8 @@ class Scene extends Model
     }
     
     /**
+     * todo: split code to types
+     *
      *  set the question_count and is_valid values,
      *  and return the error string for 'Publish Scene'
      *

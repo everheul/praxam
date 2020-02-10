@@ -1,5 +1,5 @@
 {{--
-    components.toprow
+    layouts.toprow
     arguments: 
 --}}
 

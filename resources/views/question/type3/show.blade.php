@@ -1,5 +1,5 @@
 {{-- question.type3.show
-     Show a question of type 3 with its (dragable) answers.
+     Show a question of type 3 with its (draggable) answers.
      input: $praxquestion, $praxscene
 --}}
 <question id="{{ $praxquestion->question->id }}">
@@ -20,7 +20,7 @@
                     <div id="choices_{{ $praxquestion->question->id }}{{ $praxquestion->locked ? '_disabled' : '' }}" class="sortable mr-0 mr-sm-1 mr-lg-2 mr-xl-3">
                         @foreach ($praxquestion->praxanswers as $praxanswer)
                             @if(!$praxanswer->checked)
-                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
+                                <div class="draggable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
                                     {{ $praxanswer->orderStr() }}{{ $praxanswer->answer->text }}
                                 </div>
                             @endif
@@ -32,7 +32,7 @@
                     <div id="answers_{{ $praxquestion->question->id }}{{ $praxquestion->locked ? '_disabled' : '' }}" class="sortable ml-0 ml-sm-1 ml-lg-2 ml-xl-3">
                         @foreach ($praxquestion->praxanswers as $praxanswer)
                             @if($praxanswer->checked)
-                                <div class="dragable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
+                                <div class="draggable nots card px-3 py-1 m-2 {{ $praxanswer->coolnessStr() }}" value="{{ $praxanswer->answer->id }}">
                                     {{ $praxanswer->orderStr() }}{{ $praxanswer->answer->text }}
                                 </div>
                             @endif

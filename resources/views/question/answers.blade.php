@@ -1,4 +1,4 @@
-{{-- ANSWERS -- SORTABLE LIST
+{{-- MANAGE ANSWERS -- SORTABLE LIST
      input: $question
 --}}
 @extends('layouts.exam')
@@ -8,7 +8,12 @@
         <div class="row mb-3">
             <div class="card w-100 p-3 appcolor">
                 <h3>Manage Answers</h3>
-                <h4>Question {{ $question->order }} of {{ $question->scene->question_count }} </h4>
+                <h4>
+                    Scene: {{ $question->scene->head }}
+                    @if($question->scene->question_count > 1)
+                        , Question {{ $question->order }} of {{ $question->scene->question_count }}
+                    @endif
+                </h4>
                 <div class="card m-1 mt-3 px-3 py-1 border-dark"><h3>{{ $question->head }}</h3>{!! $question->text !!}</div>
                 <hr />
 
@@ -21,7 +26,7 @@
                         </button>
                         Answers
                     </label>
-                    <div class="col-lg-5">
+                    <div class="col-lg-5 mt-1">
                         <div class="card">
                             <div class="card-header p-2 text-center">
                                 <h5 class="mb-0 mt-1">All Answers</h5>
@@ -29,14 +34,13 @@
                             <div id="all_answers" class="card-body p-1">
                 {{-- all answers in std order --}}
                             @foreach($question->answers as $answer)
-                                <div class="dragable nots card px-3 py-1 m-2 bg-light" id="answer_{{$answer->id}}">
+                                <div class="draggable nots card px-3 py-1 m-2 bg-light" id="answer_{{$answer->id}}">
                                     <div class="row p-1">
-                                        <div class="col-8 text-left pt-1">
-                                            <span name="a_label" class="text-secondary">Answer {{ $answer->order }}: </span> <span name="a_text">{{ $answer->text }}</span>
+                                        <div class="col-10 text-left pt-1 px-1">
+                                            <span name="a_label" class="text-secondary mr-1">Option {{ $answer->order }}: </span> <span name="a_text" class="text-dark"><b>{{ $answer->text }}</b></span>
                                         </div>
-                                        <div class="col-4">
-                                            <form method="POST" accept-charset="UTF-8"
-                                                    action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/{{ $answer->id }}/destroy">
+                                        <div class="col-2 text-right pr-1">
+                                            <form method="POST" accept-charset="UTF-8" action="/exam/{{ $question->scene->exam_id }}/scene/{{ $question->scene->id }}/question/{{ $question->id }}/answer/{{ $answer->id }}/destroy">
                                                 @method('delete')
                                                 @csrf
                                                 <div class="btn-group btn-group-sm float-right" role="group">
@@ -53,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-lg-5 mt-1">
                         <div class="card">
                             <div class="card-header p-2 text-center">
                                 <h5 class="mb-0 mt-1">{{ $question->questionType->name }}</h5>
@@ -61,12 +65,12 @@
                             <div id="correct_answers" class="card-body p-1">
                 {{-- correct answers in correct order --}}
                             @foreach($correct as $answer)
-                                <div class="dragable nots card px-3 py-1 m-2 bg-light" id="copy_answer_{{$answer->id}}">
+                                <div class="draggable nots card px-3 py-1 m-2 bg-light" id="copy_answer_{{$answer->id}}">
                                     <div class="row p-1">
-                                        <div class="col-8 text-left pt-1">
-                                            <span name="a_label" class="text-secondary">Correct {{ $answer->correct_order }}: </span> <span name="a_text">{{ $answer->text }}</span>
+                                        <div class="col-10 text-left pt-1 px-1">
+                                            <span name="a_label" class="text-secondary mr-1">Correct {{ $answer->correct_order }}: </span> <span name="a_text" class="text-dark"><b>{{ $answer->text }}</b></span>
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-2 text-right pr-1">
                                             <div class="btn-group btn-group-sm float-right" role="group">
                                                 <button name="delete" type="submit" dragger="copy_answer_{{$answer->id}}" class="btn btn-danger remove_answer" title="Delete Answer">
                                                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -120,49 +124,6 @@
 @push('scripts')
 <script>
     var sortable_height;
-    
-    $(function() {
-        // activate sortable on question list
-        $('#all_answers').sortable({
-            cursor: "move",
-            scroll: false,
-            // stops page scolling if scrolled down:
-            create: function () {
-                sortable_height = $(this).height();
-                $(this).height(sortable_height);
-            },
-            connectWith: "#correct_answers",
-            forcePlaceholderSize: false,
-            helper: function (e, li) {
-                copyHelper = li.clone().insertAfter(li);
-                return li.clone();
-            },
-            stop: function () {
-                copyHelper && copyHelper.remove();
-            }
-        });
-        $('#correct_answers').sortable({
-            cursor: "move",
-            scroll: false,
-            create: function () {
-                $(this).height(sortable_height);
-            },
-            receive: function (e, ui) {
-                copyHelper = null;
-                //- change the id:
-                newid = 'copy_' + $(ui.item).attr('id');
-                $(ui.item).attr('id', newid);
-                //- change the label:
-                $(ui.item).find("span[name=a_label]").text("Correct :");
-                //- change click event target and add draggers id:
-                $(ui.item).find("button").unbind('click').on('click', removeAnswer);
-                $(ui.item).find("button").attr('dragger',newid);
-            }
-        });
-        $('.delete_answer').on('click', deleteAnswer);
-        $('.remove_answer').on('click', removeAnswer);
-        $('.btooltip').tooltip({ container: 'body', delay: { "show": 400, "hide": 100 } });
-    });
 
     function deleteAnswer(e) {
         //console.log('deleting:',a);
@@ -180,7 +141,7 @@
     function saveOrder() {
         var myForm = $("#answers_order");
         var order = 1;
-        $("#all_answers .dragable").each(function () {
+        $("#all_answers .draggable").each(function () {
             var dom = document.createElement('input');
             dom.type = 'hidden';
             dom.name = 'answers[' + $(this).attr('id') + ']';
@@ -188,7 +149,7 @@
             myForm.append(dom);
         });
         order = 1;
-        $("#correct_answers .dragable").each(function () {
+        $("#correct_answers .draggable").each(function () {
             var dom = document.createElement('input');
             dom.type = 'hidden';
             dom.name = 'correct[' + $(this).attr('id') + ']';
@@ -197,6 +158,54 @@
         });
         return true;
     }
-
 </script>
+@endpush
+
+@push('ready')
+    $('.delete_answer').on('click', deleteAnswer);
+    $('.remove_answer').on('click', removeAnswer);
+    // activate sortable on answer lists
+    $('#all_answers').sortable({
+        cursor: "move",
+        scroll: false,
+        // stops page scolling if scrolled down:
+        create: function () {
+            sortable_height = $(this).height();
+            //$(this).height(sortable_height);
+        },
+        update: function () {
+            sortable_height = $(this).height();
+        },
+        connectWith: "#correct_answers",
+        forcePlaceholderSize: false,
+        helper: function (e, li) {
+            copyHelper = li.clone().insertAfter(li);
+            return li.clone();
+        },
+        stop: function () {
+            copyHelper && copyHelper.remove();
+        }
+    });
+    $('#correct_answers').sortable({
+        cursor: "move",
+        scroll: false,
+        create: function () {
+            $(this).height(sortable_height);
+        },
+        update: function () {
+            $(this).height(sortable_height);
+        },
+        receive: function (e, ui) {
+            copyHelper = null;
+            //- change the id:
+            newid = 'copy_' + $(ui.item).attr('id');
+            $(ui.item).attr('id', newid);
+            //- change the label:
+            $(ui.item).find("span[name=a_label]").text("Correct :");
+            //- change click event target and add draggers id:
+            $(ui.item).find("button").unbind('click').on('click', removeAnswer);
+            $(ui.item).find("button").attr('dragger', newid);
+        }
+    });
+    $('.btooltip').tooltip({ container: 'body', delay: { "show": 400, "hide": 100 } });
 @endpush

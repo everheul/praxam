@@ -12,9 +12,8 @@
 @section('body')
     <div id="mainapp">
 
-        <!-- Top Row -->
-        @component('components.toprow',['align'=>'left'])
-        @endcomponent
+        <!-- toprow -->
+        @include('layouts.toprow')
 
          <!-- Page Content -->
         <div id="content">

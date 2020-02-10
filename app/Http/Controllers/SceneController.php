@@ -1,9 +1,6 @@
 <?php
 
 /*  SceneController
- *
- * todo:
- * update exams e set e.scene_count = (select count(*) from scenes where exam_id = e.id and deleted_at is null)
  */
 
 namespace App\Http\Controllers;
@@ -25,11 +22,12 @@ use File;
 
 class SceneController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth');
         $this->middleware('args2session')->only('index');
         $this->middleware('check_exam_route');
-        $this->middleware('exam_owner')->only('edit','update','destroy','order');
+        $this->middleware('exam_owner')->only('edit', 'update', 'destroy', 'order');
     }
 
     /**
@@ -37,27 +35,27 @@ class SceneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $exam_id) {
+    public function index(Request $request, $exam_id)
+    {
         $args = $this->getIndexArgs($request);
         $args['exam'] = Exam::findOrFail($exam_id);
+        $sql_filter = Helper::likeFilter($args['filter']);
 
-        /* note: the whereRaw below is a workaround, for this grouped 'where' does not seem to work with paginate:
-              ->where( function($q) use($lf) {
+        /* note: whereRaw() below is a workaround, for this grouped 'where' does not seem to work with paginate:
+          ->where( function($q) use($lf) {
                 $q->where('head', 'LIKE', "'$lf'")->
                 orWhere('text', 'LIKE', "'$lf'")->
                 orWhere('instructions', 'LIKE', "'$lf'");
-                })
-            DB::enableQueryLog();
-            dd(DB::getQueryLog());
+            })
         */
 
-        $sqlfilter = Helper::likeFilter($args['filter']);
         //DB::enableQueryLog();
         $args['scenes'] = $args['exam']->scenes()
-                ->whereRaw("(`scenes`.`head` LIKE '$sqlfilter' or `scenes`.`text` LIKE '$sqlfilter' or `scenes`.`instructions` LIKE '$sqlfilter')")
-                ->orderBy($args['sortby'], $args['direction'])
-                ->paginate($args['paginate']);
+            ->whereRaw("(`scenes`.`head` LIKE '$sql_filter' or `scenes`.`text` LIKE '$sql_filter' or `scenes`.`instructions` LIKE '$sql_filter')")
+            ->orderBy($args['sortby'], $args['direction'])
+            ->paginate($args['paginate']);
         //dd(DB::getQueryLog());
+
         $args['sidebar'] = (new Sidebar)->sbarSceneIndex($args['exam']);
         return view('scene.index', $args);
     }
@@ -66,36 +64,43 @@ class SceneController extends Controller
      * @param Request $request
      * @return array
      */
-    private function getIndexArgs(Request $request) {
+    private function getIndexArgs(Request $request)
+    {
         //- code for 'args2session'
-        $page_base = str_replace('/','.',$request->path());
-        $this->registerPaginator($request,$page_base);
+        $page_base = str_replace('/', '.', $request->path());
+        $this->registerPaginator($request, $page_base);
         $paginate = $request->session()->get('paginate', 10);
-        $filter = $request->session()->get($page_base.'.filter', "%");
-        $direction = $request->session()->get($page_base.'.direction', 'asc');
-        $sortby = $request->session()->get($page_base.'.sortby', 'id');
-        if (!in_array($sortby,['id','text','question_count','head'])) $sortby = 'id';
-        return compact('paginate','filter','sortby','direction');
+        $filter = $request->session()->get($page_base . '.filter', "%");
+        $direction = $request->session()->get($page_base . '.direction', 'asc');
+        $sortby = $request->session()->get($page_base . '.sortby', 'id');
+        if (!in_array($sortby, ['id', 'text', 'question_count', 'head'])) $sortby = 'id';
+        return compact('paginate', 'filter', 'sortby', 'direction');
     }
 
     /**
-     * Show the scene. Admin mode, action IGNORE.
+     * Preview the scene. Admin mode.
      *
-     * @param  int  $exam_id
-     * @param  int  $scene_id
+     * @param  int $exam_id
+     * @param  int $scene_id
      * @return \Illuminate\Http\Response
      */
-    public function show($exam_id, $scene_id) {
-        $scene = Scene::where('id', '=', $scene_id)->with('exam','sceneType','questions','questions.answers')->firstOrFail();
+    public function show($exam_id, $scene_id)
+    {
+        $scene = Scene::findOrFail($scene_id);
+        return (new SceneMgr($scene))->preview();
+/*
+
+        $scene = Scene::where('id', '=', $scene_id)->with('exam', 'sceneType', 'questions', 'questions.answers')->firstOrFail();
         $scene->setQuestionsOrder(); //- todo
         $praxscene = (new PraxScene())->setAdminSceneData($scene);
-        return View( 'scene.type' . $scene->scene_type_id . '.show',
-            [   'sidebar' => (new Sidebar())->sbarSceneShow($scene),
+        return View('scene.type' . $scene->scene_type_id . '.show',
+            ['sidebar' => (new Sidebar())->sbarSceneShow($scene),
                 'pagehead' => 'Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'praxscene' => $praxscene,
                 'useraction' => 'IGNORE',
                 'exam_id' => $exam_id,
             ]);
+*/
     }
 
     /**
@@ -103,11 +108,12 @@ class SceneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($exam_id) {
+    public function create($exam_id)
+    {
         $exam = Exam::findOrFail($exam_id);
-        $scene_types = SceneType::select('id','name')->pluck('name','id');
-        return View( 'scene.create',
-            [   'sidebar' => (new Sidebar())->sbarSceneCreate($exam),
+        $scene_types = SceneType::select('id', 'name')->pluck('name', 'id');
+        return View('scene.create',
+            ['sidebar' => (new Sidebar())->sbarSceneCreate($exam),
                 'exam_id' => $exam_id,
                 'scene_types' => $scene_types,
                 'scene' => null,
@@ -118,15 +124,16 @@ class SceneController extends Controller
      * POST
      * Store a newly created scene in storage.
      *
-     * @param  NewSceneRequest  $request
+     * @param  NewSceneRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(NewSceneRequest $request, $exam_id) {
+    public function store(NewSceneRequest $request, $exam_id)
+    {
         if ($exam_id != $request->get('exam_id')) {
             //todo: log this.
             abort(400, 'Unexpected form contents.');
         }
-        $scene = Scene::create($request->only('exam_id','head','scene_type_id'));
+        $scene = Scene::create($request->only('exam_id', 'head', 'scene_type_id'));
         //- always go to edit after create, to view the type2 fields &| add questions
         return redirect("/exam/$exam_id/scene/{$scene->id}/edit");
     }
@@ -137,7 +144,8 @@ class SceneController extends Controller
      * @param $scene_id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function order(NewQuestionOrderRequest $request, $exam_id, $scene_id) {
+    public function order(NewQuestionOrderRequest $request, $exam_id, $scene_id)
+    {
 
         // todo: check id's
 
@@ -146,9 +154,9 @@ class SceneController extends Controller
             ->firstOrFail();
 
         $qlist = $request->get('questions');
-        if(!empty($qlist) && is_array($qlist)) {
-            foreach($qlist as $question_id => $order ) {
-                $question = $scene->questions->firstWhere('id', $question_id );
+        if (!empty($qlist) && is_array($qlist)) {
+            foreach ($qlist as $question_id => $order) {
+                $question = $scene->questions->firstWhere('id', $question_id);
                 if (!empty($question)) {
                     $question->order = $order;
                     $question->save();
@@ -160,34 +168,36 @@ class SceneController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified scene.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit( $exam_id, $scene_id) {
-        $scene = Scene::where('id', '=', $scene_id)
-            ->with('exam','questions')
+    public function edit($exam_id, $scene_id)
+    {
+        $scene = Scene::where('id', $scene_id)
+            ->with('exam', 'questions')
             ->firstOrFail();
-        $scene_types = SceneType::select('id','name')->pluck('name','id');
+        $scene_types = SceneType::select('id', 'name')->pluck('name', 'id');
         return View('scene.type' . $scene->scene_type_id . '.edit',
-            [   'sidebar' => (new Sidebar)->sbarSceneEdit($scene),
+            ['sidebar' => (new Sidebar)->sbarSceneEdit($scene),
                 'pagehead' => 'Edit Scene ' . $this->getSceneOrderOfTotal($exam_id, $scene_id),
                 'scene' => $scene,
                 'scene_types' => $scene_types,
             ]);
     }
-    
+
     /**
      * POST
      * Update the scene.
      *
-     * @param  NewSceneRequest  $request
-     * @param  int  $exam_id
-     * @param  int  $scene_id
+     * @param  NewSceneRequest $request
+     * @param  int $exam_id
+     * @param  int $scene_id
      * @return \Illuminate\Http\Response
      */
-    public function update( NewSceneRequest $request, $exam_id, $scene_id) {
+    public function update(NewSceneRequest $request, $exam_id, $scene_id)
+    {
         //dd($request);
         if (($exam_id != $request->get('exam_id')) || ($scene_id != $request->get('scene_id'))) {
             // todo
@@ -226,7 +236,8 @@ class SceneController extends Controller
      * @param array $data
      * @param NewSceneRequest $request
      */
-    private function handleUploadImage(Scene $scene, Array &$data, NewSceneRequest $request) {
+    private function handleUploadImage(Scene $scene, Array &$data, NewSceneRequest $request)
+    {
         if ($request->hasFile('newimage')) {
             $image = $request->file('newimage');
             if ($image->isValid()) {
@@ -246,12 +257,13 @@ class SceneController extends Controller
      * todo! Prevent deletion of scenes that are used in a test!
      * Offer to 'un-public' to stop usage from now.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($exam_id, $scene_id) {
+    public function destroy($exam_id, $scene_id)
+    {
         $scene = Scene::where('id', '=', $scene_id)
-            ->with('exam') //- todo: delete questions/answers too?
+            ->with('exam')//- todo: delete questions/answers too?
             ->firstOrFail();
         $scene->delete();
         $scene->exam->countScenes();
@@ -260,12 +272,13 @@ class SceneController extends Controller
 
     /**
      * Show the next question of this exam
-     * 
+     *
      * @param int $exam_id
      * @param int $scene_id
      * @return Response
      */
-    public function nextScene($exam_id, $scene_id) {
+    public function nextScene($exam_id, $scene_id)
+    {
         $nextScene = $this->getNextScene($exam_id, $scene_id);
         if (empty($nextScene)) {
             return redirect("/exam/$exam_id/scene");
@@ -281,7 +294,8 @@ class SceneController extends Controller
      * @param $scene_id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function editNextScene($exam_id, $scene_id) {
+    public function editNextScene($exam_id, $scene_id)
+    {
         $nextScene = $this->getNextScene($exam_id, $scene_id);
         if (empty($nextScene)) {
             return redirect("/exam/$exam_id/scene");
@@ -295,10 +309,11 @@ class SceneController extends Controller
      * @param $scene_id
      * @return mixed
      */
-    private function getNextScene($exam_id, $scene_id) {
+    private function getNextScene($exam_id, $scene_id)
+    {
         $nextScene = Scene::select('id')
             ->where('exam_id', '=', $exam_id)
-            ->where('id','>',$scene_id)
+            ->where('id', '>', $scene_id)
             ->orderBy('id')
             ->first();
         if (empty($nextScene)) {
@@ -312,18 +327,19 @@ class SceneController extends Controller
 
     /**
      * Get the Scene order index
+     * TODO: useless overhead! instead fill and use scenes.order, together with exams.scene_count
      *
      * @param $exam_id
      * @param $scene_id
      * @return string
      */
-    private function getSceneOrderOfTotal($exam_id, $scene_id) {
+    private function getSceneOrderOfTotal($exam_id, $scene_id)
+    {
         $scenes = Scene::select('id')
             ->where('exam_id', '=', $exam_id)
             ->orderBy('id')
             ->get();
         $idlist = array_flip($scenes->pluck('id')->all());
-        return sprintf("%d of %d", $idlist[$scene_id]+1, $scenes->count());
+        return sprintf("%d of %d", $idlist[$scene_id] + 1, $scenes->count());
     }
-
 }

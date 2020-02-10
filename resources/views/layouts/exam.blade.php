@@ -1,13 +1,6 @@
 {{-- layouts.exam
-    base template for exam lists and questions.
-    stacks: head, style, scripts
-    sections: toprow, sidebar, content
-    variables:
-        $sidebar[
-            ['type' => 'sbar-head','head','text'],
-            ['type' => 'sbar-link','head','text','href'],
-            ['type' => 'sbar-stat','todo'],
-        ]
+    Base template for all pages but welcome.
+    input: $sidebar
 --}}
 
 @extends('layouts.html')
@@ -20,26 +13,14 @@
     <div id="mainapp" class="container-fluid clearfix">
 
         <!-- toprow -->
-        @include('components.toprow',['align' => 'left'])
+        @include('layouts.toprow')
 
         <!-- sidebar -->
-        @include('components.sidebar',$sidebar)
+        @include('layouts.sidebar',$sidebar)
 
-        <!-- Page Content -->
+        <!-- page content -->
         <div id="content">
             @yield('content')
         </div>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-// activate sidebar click
-$(document).ready(function () {
-    $('.sidebar-arrow').on('click', function () {
-        $('#sidebar').toggleClass('active');
-        $('#content').toggleClass('active');
-    });
-});
-</script>
-@endpush

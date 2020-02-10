@@ -1,4 +1,4 @@
-{{-- QUESTIONS -- SORTABLE LIST
+{{-- SCENE QUESTIONS -- SORTABLE LIST
  --}}
 
 <div class="form-group row">
@@ -12,12 +12,12 @@
     <div class="col-lg-10">
         <div id="questions_list" class="card pt-2 pb-3 px-3">
             @foreach($scene->questions->sortBy('order') as $question)
-                <div class="dragable card px-2 py-0 mt-2 mb-0 mx-0 appcolor" id="{{$question->id}}">
+                <div class="draggable card px-2 py-0 mt-2 mb-0 mx-0 appcolor" id="{{$question->id}}">
                     <div class="row p-1">
                         <div class="col-8 pr-0 pt-1 text-left drag">
                         {{ $question->getLabel() }}
                         </div>
-                        <div class="col-4 pr-1">
+                        <div class="col-4 pr-2">
                             <form method="POST" action="/exam/{{ $scene->exam_id }}/scene/{{ $scene->id }}/question/{{ $question->id }}/destroy" accept-charset="UTF-8">
                                 @method('delete')
                                 @csrf
@@ -58,22 +58,10 @@
 
 @push('scripts')
 <script>
-    $(function() {
-        // activate sortable on question list
-        $('#questions_list').sortable({
-                cursor: "move",
-                scroll: false,
-                // stops page scolling if scrolled down:
-                create: function () {
-                    $(this).height($(this).height());
-                }
-            }
-        )
-    });
     function saveOrder() {
         var myForm = $("#questions_order");
         var order = 1;
-        $("#questions_list .dragable").each(function () {
+        $("#questions_list .draggable").each(function () {
                 var dom = document.createElement('input');
                 dom.type = 'hidden';
                 dom.name = 'questions[' + $(this).attr('id') + ']';
@@ -83,4 +71,17 @@
         return true;
     }
 </script>
+@endpush
+
+@push('ready')
+    // activate sortable on question list
+    $('#questions_list').sortable({
+                cursor: "move",
+                scroll: false,
+                // stops page scolling if scrolled down:
+                create: function () {
+                    $(this).height($(this).height());
+                }
+            }
+    )
 @endpush

@@ -20,7 +20,7 @@
 <div class="form-group row">
     <label for="question_type" class="col-md-2 pt-2 col-form-label @error('question_type_id')text-danger @enderror">
         <button type="button" class="btn btn-sm btn-info btooltip" data-toggle="tooltip" data-placement="left"  data-html="true"
-                title="Choose here for answers with:<br /> <b>1.</b> radio buttons.<br /> <b>2.</b> checkboxes.<br /> <b>3.</b> dragable answers in a sortable list.">
+                title="Choose here for answers with:<br /> <b>1.</b> radio buttons.<br /> <b>2.</b> checkboxes.<br /> <b>3.</b> draggable answers in a sortable list.">
             <i class="fa fa-info" aria-hidden="true"></i>
         </button>
         Question Type

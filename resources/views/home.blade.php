@@ -6,25 +6,6 @@
 
 @extends('layouts.exam')
 
-@push('style')
-
-@endpush
-
-{{-- background image test
-@push('style')
-#content {
-    background-image: url('/img/bgbird.jpg');
-    background-picture: center;
-    background-repeat: no-repeat;
-    background-position: top;
-    background-attachment: fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: cover;
-}
-@endpush
---}}
 @section('content')
 <div class="container">
     <div class="row justify-content-left">
